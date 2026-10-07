@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgendaRouteImport } from './routes/agenda'
+import { Route as AgendarRouteImport } from './routes/agendar'
+import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as LembretesRouteImport } from './routes/lembretes'
+import { Route as LocaisRouteImport } from './routes/locais'
+import { Route as OrcamentosRouteImport } from './routes/orcamentos'
+import { Route as OrdensRouteImport } from './routes/ordens'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgendaRoute = AgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgendarRoute = AgendarRouteImport.update({
+  id: '/agendar',
+  path: '/agendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LembretesRoute = LembretesRouteImport.update({
+  id: '/lembretes',
+  path: '/lembretes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocaisRoute = LocaisRouteImport.update({
+  id: '/locais',
+  path: '/locais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrcamentosRoute = OrcamentosRouteImport.update({
+  id: '/orcamentos',
+  path: '/orcamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdensRoute = OrdensRouteImport.update({
+  id: '/ordens',
+  path: '/ordens',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/agendar': typeof AgendarRoute
+  '/clientes': typeof ClientesRoute
+  '/equipe': typeof EquipeRoute
+  '/lembretes': typeof LembretesRoute
+  '/locais': typeof LocaisRoute
+  '/orcamentos': typeof OrcamentosRoute
+  '/ordens': typeof OrdensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/agendar': typeof AgendarRoute
+  '/clientes': typeof ClientesRoute
+  '/equipe': typeof EquipeRoute
+  '/lembretes': typeof LembretesRoute
+  '/locais': typeof LocaisRoute
+  '/orcamentos': typeof OrcamentosRoute
+  '/ordens': typeof OrdensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agenda': typeof AgendaRoute
+  '/agendar': typeof AgendarRoute
+  '/clientes': typeof ClientesRoute
+  '/equipe': typeof EquipeRoute
+  '/lembretes': typeof LembretesRoute
+  '/locais': typeof LocaisRoute
+  '/orcamentos': typeof OrcamentosRoute
+  '/ordens': typeof OrdensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/agenda'
+    | '/agendar'
+    | '/clientes'
+    | '/equipe'
+    | '/lembretes'
+    | '/locais'
+    | '/orcamentos'
+    | '/ordens'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/agenda'
+    | '/agendar'
+    | '/clientes'
+    | '/equipe'
+    | '/lembretes'
+    | '/locais'
+    | '/orcamentos'
+    | '/ordens'
+  id:
+    | '__root__'
+    | '/'
+    | '/agenda'
+    | '/agendar'
+    | '/clientes'
+    | '/equipe'
+    | '/lembretes'
+    | '/locais'
+    | '/orcamentos'
+    | '/ordens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgendaRoute: typeof AgendaRoute
+  AgendarRoute: typeof AgendarRoute
+  ClientesRoute: typeof ClientesRoute
+  EquipeRoute: typeof EquipeRoute
+  LembretesRoute: typeof LembretesRoute
+  LocaisRoute: typeof LocaisRoute
+  OrcamentosRoute: typeof OrcamentosRoute
+  OrdensRoute: typeof OrdensRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agenda': {
+      id: '/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agendar': {
+      id: '/agendar'
+      path: '/agendar'
+      fullPath: '/agendar'
+      preLoaderRoute: typeof AgendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe': {
+      id: '/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lembretes': {
+      id: '/lembretes'
+      path: '/lembretes'
+      fullPath: '/lembretes'
+      preLoaderRoute: typeof LembretesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locais': {
+      id: '/locais'
+      path: '/locais'
+      fullPath: '/locais'
+      preLoaderRoute: typeof LocaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orcamentos': {
+      id: '/orcamentos'
+      path: '/orcamentos'
+      fullPath: '/orcamentos'
+      preLoaderRoute: typeof OrcamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ordens': {
+      id: '/ordens'
+      path: '/ordens'
+      fullPath: '/ordens'
+      preLoaderRoute: typeof OrdensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgendaRoute: AgendaRoute,
+  AgendarRoute: AgendarRoute,
+  ClientesRoute: ClientesRoute,
+  EquipeRoute: EquipeRoute,
+  LembretesRoute: LembretesRoute,
+  LocaisRoute: LocaisRoute,
+  OrcamentosRoute: OrcamentosRoute,
+  OrdensRoute: OrdensRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
