@@ -116,3 +116,34 @@
     color-scheme: dark;
   }
 }
+
+@keyframes step-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes check-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: none; }
+}
+@utility animate-step { animation: step-in 200ms ease-out both; }
+@utility animate-pop { animation: pop-in 300ms ease-out both; }
+@utility check-path {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: check-draw 450ms 200ms ease-out forwards;
+}
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+:root {
+  --gradient-top: radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in oklab, #2563EB 14%, transparent), transparent 70%);
+  --gradient-cta: linear-gradient(180deg, #3B76F0, #2563EB);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-step, .animate-pop, .check-path { animation: none; stroke-dashoffset: 0; }
+}
