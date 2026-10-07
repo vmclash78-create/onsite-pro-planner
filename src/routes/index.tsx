@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
-import { indicadores, agendaHoje, orcamentosPendentes, servicosPorCategoria, type StatusAgenda } from "@/lib/sample-data";
+import { indicadores, agendaHoje, orcamentosPendentes, servicosPorCategoria, manutencoesVencidas, type StatusAgenda } from "@/lib/sample-data";
 import { brl, dataBR, horaBR } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
@@ -43,8 +43,8 @@ function Dashboard() {
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <section className="rounded-lg border bg-card">
           <div className="flex items-baseline justify-between border-b px-4 py-3">
-            <h2 className="text-sm font-semibold">Agenda de hoje</h2>
-            <span className="text-xs tabular-nums text-muted-foreground">{dataBR(new Date())}</span>
+            <h2 className="text-sm font-semibold">Agenda de hoje <span className="ml-1 font-normal tabular-nums text-muted-foreground">{dataBR(new Date())}</span></h2>
+            <Link to="/agenda" className="text-xs text-primary hover:underline">Ver semana</Link>
           </div>
           <ul className="divide-y">
             {agendaHoje.map((a) => (
@@ -69,8 +69,8 @@ function Dashboard() {
         <div className="flex flex-col gap-5">
           <section className="rounded-lg border bg-card">
             <div className="flex items-baseline justify-between border-b px-4 py-3">
-              <h2 className="text-sm font-semibold">Orçamentos aguardando resposta</h2>
-              <span className="text-xs tabular-nums text-muted-foreground">{orcamentosPendentes.length}</span>
+              <h2 className="text-sm font-semibold">Orçamentos aguardando</h2>
+              <Link to="/orcamentos" className="text-xs text-primary hover:underline">Ver todos</Link>
             </div>
             <ul className="divide-y">
               {orcamentosPendentes.map((o) => (
@@ -88,7 +88,7 @@ function Dashboard() {
 
           <section className="rounded-lg border bg-card p-4">
             <div className="flex items-baseline justify-between">
-              <h2 className="text-sm font-semibold">Serviços por categoria no mês</h2>
+              <h2 className="text-sm font-semibold">Serviços no mês</h2>
               <span className="text-xs tabular-nums text-muted-foreground">{totalMes} no total</span>
             </div>
             <div className="mt-4 space-y-3">
@@ -104,6 +104,27 @@ function Dashboard() {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="rounded-lg border bg-card">
+            <div className="flex items-baseline justify-between border-b px-4 py-3">
+              <h2 className="text-sm font-semibold">Manutenção vencida</h2>
+              <Link to="/lembretes" className="text-xs text-primary hover:underline">Ver lembretes</Link>
+            </div>
+            <ul className="divide-y">
+              {manutencoesVencidas.map((m) => {
+                const dias = Math.round((Date.now() - new Date(m.vencida).getTime()) / 864e5);
+                return (
+                  <li key={m.id} className="flex items-baseline justify-between gap-3 px-4 py-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{m.cliente}</div>
+                      <div className="truncate text-xs text-muted-foreground">{m.aparelho} · {m.bairro}</div>
+                    </div>
+                    <span className="shrink-0 text-xs tabular-nums text-destructive">{dias} dias</span>
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         </div>
       </div>

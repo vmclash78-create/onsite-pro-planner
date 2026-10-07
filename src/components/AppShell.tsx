@@ -8,9 +8,9 @@ import { company } from "@/lib/company";
 export const navItems = [
   { to: "/", label: "Início", icon: LayoutDashboard },
   { to: "/agenda", label: "Agenda", icon: CalendarDays },
-  { to: "/ordens", label: "Ordens de serviço", icon: Wrench },
-  { to: "/orcamentos", label: "Orçamentos", icon: FileText },
   { to: "/clientes", label: "Clientes", icon: Users },
+  { to: "/orcamentos", label: "Orçamentos", icon: FileText },
+  { to: "/ordens", label: "Ordens de serviço", icon: Wrench },
   { to: "/locais", label: "Locais", icon: MapPin },
   { to: "/equipe", label: "Equipe", icon: HardHat },
   { to: "/lembretes", label: "Lembretes", icon: BellRing },
@@ -27,8 +27,8 @@ function Brand() {
         VM
       </div>
       <div className="min-w-0 leading-tight">
-        <div className="truncate text-sm font-semibold text-sidebar-accent-foreground">VM Climatização</div>
-        <div className="truncate text-xs text-muted-foreground">& Acabamentos</div>
+        <div className="truncate text-sm font-semibold text-sidebar-accent-foreground">VM Climatização & Acabamentos</div>
+        <div className="truncate text-xs text-muted-foreground">Hidrolândia/CE</div>
       </div>
     </div>
   );
