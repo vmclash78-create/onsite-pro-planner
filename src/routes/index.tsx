@@ -30,9 +30,9 @@ function Dashboard() {
   const totalMes = servicosPorCategoria.reduce((a, s) => a + s.total, 0);
   return (
     <AppShell title="Início" breadcrumb={["Painel", "Início"]} actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
-      <div className="grid grid-cols-2 divide-border overflow-hidden rounded-lg border bg-card lg:grid-cols-4 lg:divide-x">
+      <div className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card lg:grid-cols-4">
         {indicadores.map((k, i) => (
-          <div key={k.rotulo} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r lg:border-r-0" : ""}`}>
+          <div key={k.rotulo} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 3 ? "lg:border-r-0" : ""}`}>
             <div className="text-xs text-muted-foreground">{k.rotulo}</div>
             <div className="mt-1 text-2xl font-semibold tabular-nums">{k.valor}</div>
             <div className={`mt-1 text-xs ${tomCor[k.tom]}`}>{k.variacao}</div>
