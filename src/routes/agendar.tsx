@@ -75,7 +75,7 @@ function Agendar() {
             <div className="text-sm">
               <div className="font-medium">{company.addressDisplay}</div>
               <div className="mt-1 text-muted-foreground">
-                Atendemos {company.serviceAreas.join(" e ")}.
+                Atendemos {company.serviceAreaSentence}.
               </div>
             </div>
           </div>

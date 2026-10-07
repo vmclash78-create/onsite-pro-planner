@@ -9,4 +9,6 @@ export const company = {
   state: "CE",
   addressDisplay: "Rua Aniceta Ferreira — Hidrolândia/CE",
   serviceAreas: ["Hidrolândia e região", "Fortaleza e região"],
+  serviceAreaSentence: "Hidrolândia e região, além de Fortaleza e região",
+
 } as const;
