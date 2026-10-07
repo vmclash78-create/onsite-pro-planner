@@ -28,7 +28,7 @@ export function Panel({ title, action, children }: { title?: ReactNode; action?:
 }
 
 export function FormPanel({ title, onClose, onSubmit, saving, error, children }: {
-  title: string; onClose: () => void; onSubmit: () => void; saving?: boolean; error?: string | null; children: ReactNode;
+  title: string; onClose: () => void; onSubmit: () => void; saving?: boolean; error?: string | null | undefined; children: ReactNode;
 }) {
   return (
     <form
