@@ -3,6 +3,8 @@ import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, Menu, X, ExternalLink, Snowflake,
 } from "lucide-react";
+import { company } from "@/lib/company";
+
 
 export const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -65,10 +67,26 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col gap-6 bg-sidebar p-4 text-sidebar-foreground lg:flex">
         <Brand />
         <NavList />
-        <div className="mt-auto rounded-md bg-sidebar-accent p-3 text-xs">
-          <div className="font-medium text-sidebar-accent-foreground">Felipe F.</div>
-          <div className="text-sidebar-foreground/60">Administrador</div>
+        <div className="mt-auto space-y-3">
+          <div className="rounded-md bg-sidebar-accent p-3 text-xs">
+            <div className="font-medium text-sidebar-accent-foreground">Felipe F.</div>
+            <div className="text-sidebar-foreground/60">Administrador</div>
+          </div>
+          <div className="px-1 text-xs leading-relaxed text-sidebar-foreground/85">
+            <a
+              href={company.whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="block font-medium text-sidebar-foreground underline-offset-2 hover:underline"
+            >
+              {company.phoneDisplay}
+            </a>
+            <div className="mt-0.5">{company.addressDisplay}</div>
+            <div className="mt-1">Atende {company.serviceAreaSentence}</div>
+          </div>
+
         </div>
+
       </aside>
 
       {open && (
@@ -80,6 +98,20 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               <button aria-label="Fechar menu" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
             </div>
             <NavList onNavigate={() => setOpen(false)} />
+            <div className="mt-auto border-t border-sidebar-border pt-3 text-xs leading-relaxed text-sidebar-foreground/85">
+              <a
+                href={company.whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="block font-medium text-sidebar-foreground underline-offset-2 hover:underline"
+              >
+                {company.phoneDisplay}
+              </a>
+              <div className="mt-0.5">{company.addressDisplay}</div>
+              <div className="mt-1">Atende {company.serviceAreaSentence}</div>
+            </div>
+
+
           </aside>
         </div>
       )}
