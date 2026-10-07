@@ -1,111 +1,111 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, FileClock, Loader, CheckCircle2, AlertTriangle, Plus } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
-import { resumo, proximosServicos, manutencoesVencidas, type Categoria } from "@/lib/sample-data";
+import { createFileRoute } from "@tanstack/react-router";
+import { AppShell, PrimaryButton } from "@/components/AppShell";
+import { indicadores, agendaHoje, orcamentosPendentes, servicosPorCategoria, type StatusAgenda } from "@/lib/sample-data";
 import { brl, dataBR, horaBR } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — VM Climatização & Acabamentos" },
-      { name: "description", content: "Visão geral de agendamentos, orçamentos e ordens de serviço." },
-      { property: "og:title", content: "Dashboard — VM Climatização & Acabamentos" },
-      { property: "og:description", content: "Visão geral de agendamentos, orçamentos e ordens de serviço." },
+      { title: "Início — VM Climatização & Acabamentos" },
+      { name: "description", content: "Agenda do dia, orçamentos pendentes e ordens de serviço da VM Climatização & Acabamentos." },
+      { property: "og:title", content: "Início — VM Climatização & Acabamentos" },
+      { property: "og:description", content: "Agenda do dia, orçamentos pendentes e ordens de serviço." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,
 });
 
-const catCor: Record<Categoria, string> = {
-  "Refrigeração": "bg-accent text-accent-foreground",
-  "Gesso": "bg-secondary text-secondary-foreground",
-  "Elétrica": "bg-warning/20 text-foreground",
+const statusCor: Record<StatusAgenda, string> = {
+  Agendada: "text-muted-foreground",
+  "Em andamento": "text-primary",
+  Concluída: "text-success",
+  Atrasada: "text-destructive",
 };
-
-const statusCor = {
-  "Agendada": "text-primary",
-  "Pendente": "text-warning",
-  "Em andamento": "text-success",
-} as const;
+const tomCor = { up: "text-success", warn: "text-warning", flat: "text-muted-foreground" };
 
 function Dashboard() {
-  const cards = [
-    { label: "Agendamentos hoje", valor: resumo.agendamentosHoje, icon: CalendarCheck, to: "/agenda" },
-    { label: "Orçamentos pendentes", valor: resumo.orcamentosPendentes, icon: FileClock, to: "/orcamentos" },
-    { label: "Ordens em andamento", valor: resumo.ordensAndamento, icon: Loader, to: "/ordens" },
-    { label: "Concluídas no mês", valor: resumo.concluidasMes, icon: CheckCircle2, to: "/ordens" },
-  ] as const;
-
+  const max = Math.max(...servicosPorCategoria.map((s) => s.total));
+  const totalMes = servicosPorCategoria.reduce((a, s) => a + s.total, 0);
   return (
-    <AppShell
-      title="Dashboard"
-      actions={
-        <Link to="/agenda" className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Novo agendamento</span>
-        </Link>
-      }
-    >
-      <p className="mb-5 text-sm text-muted-foreground">
-        {dataBR(new Date())} · Faturamento no mês: <span className="font-medium text-foreground">{brl(resumo.faturamentoMes)}</span>
-      </p>
-
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        {cards.map(({ label, valor, icon: Icon, to }) => (
-          <Link key={label} to={to} className="rounded-xl border bg-card p-4 transition-shadow hover:shadow-md">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span className="text-xs sm:text-sm">{label}</span>
-              <Icon className="h-4 w-4 text-primary" />
-            </div>
-            <div className="mt-2 text-3xl font-semibold">{valor}</div>
-          </Link>
+    <AppShell title="Início" breadcrumb={["Painel", "Início"]} actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
+      <div className="grid grid-cols-2 divide-border overflow-hidden rounded-lg border bg-card lg:grid-cols-4 lg:divide-x">
+        {indicadores.map((k, i) => (
+          <div key={k.rotulo} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r lg:border-r-0" : ""}`}>
+            <div className="text-xs text-muted-foreground">{k.rotulo}</div>
+            <div className="mt-1 text-2xl font-semibold tabular-nums">{k.valor}</div>
+            <div className={`mt-1 text-xs ${tomCor[k.tom]}`}>{k.variacao}</div>
+          </div>
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <section className="rounded-xl border bg-card lg:col-span-2">
-          <div className="flex items-center justify-between border-b p-4">
-            <h2 className="font-semibold">Próximos serviços</h2>
-            <Link to="/agenda" className="text-sm text-primary hover:underline">Ver agenda</Link>
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+        <section className="rounded-lg border bg-card">
+          <div className="flex items-baseline justify-between border-b px-4 py-3">
+            <h2 className="text-sm font-semibold">Agenda de hoje</h2>
+            <span className="text-xs tabular-nums text-muted-foreground">{dataBR(new Date())}</span>
           </div>
           <ul className="divide-y">
-            {proximosServicos.map((s) => (
-              <li key={s.id} className="flex items-center gap-4 p-4">
-                <div className="w-14 shrink-0 text-center">
-                  <div className="text-sm font-semibold">{horaBR(s.inicio)}</div>
-                  <div className="text-xs text-muted-foreground">{dataBR(s.inicio).slice(0, 5)}</div>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium">{s.cliente}</div>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span className={`rounded px-1.5 py-0.5 font-medium ${catCor[s.categoria]}`}>{s.categoria}</span>
-                    <span>{s.tipo}</span>·<span>{s.bairro}</span>·<span>{s.tecnico}</span>
+            {agendaHoje.map((a) => (
+              <li key={a.id} className="grid grid-cols-[3.25rem_minmax(0,1fr)_auto] gap-3 px-4 py-3">
+                <div className="pt-0.5 text-sm font-medium tabular-nums">{horaBR(a.hora)}</div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{a.cliente}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {a.categoria} · {a.tipo}
                   </div>
+                  <div className="truncate text-xs text-muted-foreground">{a.endereco} · {a.tecnico}</div>
                 </div>
-                <span className={`hidden text-xs font-medium sm:inline ${statusCor[s.status]}`}>{s.status}</span>
+                <div className={`flex items-center gap-1.5 text-xs ${statusCor[a.status]}`}>
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                  {a.status}
+                </div>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="rounded-xl border bg-card">
-          <div className="flex items-center gap-2 border-b p-4">
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-            <h2 className="font-semibold">Manutenções vencidas</h2>
-          </div>
-          <ul className="divide-y">
-            {manutencoesVencidas.map((m) => (
-              <li key={m.id} className="p-4">
-                <div className="font-medium">{m.aparelho}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  {m.cliente} · venceu em <span className="text-destructive">{dataBR(m.vencida)}</span>
+        <div className="flex flex-col gap-5">
+          <section className="rounded-lg border bg-card">
+            <div className="flex items-baseline justify-between border-b px-4 py-3">
+              <h2 className="text-sm font-semibold">Orçamentos aguardando resposta</h2>
+              <span className="text-xs tabular-nums text-muted-foreground">{orcamentosPendentes.length}</span>
+            </div>
+            <ul className="divide-y">
+              {orcamentosPendentes.map((o) => (
+                <li key={o.id} className="px-4 py-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="truncate text-sm font-medium">{o.cliente}</span>
+                    <span className="shrink-0 text-sm tabular-nums">{brl(o.valor)}</span>
+                  </div>
+                  <div className="truncate text-xs text-muted-foreground">{o.servico}</div>
+                  <div className="text-xs tabular-nums text-muted-foreground">{o.id} · enviado em {dataBR(o.enviado)}</div>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="rounded-lg border bg-card p-4">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-sm font-semibold">Serviços por categoria no mês</h2>
+              <span className="text-xs tabular-nums text-muted-foreground">{totalMes} no total</span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {servicosPorCategoria.map((s) => (
+                <div key={s.categoria}>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{s.categoria}</span>
+                    <span className="tabular-nums">{s.total}</span>
+                  </div>
+                  <div className="mt-1 h-2 rounded-sm bg-muted">
+                    <div className="h-2 rounded-sm bg-chart-1" style={{ width: `${(s.total / max) * 100}%` }} />
+                  </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-          <div className="border-t p-3 text-center">
-            <Link to="/lembretes" className="text-sm text-primary hover:underline">Ver todos os lembretes</Link>
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        </div>
       </div>
     </AppShell>
   );
