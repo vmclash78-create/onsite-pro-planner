@@ -3,6 +3,8 @@ import { useState, type ReactNode } from "react";
 import {
   LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, Menu, X, ExternalLink, Snowflake,
 } from "lucide-react";
+import { company } from "@/lib/company";
+
 
 export const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -88,6 +90,12 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               <button aria-label="Fechar menu" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
             </div>
             <NavList onNavigate={() => setOpen(false)} />
+            <div className="mt-auto border-t border-sidebar-border pt-3 text-xs text-sidebar-foreground/60">
+              <div className="text-sidebar-foreground/80">{company.phoneDisplay}</div>
+              <div>{company.addressDisplay}</div>
+              <div className="mt-1">Atende {company.serviceAreas.join(" e ")}</div>
+            </div>
+
           </aside>
         </div>
       )}
