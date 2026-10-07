@@ -14,16 +14,381 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          categoria: string
+          cep: string | null
+          client_id: string | null
+          created_at: string
+          data: string | null
+          descricao: string | null
+          endereco: string | null
+          fotos: string[]
+          hora: string | null
+          ia_analisado_em: string | null
+          ia_justificativa: string | null
+          ia_proximos_passos: Json | null
+          ia_tipo: string | null
+          ia_urgencia: string | null
+          id: string
+          location_id: string | null
+          nome_contato: string
+          origem: string
+          status: string
+          tecnico_id: string | null
+          tipo: string
+          visita_orcamento: boolean
+          whatsapp: string
+        }
+        Insert: {
+          categoria: string
+          cep?: string | null
+          client_id?: string | null
+          created_at?: string
+          data?: string | null
+          descricao?: string | null
+          endereco?: string | null
+          fotos?: string[]
+          hora?: string | null
+          ia_analisado_em?: string | null
+          ia_justificativa?: string | null
+          ia_proximos_passos?: Json | null
+          ia_tipo?: string | null
+          ia_urgencia?: string | null
+          id?: string
+          location_id?: string | null
+          nome_contato: string
+          origem?: string
+          status?: string
+          tecnico_id?: string | null
+          tipo: string
+          visita_orcamento?: boolean
+          whatsapp: string
+        }
+        Update: {
+          categoria?: string
+          cep?: string | null
+          client_id?: string | null
+          created_at?: string
+          data?: string | null
+          descricao?: string | null
+          endereco?: string | null
+          fotos?: string[]
+          hora?: string | null
+          ia_analisado_em?: string | null
+          ia_justificativa?: string | null
+          ia_proximos_passos?: Json | null
+          ia_tipo?: string | null
+          ia_urgencia?: string | null
+          id?: string
+          location_id?: string | null
+          nome_contato?: string
+          origem?: string
+          status?: string
+          tecnico_id?: string | null
+          tipo?: string
+          visita_orcamento?: boolean
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_tecnico_id_fkey"
+            columns: ["tecnico_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          created_at: string
+          documento: string | null
+          email: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          documento?: string | null
+          email?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      equipment: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          intervalo_meses: number
+          location_id: string
+          ultima_manutencao: string | null
+        }
+        Insert: {
+          created_at?: string
+          descricao: string
+          id?: string
+          intervalo_meses?: number
+          location_id: string
+          ultima_manutencao?: string | null
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          intervalo_meses?: number
+          location_id?: string
+          ultima_manutencao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          apelido: string
+          bairro: string | null
+          cep: string | null
+          cidade: string
+          client_id: string
+          created_at: string
+          endereco: string
+          id: string
+        }
+        Insert: {
+          apelido?: string
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string
+          client_id: string
+          created_at?: string
+          endereco: string
+          id?: string
+        }
+        Update: {
+          apelido?: string
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string
+          client_id?: string
+          created_at?: string
+          endereco?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "locations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          especialidade: string | null
+          id: string
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          especialidade?: string | null
+          id: string
+          nome?: string
+          telefone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          especialidade?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          client_id: string
+          created_at: string
+          descricao: string
+          enviado_em: string | null
+          id: string
+          numero: number
+          status: string
+          valor: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          descricao: string
+          enviado_em?: string | null
+          id?: string
+          numero?: number
+          status?: string
+          valor?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          descricao?: string
+          enviado_em?: string | null
+          id?: string
+          numero?: number
+          status?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_orders: {
+        Row: {
+          appointment_id: string | null
+          categoria: string
+          client_id: string
+          concluida_em: string | null
+          created_at: string
+          descricao: string
+          id: string
+          inicio: string | null
+          numero: number
+          status: string
+          tecnico_id: string | null
+          valor: number | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          categoria: string
+          client_id: string
+          concluida_em?: string | null
+          created_at?: string
+          descricao: string
+          id?: string
+          inicio?: string | null
+          numero?: number
+          status?: string
+          tecnico_id?: string | null
+          valor?: number | null
+        }
+        Update: {
+          appointment_id?: string | null
+          categoria?: string
+          client_id?: string
+          concluida_em?: string | null
+          created_at?: string
+          descricao?: string
+          id?: string
+          inicio?: string | null
+          numero?: number
+          status?: string
+          tecnico_id?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_orders_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_tecnico_id_fkey"
+            columns: ["tecnico_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "tecnico"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +515,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "tecnico"],
+    },
   },
 } as const
