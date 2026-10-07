@@ -26,3 +26,4 @@ export const TIPOS: Record<string, string[]> = {
   Gesso: ["Forro", "Parede", "Sanca", "Reparo"],
   Elétrica: ["Ponto novo", "Quadro", "Instalação", "Reparo"],
 };
+export const STATUS_AG = ["Pendente", "Agendada", "Em andamento", "Concluída", "Cancelada"];

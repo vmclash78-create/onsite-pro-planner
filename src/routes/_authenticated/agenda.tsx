@@ -7,7 +7,7 @@ import { Field, FormPanel, Panel, StateRow, StatusSelect, inputCls } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { addDias, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
-import { CATEGORIAS, TIPOS } from "@/lib/staff";
+import { CATEGORIAS, STATUS_AG, TIPOS } from "@/lib/staff";
 import { useClientes, useTecnicos } from "./-shared";
 
 export const Route = createFileRoute("/_authenticated/agenda")({
@@ -15,7 +15,6 @@ export const Route = createFileRoute("/_authenticated/agenda")({
   component: Agenda,
 });
 
-export const STATUS_AG = ["Pendente", "Agendada", "Em andamento", "Concluída", "Cancelada"];
 
 function segunda(iso: string) {
   const d = new Date(`${iso}T12:00:00`);

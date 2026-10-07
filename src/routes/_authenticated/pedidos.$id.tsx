@@ -9,8 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { analisarPedido } from "@/lib/pedidos.functions";
 import { dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
-import { useMe } from "@/lib/staff";
-import { STATUS_AG } from "./agenda";
+import { STATUS_AG, useMe } from "@/lib/staff";
 
 export const Route = createFileRoute("/_authenticated/pedidos/$id")({
   head: pageHead("Pedido", "Detalhes do pedido de serviço, fotos e análise com IA."),
