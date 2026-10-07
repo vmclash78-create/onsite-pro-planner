@@ -91,7 +91,7 @@ export async function buscarCep(cep: string): Promise<{ rua: string; bairro: str
 }
 
 export type PedidoAgendamento = {
-  categoria: string; tipo: string; visitaOrcamento: boolean; data?: string; hora?: string;
+  categoria: string; tipo: string; visitaOrcamento: boolean; data?: string | undefined; hora?: string | undefined;
   nome: string; whatsapp: string; endereco: string; descricao: string; fotos: File[];
 };
 

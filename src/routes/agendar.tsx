@@ -41,7 +41,7 @@ function Agendar() {
   const [visita, setVisita] = useState(false);
   const [dados, setDados] = useState<Dados>({ nome: "", whats: "", cep: "", rua: "", numero: "", bairro: "", descricao: "", lgpd: false });
   const [fotos, setFotos] = useState<File[]>([]);
-  const [erros, setErros] = useState<Partial<Record<keyof Dados, string>>>({});
+  const [erros, setErros] = useState<Partial<Record<keyof Dados, string | undefined>>>({});
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState<string | null>(null);
   const [protocolo, setProtocolo] = useState<string | null>(null);
@@ -360,8 +360,8 @@ function Campo({ label, value, onChange, erro, type = "text", inputMode, autoCom
 }
 
 function PassoDados({ dados, setDados, erros, setErros, fotos, setFotos }: {
-  dados: Dados; setDados: (f: (d: Dados) => Dados) => void; erros: Partial<Record<keyof Dados, string>>;
-  setErros: (f: (e: Partial<Record<keyof Dados, string>>) => Partial<Record<keyof Dados, string>>) => void;
+  dados: Dados; setDados: (f: (d: Dados) => Dados) => void; erros: Partial<Record<keyof Dados, string | undefined>>;
+  setErros: (f: (e: Partial<Record<keyof Dados, string | undefined>>) => Partial<Record<keyof Dados, string | undefined>>) => void;
   fotos: File[]; setFotos: (f: File[]) => void;
 }) {
   const [cepEstado, setCepEstado] = useState<"idle" | "carregando" | "ok" | "nao" | "erro">("idle");
