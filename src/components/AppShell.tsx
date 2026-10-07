@@ -65,10 +65,18 @@ export function AppShell({ title, actions, children }: { title: string; actions?
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col gap-6 bg-sidebar p-4 text-sidebar-foreground lg:flex">
         <Brand />
         <NavList />
-        <div className="mt-auto rounded-md bg-sidebar-accent p-3 text-xs">
-          <div className="font-medium text-sidebar-accent-foreground">Felipe F.</div>
-          <div className="text-sidebar-foreground/60">Administrador</div>
+        <div className="mt-auto space-y-3">
+          <div className="rounded-md bg-sidebar-accent p-3 text-xs">
+            <div className="font-medium text-sidebar-accent-foreground">Felipe F.</div>
+            <div className="text-sidebar-foreground/60">Administrador</div>
+          </div>
+          <div className="px-1 text-xs text-sidebar-foreground/60">
+            <div className="text-sidebar-foreground/80">{company.phoneDisplay}</div>
+            <div>{company.addressDisplay}</div>
+            <div className="mt-1">Atende {company.serviceAreas.join(" e ")}</div>
+          </div>
         </div>
+
       </aside>
 
       {open && (
