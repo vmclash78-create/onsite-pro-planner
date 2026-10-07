@@ -10,25 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AgendaRouteImport } from './routes/agenda'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AgendarRouteImport } from './routes/agendar'
-import { Route as ClientesRouteImport } from './routes/clientes'
-import { Route as EquipeRouteImport } from './routes/equipe'
-import { Route as LembretesRouteImport } from './routes/lembretes'
-import { Route as LocaisRouteImport } from './routes/locais'
-import { Route as MaisRouteImport } from './routes/mais'
-import { Route as OrcamentosRouteImport } from './routes/orcamentos'
-import { Route as OrdensRouteImport } from './routes/ordens'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedEquipeRouteImport } from './routes/_authenticated/equipe'
+import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedLembretesRouteImport } from './routes/_authenticated/lembretes'
+import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated/locais'
+import { Route as AuthenticatedMaisRouteImport } from './routes/_authenticated/mais'
+import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
+import { Route as AuthenticatedOrdensRouteImport } from './routes/_authenticated/ordens'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AgendaRoute = AgendaRouteImport.update({
-  id: '/agenda',
-  path: '/agenda',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AgendarRoute = AgendarRouteImport.update({
@@ -36,39 +37,9 @@ const AgendarRoute = AgendarRouteImport.update({
   path: '/agendar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ClientesRoute = ClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EquipeRoute = EquipeRouteImport.update({
-  id: '/equipe',
-  path: '/equipe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LembretesRoute = LembretesRouteImport.update({
-  id: '/lembretes',
-  path: '/lembretes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LocaisRoute = LocaisRouteImport.update({
-  id: '/locais',
-  path: '/locais',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaisRoute = MaisRouteImport.update({
-  id: '/mais',
-  path: '/mais',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrcamentosRoute = OrcamentosRouteImport.update({
-  id: '/orcamentos',
-  path: '/orcamentos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdensRoute = OrdensRouteImport.update({
-  id: '/ordens',
-  path: '/ordens',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -76,100 +47,142 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
   path: '/privacidade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEquipeRoute = AuthenticatedEquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLembretesRoute = AuthenticatedLembretesRouteImport.update({
+  id: '/lembretes',
+  path: '/lembretes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLocaisRoute = AuthenticatedLocaisRouteImport.update({
+  id: '/locais',
+  path: '/locais',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMaisRoute = AuthenticatedMaisRouteImport.update({
+  id: '/mais',
+  path: '/mais',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrcamentosRoute = AuthenticatedOrcamentosRouteImport.update({
+  id: '/orcamentos',
+  path: '/orcamentos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrdensRoute = AuthenticatedOrdensRouteImport.update({
+  id: '/ordens',
+  path: '/ordens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/agenda': typeof AgendaRoute
   '/agendar': typeof AgendarRoute
-  '/clientes': typeof ClientesRoute
-  '/equipe': typeof EquipeRoute
-  '/lembretes': typeof LembretesRoute
-  '/locais': typeof LocaisRoute
-  '/mais': typeof MaisRoute
-  '/orcamentos': typeof OrcamentosRoute
-  '/ordens': typeof OrdensRoute
+  '/auth': typeof AuthRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/equipe': typeof AuthenticatedEquipeRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/lembretes': typeof AuthenticatedLembretesRoute
+  '/locais': typeof AuthenticatedLocaisRoute
+  '/mais': typeof AuthenticatedMaisRoute
+  '/orcamentos': typeof AuthenticatedOrcamentosRoute
+  '/ordens': typeof AuthenticatedOrdensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/agenda': typeof AgendaRoute
   '/agendar': typeof AgendarRoute
-  '/clientes': typeof ClientesRoute
-  '/equipe': typeof EquipeRoute
-  '/lembretes': typeof LembretesRoute
-  '/locais': typeof LocaisRoute
-  '/mais': typeof MaisRoute
-  '/orcamentos': typeof OrcamentosRoute
-  '/ordens': typeof OrdensRoute
+  '/auth': typeof AuthRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/clientes': typeof AuthenticatedClientesRoute
+  '/equipe': typeof AuthenticatedEquipeRoute
+  '/inicio': typeof AuthenticatedInicioRoute
+  '/lembretes': typeof AuthenticatedLembretesRoute
+  '/locais': typeof AuthenticatedLocaisRoute
+  '/mais': typeof AuthenticatedMaisRoute
+  '/orcamentos': typeof AuthenticatedOrcamentosRoute
+  '/ordens': typeof AuthenticatedOrdensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/agenda': typeof AgendaRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agendar': typeof AgendarRoute
-  '/clientes': typeof ClientesRoute
-  '/equipe': typeof EquipeRoute
-  '/lembretes': typeof LembretesRoute
-  '/locais': typeof LocaisRoute
-  '/mais': typeof MaisRoute
-  '/orcamentos': typeof OrcamentosRoute
-  '/ordens': typeof OrdensRoute
+  '/auth': typeof AuthRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/equipe': typeof AuthenticatedEquipeRoute
+  '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/lembretes': typeof AuthenticatedLembretesRoute
+  '/_authenticated/locais': typeof AuthenticatedLocaisRoute
+  '/_authenticated/mais': typeof AuthenticatedMaisRoute
+  '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
+  '/_authenticated/ordens': typeof AuthenticatedOrdensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/agenda'
     | '/agendar'
+    | '/auth'
+    | '/privacidade'
     | '/clientes'
     | '/equipe'
+    | '/inicio'
     | '/lembretes'
     | '/locais'
     | '/mais'
     | '/orcamentos'
     | '/ordens'
-    | '/privacidade'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/agenda'
     | '/agendar'
+    | '/auth'
+    | '/privacidade'
     | '/clientes'
     | '/equipe'
+    | '/inicio'
     | '/lembretes'
     | '/locais'
     | '/mais'
     | '/orcamentos'
     | '/ordens'
-    | '/privacidade'
   id:
     | '__root__'
     | '/'
-    | '/agenda'
+    | '/_authenticated'
     | '/agendar'
-    | '/clientes'
-    | '/equipe'
-    | '/lembretes'
-    | '/locais'
-    | '/mais'
-    | '/orcamentos'
-    | '/ordens'
+    | '/auth'
     | '/privacidade'
+    | '/_authenticated/clientes'
+    | '/_authenticated/equipe'
+    | '/_authenticated/inicio'
+    | '/_authenticated/lembretes'
+    | '/_authenticated/locais'
+    | '/_authenticated/mais'
+    | '/_authenticated/orcamentos'
+    | '/_authenticated/ordens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AgendaRoute: typeof AgendaRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgendarRoute: typeof AgendarRoute
-  ClientesRoute: typeof ClientesRoute
-  EquipeRoute: typeof EquipeRoute
-  LembretesRoute: typeof LembretesRoute
-  LocaisRoute: typeof LocaisRoute
-  MaisRoute: typeof MaisRoute
-  OrcamentosRoute: typeof OrcamentosRoute
-  OrdensRoute: typeof OrdensRoute
+  AuthRoute: typeof AuthRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
 }
 
@@ -182,11 +195,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/agenda': {
-      id: '/agenda'
-      path: '/agenda'
-      fullPath: '/agenda'
-      preLoaderRoute: typeof AgendaRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/agendar': {
@@ -196,53 +209,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgendarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/clientes': {
-      id: '/clientes'
-      path: '/clientes'
-      fullPath: '/clientes'
-      preLoaderRoute: typeof ClientesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/equipe': {
-      id: '/equipe'
-      path: '/equipe'
-      fullPath: '/equipe'
-      preLoaderRoute: typeof EquipeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lembretes': {
-      id: '/lembretes'
-      path: '/lembretes'
-      fullPath: '/lembretes'
-      preLoaderRoute: typeof LembretesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/locais': {
-      id: '/locais'
-      path: '/locais'
-      fullPath: '/locais'
-      preLoaderRoute: typeof LocaisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mais': {
-      id: '/mais'
-      path: '/mais'
-      fullPath: '/mais'
-      preLoaderRoute: typeof MaisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orcamentos': {
-      id: '/orcamentos'
-      path: '/orcamentos'
-      fullPath: '/orcamentos'
-      preLoaderRoute: typeof OrcamentosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ordens': {
-      id: '/ordens'
-      path: '/ordens'
-      fullPath: '/ordens'
-      preLoaderRoute: typeof OrdensRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -252,20 +223,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacidadeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/clientes': {
+      id: '/_authenticated/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/equipe': {
+      id: '/_authenticated/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof AuthenticatedEquipeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inicio': {
+      id: '/_authenticated/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof AuthenticatedInicioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lembretes': {
+      id: '/_authenticated/lembretes'
+      path: '/lembretes'
+      fullPath: '/lembretes'
+      preLoaderRoute: typeof AuthenticatedLembretesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/locais': {
+      id: '/_authenticated/locais'
+      path: '/locais'
+      fullPath: '/locais'
+      preLoaderRoute: typeof AuthenticatedLocaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mais': {
+      id: '/_authenticated/mais'
+      path: '/mais'
+      fullPath: '/mais'
+      preLoaderRoute: typeof AuthenticatedMaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orcamentos': {
+      id: '/_authenticated/orcamentos'
+      path: '/orcamentos'
+      fullPath: '/orcamentos'
+      preLoaderRoute: typeof AuthenticatedOrcamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ordens': {
+      id: '/_authenticated/ordens'
+      path: '/ordens'
+      fullPath: '/ordens'
+      preLoaderRoute: typeof AuthenticatedOrdensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedEquipeRoute: typeof AuthenticatedEquipeRoute
+  AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedLembretesRoute: typeof AuthenticatedLembretesRoute
+  AuthenticatedLocaisRoute: typeof AuthenticatedLocaisRoute
+  AuthenticatedMaisRoute: typeof AuthenticatedMaisRoute
+  AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
+  AuthenticatedOrdensRoute: typeof AuthenticatedOrdensRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedEquipeRoute: AuthenticatedEquipeRoute,
+  AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedLembretesRoute: AuthenticatedLembretesRoute,
+  AuthenticatedLocaisRoute: AuthenticatedLocaisRoute,
+  AuthenticatedMaisRoute: AuthenticatedMaisRoute,
+  AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
+  AuthenticatedOrdensRoute: AuthenticatedOrdensRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AgendaRoute: AgendaRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgendarRoute: AgendarRoute,
-  ClientesRoute: ClientesRoute,
-  EquipeRoute: EquipeRoute,
-  LembretesRoute: LembretesRoute,
-  LocaisRoute: LocaisRoute,
-  MaisRoute: MaisRoute,
-  OrcamentosRoute: OrcamentosRoute,
-  OrdensRoute: OrdensRoute,
+  AuthRoute: AuthRoute,
   PrivacidadeRoute: PrivacidadeRoute,
 }
 export const routeTree = rootRouteImport
