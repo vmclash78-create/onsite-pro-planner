@@ -332,7 +332,7 @@ function PassoData({ dia, hora, visita, onDia, onHora, onVisita }: {
 }
 
 function Campo({ label, value, onChange, erro, type = "text", inputMode, autoComplete, onBlur, sufixo, multiline }: {
-  label: string; value: string; onChange: (v: string) => void; erro?: string; type?: string;
+  label: string; value: string; onChange: (v: string) => void; erro?: string | undefined; type?: string;
   inputMode?: "numeric" | "tel" | "text"; autoComplete?: string; onBlur?: () => void; sufixo?: ReactNode; multiline?: boolean;
 }) {
   const id = useId();
@@ -473,7 +473,7 @@ function Sucesso({ protocolo, servico, quando, endereco, dia, hora, visita }: {
 }) {
   const baixarIcs = () => {
     if (!dia || !hora) return;
-    const [h, m] = hora.split(":").map(Number);
+    const [h = 0, m = 0] = hora.split(":").map(Number);
     const ini = new Date(dia.date); ini.setHours(h, m);
     const fim = new Date(ini.getTime() + 2 * 3600e3);
     const f = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
