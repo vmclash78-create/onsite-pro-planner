@@ -24,8 +24,8 @@ function Brand() {
         <Snowflake className="h-5 w-5" />
       </div>
       <div className="leading-tight">
-        <div className="font-semibold">Climatech</div>
-        <div className="text-xs text-sidebar-foreground/60">Gestão de serviços</div>
+        <div className="font-semibold">VM Climatização</div>
+        <div className="text-xs text-sidebar-foreground/60">& Acabamentos</div>
       </div>
     </div>
   );

@@ -4,9 +4,9 @@ import { Snowflake } from "lucide-react";
 export const Route = createFileRoute("/agendar")({
   head: () => ({
     meta: [
-      { title: "Agende seu serviço — Climatech" },
+      { title: "Agende seu serviço — VM Climatização & Acabamentos" },
       { name: "description", content: "Agende refrigeração, gesso ou elétrica online." },
-      { property: "og:title", content: "Agende seu serviço — Climatech" },
+      { property: "og:title", content: "Agende seu serviço — VM Climatização & Acabamentos" },
       { property: "og:description", content: "Agende refrigeração, gesso ou elétrica online." },
     ],
   }),
@@ -22,7 +22,7 @@ function Agendar() {
             <Snowflake className="h-5 w-5" />
           </div>
           <div>
-            <div className="font-semibold">Climatech</div>
+            <div className="font-semibold">VM Climatização & Acabamentos</div>
             <div className="text-xs text-sidebar-foreground/60">Refrigeração · Gesso · Elétrica</div>
           </div>
         </div>

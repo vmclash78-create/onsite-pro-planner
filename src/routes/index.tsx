@@ -7,9 +7,9 @@ import { brl, dataBR, horaBR } from "@/lib/format";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Climatech" },
+      { title: "Dashboard — VM Climatização & Acabamentos" },
       { name: "description", content: "Visão geral de agendamentos, orçamentos e ordens de serviço." },
-      { property: "og:title", content: "Dashboard — Climatech" },
+      { property: "og:title", content: "Dashboard — VM Climatização & Acabamentos" },
       { property: "og:description", content: "Visão geral de agendamentos, orçamentos e ordens de serviço." },
     ],
   }),
