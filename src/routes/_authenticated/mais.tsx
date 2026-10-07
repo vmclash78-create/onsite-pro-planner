@@ -1,23 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, ExternalLink } from "lucide-react";
-import { AppShell, moreItems } from "@/components/AppShell";
+import { ChevronRight, ExternalLink, LogOut } from "lucide-react";
+import { AppShell, moreItems, useSignOut } from "@/components/AppShell";
 import { company } from "@/lib/company";
+import { pageHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/mais")({
-  head: () => ({
-    meta: [
-      { title: "Mais — VM Climatização & Acabamentos" },
-      { name: "description", content: "Acesso às demais áreas do painel: ordens, orçamentos, locais, equipe e lembretes." },
-      { property: "og:title", content: "Mais — VM Climatização & Acabamentos" },
-      { property: "og:description", content: "Acesso às demais áreas do painel." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+export const Route = createFileRoute("/_authenticated/mais")({
+  head: pageHead("Mais", "Acesso às demais áreas do painel."),
   component: Mais,
 });
 
 function Mais() {
+  const sair = useSignOut();
   return (
     <AppShell title="Mais">
       <div className="divide-y rounded-lg border bg-card">
@@ -28,6 +21,9 @@ function Mais() {
             <ChevronRight className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
           </Link>
         ))}
+        <button onClick={sair} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm text-destructive hover:bg-muted">
+          <LogOut className="h-4 w-4" strokeWidth={1.75} /> Sair
+        </button>
       </div>
       <div className="mt-5 text-xs leading-relaxed text-muted-foreground">
         <a href={company.whatsappUrl} className="tabular-nums text-foreground">{company.phoneDisplay}</a>

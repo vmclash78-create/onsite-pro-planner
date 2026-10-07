@@ -12,4 +12,8 @@
 ## Architecture
 - Internal panel pages use `AppShell` (src/components/AppShell.tsx) for sidebar/mobile nav; the public booking page (/agendar) renders without it — keeps public and staff UI separated.
 - Formatting of dates/currency goes through src/lib/format.ts (pt-BR) — single source for BR formats.
-- Dashboard currently uses sample data from src/lib/sample-data.ts until the backend is connected.
+- Staff panel routes live under src/routes/_authenticated/ (client-only auth gate); `/` redirects to `/inicio` — keeps every customer-data screen behind sign-in.
+- Panel screens read/write through the browser Supabase client with RLS (`is_staff`) — no per-screen server functions needed for CRUD.
+- Access is role-based via `user_roles` (admin/tecnico); the first account becomes admin, later accounts wait for an admin in Equipe — prevents open sign-up from exposing data.
+- Public booking writes only through server functions in src/lib/pedidos.functions.ts (signed upload URLs + validated insert); anon has no table access — keeps customer data private.
+- AI triage runs server-side in src/lib/triagem.server.ts (Lovable AI Gateway, Responses API, structured output) and is admin-only — keeps the key and prompts off the client.
