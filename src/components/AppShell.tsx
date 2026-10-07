@@ -72,11 +72,19 @@ export function AppShell({ title, actions, children }: { title: string; actions?
             <div className="font-medium text-sidebar-accent-foreground">Felipe F.</div>
             <div className="text-sidebar-foreground/60">Administrador</div>
           </div>
-          <div className="px-1 text-xs text-sidebar-foreground/60">
-            <div className="text-sidebar-foreground/80">{company.phoneDisplay}</div>
-            <div>{company.addressDisplay}</div>
-            <div className="mt-1">Atende {company.serviceAreas.join(" e ")}</div>
+          <div className="px-1 text-xs leading-relaxed text-sidebar-foreground/85">
+            <a
+              href={company.whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="block font-medium text-sidebar-foreground underline-offset-2 hover:underline"
+            >
+              {company.phoneDisplay}
+            </a>
+            <div className="mt-0.5">{company.addressDisplay}</div>
+            <div className="mt-1">Atende {company.serviceAreaSentence}</div>
           </div>
+
         </div>
 
       </aside>
@@ -90,11 +98,19 @@ export function AppShell({ title, actions, children }: { title: string; actions?
               <button aria-label="Fechar menu" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
             </div>
             <NavList onNavigate={() => setOpen(false)} />
-            <div className="mt-auto border-t border-sidebar-border pt-3 text-xs text-sidebar-foreground/60">
-              <div className="text-sidebar-foreground/80">{company.phoneDisplay}</div>
-              <div>{company.addressDisplay}</div>
-              <div className="mt-1">Atende {company.serviceAreas.join(" e ")}</div>
+            <div className="mt-auto border-t border-sidebar-border pt-3 text-xs leading-relaxed text-sidebar-foreground/85">
+              <a
+                href={company.whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="block font-medium text-sidebar-foreground underline-offset-2 hover:underline"
+              >
+                {company.phoneDisplay}
+              </a>
+              <div className="mt-0.5">{company.addressDisplay}</div>
+              <div className="mt-1">Atende {company.serviceAreaSentence}</div>
             </div>
+
 
           </aside>
         </div>
