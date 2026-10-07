@@ -16,6 +16,7 @@ import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as LembretesRouteImport } from './routes/lembretes'
 import { Route as LocaisRouteImport } from './routes/locais'
+import { Route as MaisRouteImport } from './routes/mais'
 import { Route as OrcamentosRouteImport } from './routes/orcamentos'
 import { Route as OrdensRouteImport } from './routes/ordens'
 
@@ -54,6 +55,11 @@ const LocaisRoute = LocaisRouteImport.update({
   path: '/locais',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MaisRoute = MaisRouteImport.update({
+  id: '/mais',
+  path: '/mais',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrcamentosRoute = OrcamentosRouteImport.update({
   id: '/orcamentos',
   path: '/orcamentos',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/equipe': typeof EquipeRoute
   '/lembretes': typeof LembretesRoute
   '/locais': typeof LocaisRoute
+  '/mais': typeof MaisRoute
   '/orcamentos': typeof OrcamentosRoute
   '/ordens': typeof OrdensRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/equipe': typeof EquipeRoute
   '/lembretes': typeof LembretesRoute
   '/locais': typeof LocaisRoute
+  '/mais': typeof MaisRoute
   '/orcamentos': typeof OrcamentosRoute
   '/ordens': typeof OrdensRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/equipe': typeof EquipeRoute
   '/lembretes': typeof LembretesRoute
   '/locais': typeof LocaisRoute
+  '/mais': typeof MaisRoute
   '/orcamentos': typeof OrcamentosRoute
   '/ordens': typeof OrdensRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/lembretes'
     | '/locais'
+    | '/mais'
     | '/orcamentos'
     | '/ordens'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/lembretes'
     | '/locais'
+    | '/mais'
     | '/orcamentos'
     | '/ordens'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/lembretes'
     | '/locais'
+    | '/mais'
     | '/orcamentos'
     | '/ordens'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   EquipeRoute: typeof EquipeRoute
   LembretesRoute: typeof LembretesRoute
   LocaisRoute: typeof LocaisRoute
+  MaisRoute: typeof MaisRoute
   OrcamentosRoute: typeof OrcamentosRoute
   OrdensRoute: typeof OrdensRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mais': {
+      id: '/mais'
+      path: '/mais'
+      fullPath: '/mais'
+      preLoaderRoute: typeof MaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orcamentos': {
       id: '/orcamentos'
       path: '/orcamentos'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipeRoute: EquipeRoute,
   LembretesRoute: LembretesRoute,
   LocaisRoute: LocaisRoute,
+  MaisRoute: MaisRoute,
   OrcamentosRoute: OrcamentosRoute,
   OrdensRoute: OrdensRoute,
 }
