@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import "@/styles/agendar.css";
 
@@ -49,7 +52,12 @@ function Agendar() {
   const [whats, setWhats] = useState("");
   const [cep, setCep] = useState("");
   const [desc, setDesc] = useState("");
-  const [fotos, setFotos] = useState<string[]>([]);
+  const [fotos, setFotos] = useState<File[]>([]);
+  const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState<string | null>(null);
+  const [protocolo, setProtocolo] = useState("");
+  const criar = useServerFn(criarPedido);
+  const preparar = useServerFn(prepararFotos);
   const [lgpd, setLgpd] = useState(false);
   const [ok, setOk] = useState(false);
 
@@ -58,7 +66,24 @@ function Agendar() {
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
-  const next = () => { if (!pode) return; if (step < 3) go(step + 1); else { setOk(true); window.scrollTo(0, 0); } };
+  const TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "image/heic"] as const;
+  const enviar = async () => {
+    setEnviando(true); setErroEnvio(null);
+    try {
+      const validas = fotos.filter((f) => (TIPOS_OK as readonly string[]).includes(f.type));
+      const slots = validas.length ? await preparar({ data: { tipos: validas.map((f) => f.type as (typeof TIPOS_OK)[number]) } }) : [];
+      const paths: string[] = [];
+      for (let i = 0; i < slots.length; i++) {
+        const { error } = await supabase.storage.from("pedidos").uploadToSignedUrl(slots[i]!.path, slots[i]!.token, validas[i]!, { contentType: validas[i]!.type });
+        if (!error) paths.push(slots[i]!.path);
+      }
+      const r = await criar({ data: { categoria: area as "Refrigeração" | "Gesso" | "Elétrica", tipo, visita, data, hora, nome, whatsapp: whats, cep, descricao: desc, fotos: paths, lgpd: true } });
+      setProtocolo(r.protocolo); setOk(true); window.scrollTo(0, 0);
+    } catch {
+      setErroEnvio("Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.");
+    } finally { setEnviando(false); }
+  };
+  const next = () => { if (!pode || enviando) return; if (step < 3) go(step + 1); else void enviar(); };
 
   const head = (t: string) => (
     <>
@@ -69,13 +94,13 @@ function Agendar() {
   );
 
   if (ok) {
-    const msg = `Olá! Quero agendar: ${tipo} (${area}). ${resumo}. Nome: ${nome}. CEP: ${cep}. ${desc}`;
+    const msg = `Olá! Pedido ${protocolo}. Quero agendar: ${tipo} (${area}). ${resumo}. Nome: ${nome}. CEP: ${cep}. ${desc}`;
     return (
       <div className="vm-ag"><div className="w">
         <Brand />
         <main className="mn">
-          <h1 style={{ marginTop: 56 }}>Pedido pronto</h1>
-          <p className="sub">Envie pelo WhatsApp para a equipe confirmar o horário.</p>
+          <h1 style={{ marginTop: 56 }}>Pedido recebido</h1>
+          <p className="sub">Protocolo {protocolo}. Nossa equipe vai confirmar o horário pelo WhatsApp. Se quiser agilizar, envie a mensagem abaixo.</p>
           <div className="card"><div><b>{tipo} · {area}</b><span>{resumo}</span></div></div>
         </main>
         <footer className="ft">
@@ -163,11 +188,11 @@ function Agendar() {
             <textarea id="desc" placeholder="Descreva o problema" value={desc} onChange={(e) => setDesc(e.target.value)} />
             <label className="ph" style={{ position: "relative" }}>
               {fotos.length ? `${fotos.length} de 3 fotos` : "Adicionar fotos (até 3)"}
-              <input type="file" accept="image/*" multiple onChange={(e) => setFotos([...(e.target.files ?? [])].slice(0, 3).map((f) => f.name))} />
+              <input type="file" accept="image/*" multiple onChange={(e) => { setFotos([...fotos, ...(e.target.files ?? [])].slice(0, 3)); e.target.value = ""; }} />
             </label>
             <ul className="fl">
               {fotos.map((n, i) => (
-                <li key={i}><span>{n}</span><button className="lnk" onClick={() => setFotos(fotos.filter((_, j) => j !== i))}>Remover</button></li>
+                <li key={i}><span>{n.name}</span><button className="lnk" onClick={() => setFotos(fotos.filter((_, j) => j !== i))}>Remover</button></li>
               ))}
             </ul>
             <div className="lg">
@@ -181,8 +206,9 @@ function Agendar() {
       <footer className="ft">
         <div className="bt">
           {step > 1 && <button className="b bk" onClick={() => go(step - 1)}>Voltar</button>}
-          <button className="b go" disabled={!pode} onClick={next}>{step < 3 ? "Continuar" : "Confirmar agendamento"}</button>
+          <button className="b go" disabled={!pode || enviando} onClick={next}>{step < 3 ? "Continuar" : enviando ? "Enviando..." : "Confirmar agendamento"}</button>
         </div>
+        {erroEnvio && <p className="alt" role="alert" style={{ color: "#B42318" }}>{erroEnvio}</p>}
         {step === 1 && <p className="alt">Prefere falar direto? <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
       </footer>
     </div></div>
