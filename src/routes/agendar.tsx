@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { company } from "@/lib/company";
-import "./agendar.css";
+import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
   head: () => ({
