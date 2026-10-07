@@ -9,10 +9,10 @@ const em = (dias: number, h: number, m = 0) => {
 };
 
 export const indicadores = [
-  { rotulo: "Agendamentos hoje", valor: 6, variacao: "+2 em relação a ontem", tom: "up" as const },
-  { rotulo: "Orçamentos pendentes", valor: 4, variacao: "1 aguardando há mais de 5 dias", tom: "warn" as const },
-  { rotulo: "Ordens em andamento", valor: 3, variacao: "Mesmo número da semana passada", tom: "flat" as const },
-  { rotulo: "Concluídas no mês", valor: 27, variacao: "+12% sobre setembro", tom: "up" as const },
+  { rotulo: "Agendamentos hoje", valor: 6, variacao: "1 concluído", tom: "flat" as const },
+  { rotulo: "Orçamentos pendentes", valor: 4, variacao: "R$ 8.450 em aberto", tom: "warn" as const },
+  { rotulo: "Ordens em andamento", valor: 3, variacao: "1 de vários dias", tom: "flat" as const },
+  { rotulo: "Concluídas no mês", valor: 27, variacao: "5 a mais que em setembro", tom: "up" as const },
 ];
 
 export type StatusAgenda = "Agendada" | "Em andamento" | "Concluída" | "Atrasada";
@@ -40,4 +40,10 @@ export const servicosPorCategoria: { categoria: Categoria; total: number }[] = [
   { categoria: "Refrigeração", total: 16 },
   { categoria: "Elétrica", total: 7 },
   { categoria: "Gesso", total: 4 },
+];
+
+export const manutencoesVencidas = [
+  { id: "m1", cliente: "Clínica Odonto Vida", aparelho: "Split Samsung 12.000 BTU", bairro: "Papicu, Fortaleza", vencida: em(-34, 0) },
+  { id: "m2", cliente: "Escritório Nunes Advocacia", aparelho: "Cassete LG 36.000 BTU", bairro: "Aldeota, Fortaleza", vencida: em(-21, 0) },
+  { id: "m3", cliente: "Maria do Socorro Araújo", aparelho: "Split Midea 9.000 BTU", bairro: "Centro, Hidrolândia", vencida: em(-8, 0) },
 ];
