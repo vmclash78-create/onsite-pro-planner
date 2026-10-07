@@ -50,7 +50,7 @@ function Agendar() {
             href={company.whatsappUrl}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+            className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
           >
             <MessageCircle className="h-5 w-5 shrink-0 text-primary" />
             <span>
@@ -61,7 +61,7 @@ function Agendar() {
 
           <a
             href={`tel:+55${company.phoneRaw}`}
-            className="flex items-center gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-muted"
+            className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted"
           >
             <Phone className="h-5 w-5 shrink-0 text-primary" />
             <span>
@@ -70,7 +70,7 @@ function Agendar() {
             </span>
           </a>
 
-          <div className="flex items-start gap-3 rounded-xl border bg-card p-4 sm:col-span-2">
+          <div className="flex items-start gap-3 rounded-lg border bg-card p-4 sm:col-span-2">
             <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div className="text-sm">
               <div className="font-medium">{company.addressDisplay}</div>
