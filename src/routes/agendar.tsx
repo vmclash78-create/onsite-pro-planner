@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
+import { Button } from "@/components/ui/button";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
@@ -120,16 +121,16 @@ function Agendar() {
             <p className="sub">Escolha a área e o tipo de serviço.</p>
             <div className="list">
               {Object.keys(AREAS).map((a) => (
-                <button key={a} className="row" aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); }}>
+                <Button variant="ghost" key={a} className="row" aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); }}>
                   <div><b>{a}</b><span>{AREAS[a]![0]}</span></div>
                   <i className={`rd ${area === a ? "on" : ""}`} />
-                </button>
+                </Button>
               ))}
             </div>
             <div className="lb">Tipo de serviço</div>
             <div className="chips">
               {AREAS[area]![1].map((t) => (
-                <button key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => setTipo(t)}>{t}</button>
+                <Button variant="ghost" key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => setTipo(t)}>{t}</Button>
               ))}
             </div>
           </>
@@ -143,10 +144,10 @@ function Agendar() {
               {dias.map((d) => {
                 const off = d.getDay() === 0, on = data === iso(d) && !visita;
                 return (
-                  <button key={iso(d)} className={`day ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
+                  <Button variant="ghost" key={iso(d)} className={`day ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                     onClick={() => { setData(iso(d)); setHora(null); setVisita(false); }}>
                     <small>{fmt(d, { weekday: "short" }).replace(".", "")}</small><strong>{d.getDate()}</strong>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -157,17 +158,17 @@ function Agendar() {
                   {HORAS[p]!.map((h) => {
                     const off = !data || OCUPADOS.includes(`${data} ${h}`), on = hora === h && !visita;
                     return (
-                      <button key={h} className={`hr ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
-                        onClick={() => { setHora(h); setVisita(false); }}>{h}</button>
+                      <Button variant="ghost" key={h} className={`hr ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
+                        onClick={() => { setHora(h); setVisita(false); }}>{h}</Button>
                     );
                   })}
                 </div>
               </div>
             ))}
-            <button className="visit" onClick={() => { setVisita(true); setData(null); setHora(null); }}>
+            <Button variant="ghost" className="visit" onClick={() => { setVisita(true); setData(null); setHora(null); }}>
               <b>{visita ? "Visita para orçamento selecionada" : "Prefiro uma visita para orçamento"}</b>
               <span>Sem data fechada. Combinamos pelo WhatsApp.</span>
-            </button>
+            </Button>
           </>
         )}
 
@@ -176,7 +177,7 @@ function Agendar() {
             {head("Seus dados")}
             <div className="card">
               <div><b>{tipo} · {area}</b><span>{resumo}</span></div>
-              <button className="lnk" onClick={() => go(1)}>Alterar</button>
+              <Button variant="link" className="lnk" onClick={() => go(1)}>Alterar</Button>
             </div>
             <label className="f" htmlFor="nome">Nome</label>
             <input className="t" id="nome" autoComplete="name" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
@@ -192,7 +193,7 @@ function Agendar() {
             </label>
             <ul className="fl">
               {fotos.map((n, i) => (
-                <li key={i}><span>{n.name}</span><button className="lnk" onClick={() => setFotos(fotos.filter((_, j) => j !== i))}>Remover</button></li>
+                <li key={i}><span>{n.name}</span><Button variant="link" className="lnk" onClick={() => setFotos(fotos.filter((_, j) => j !== i))}>Remover</Button></li>
               ))}
             </ul>
             <div className="lg">
@@ -205,10 +206,10 @@ function Agendar() {
 
       <footer className="ft">
         <div className="bt">
-          {step > 1 && <button className="b bk" onClick={() => go(step - 1)}>Voltar</button>}
-          <button className="b go" disabled={!pode || enviando} onClick={next}>{step < 3 ? "Continuar" : enviando ? "Enviando..." : "Confirmar agendamento"}</button>
+          {step > 1 && <Button variant="ghost" className="b bk" onClick={() => go(step - 1)}>Voltar</Button>}
+          <Button className="b go" disabled={!pode || enviando} onClick={next}>{step < 3 ? "Continuar" : enviando ? "Enviando..." : "Confirmar agendamento"}</Button>
         </div>
-        {erroEnvio && <p className="alt" role="alert" style={{ color: "#B42318" }}>{erroEnvio}</p>}
+        {erroEnvio && <p className="alt envio-erro" role="alert">{erroEnvio}</p>}
         {step === 1 && <p className="alt">Prefere falar direto? <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
       </footer>
     </div></div>

@@ -105,10 +105,10 @@ function Agenda() {
         </FormPanel>
       )}
 
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-2">
         <button aria-label="Semana anterior" onClick={() => setInicio(addDias(inicio, -7))} className="flex h-8 w-8 items-center justify-center rounded-[6px] border hover:bg-muted"><ChevronLeft className="h-4 w-4" /></button>
         <button aria-label="Próxima semana" onClick={() => setInicio(addDias(inicio, 7))} className="flex h-8 w-8 items-center justify-center rounded-[6px] border hover:bg-muted"><ChevronRight className="h-4 w-4" /></button>
-        <span className="text-sm tabular-nums">{dataBR(inicio)} a {dataBR(fim)}</span>
+        <span className="min-w-0 text-xs tabular-nums sm:text-sm">{dataBR(inicio)} a {dataBR(fim)}</span>
         <button onClick={() => setInicio(segunda(isoLocal()))} className="ml-auto h-8 rounded-[6px] border px-3 text-xs hover:bg-muted">Hoje</button>
       </div>
 
@@ -122,14 +122,14 @@ function Agenda() {
                 {itens.length === 0 ? <div className="px-4 py-3 text-xs text-muted-foreground">Livre</div> : (
                   <ul className="divide-y">
                     {itens.map((a) => (
-                      <li key={a.id} className="grid grid-cols-[3.25rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
+                      <li key={a.id} className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-3 px-4 py-3 sm:grid-cols-[3.25rem_minmax(0,1fr)_auto]">
                         <div className="text-sm font-medium tabular-nums">{a.hora ?? "--:--"}</div>
                         <div className="min-w-0">
                           <Link to="/pedidos/$id" params={{ id: a.id }} className="block truncate text-sm font-medium hover:underline">{a.nome_contato}</Link>
                           <div className="truncate text-xs text-muted-foreground">{a.categoria} · {a.tipo}{a.profiles?.nome ? ` · ${a.profiles.nome}` : ""}</div>
                           <div className="truncate text-xs text-muted-foreground">{a.endereco}</div>
                         </div>
-                        <StatusSelect value={a.status} options={STATUS_AG} onChange={(s) => status.mutate({ id: a.id, s })} />
+                        <div className="col-start-2 sm:col-start-auto"><StatusSelect value={a.status} options={STATUS_AG} onChange={(s) => status.mutate({ id: a.id, s })} /></div>
                       </li>
                     ))}
                   </ul>
