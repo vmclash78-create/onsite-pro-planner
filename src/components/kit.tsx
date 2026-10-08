@@ -18,7 +18,7 @@ export function Panel({ title, action, children }: { title?: ReactNode; action?:
   return (
     <section className="min-w-0 rounded-lg border bg-card">
       {title && (
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b px-4 py-3">
+        <div className="grid grid-cols-1 items-baseline gap-3 border-b px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto]">
           <h2 className="min-w-0 text-sm font-semibold">{title}</h2>
           <div className="shrink-0">{action}</div>
         </div>
