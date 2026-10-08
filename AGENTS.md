@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture
+- Shared semantic tokens define the system theme; public booking aliases those tokens and shared layout primitives constrain content widths — keeps colors and device adaptation consistent across screens.
 - Internal panel pages use `AppShell` (src/components/AppShell.tsx) for sidebar/mobile nav; the public booking page (/agendar) renders without it — keeps public and staff UI separated.
 - Formatting of dates/currency goes through src/lib/format.ts (pt-BR) — single source for BR formats.
 - Staff panel routes live under src/routes/_authenticated/ (client-only auth gate); `/` redirects to `/inicio` — keeps every customer-data screen behind sign-in.

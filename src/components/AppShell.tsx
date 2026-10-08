@@ -7,6 +7,7 @@ import {
 import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
+import { Button } from "@/components/ui/button";
 
 export const navItems = [
   { to: "/inicio", label: "Início", icon: LayoutDashboard },
@@ -39,7 +40,7 @@ function Brand() {
 export function PrimaryButton({ label, to, onClick }: { label: string; to?: string; onClick?: () => void }) {
   const cls = "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90";
   const inner = <><Plus className={ICON} strokeWidth={2} /><span className="hidden sm:inline">{label}</span></>;
-  return to ? <Link to={to} className={cls} aria-label={label}>{inner}</Link> : <button type="button" onClick={onClick} className={cls} aria-label={label}>{inner}</button>;
+  return to ? <Button asChild className={cls}><Link to={to} aria-label={label}>{inner}</Link></Button> : <Button type="button" onClick={onClick} className={cls} aria-label={label}>{inner}</Button>;
 }
 
 export function useSignOut() {
@@ -91,11 +92,11 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
         </div>
       </aside>
 
-      <div className="lg:pl-60">
+      <div className="min-w-0 lg:pl-60">
         <header className="border-b px-4 pb-4 pt-5 lg:px-8 lg:pt-6">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex min-w-0 flex-wrap items-center gap-1 text-xs text-muted-foreground">
                 {crumbs.map((c, i) => (
                   <span key={i} className="flex items-center gap-1">
                     {i > 0 && <ChevronRight className="h-3 w-3" strokeWidth={1.75} />}
@@ -103,15 +104,15 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
                   </span>
                 ))}
               </div>
-              <h1 className="mt-1 truncate text-xl font-semibold tracking-tight">{title}</h1>
+              <h1 className="mt-1 text-xl font-semibold">{title}</h1>
             </div>
             {me.data?.isStaff && actions}
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">{body}</main>
+        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">{body}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
         {[
           { to: "/inicio", label: "Início", icon: LayoutDashboard },
           { to: "/agenda", label: "Agenda", icon: CalendarDays },
