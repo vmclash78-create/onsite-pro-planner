@@ -79,14 +79,14 @@ function Dashboard() {
           <StateRow loading={q.isLoading} error={q.error} empty={d?.agenda.length === 0} emptyText="Nenhum serviço marcado para hoje." />
           <ul className="divide-y">
             {d?.agenda.map((a) => (
-              <li key={a.id} className="grid grid-cols-[3.25rem_minmax(0,1fr)_auto] gap-3 px-4 py-3">
+              <li key={a.id} className="grid grid-cols-[3.25rem_minmax(0,1fr)] gap-3 px-4 py-3 sm:grid-cols-[3.25rem_minmax(0,1fr)_auto]">
                 <div className="pt-0.5 text-sm font-medium tabular-nums">{a.hora ?? "--:--"}</div>
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">{a.nome_contato}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.categoria} · {a.tipo}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.endereco}{a.profiles?.nome ? ` · ${a.profiles.nome}` : ""}</div>
                 </div>
-                <Status value={a.status} />
+                <div className="col-start-2 sm:col-start-auto"><Status value={a.status} /></div>
               </li>
             ))}
           </ul>
@@ -98,7 +98,7 @@ function Dashboard() {
             <ul className="divide-y">
               {d?.orcamentos.slice(0, 5).map((o) => (
                 <li key={o.id} className="px-4 py-3">
-                  <div className="flex items-baseline justify-between gap-3">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3">
                     <span className="truncate text-sm font-medium">{o.clients?.nome}</span>
                     <span className="shrink-0 text-sm tabular-nums">{brl(Number(o.valor))}</span>
                   </div>

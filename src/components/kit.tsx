@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import { Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const inputCls =
   "h-10 w-full rounded-[6px] border border-input bg-background px-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary";
 
 export function Field({ label, children, className = "" }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <label className={`block text-xs text-muted-foreground ${className}`}>
+    <label className={`block min-w-0 text-xs text-muted-foreground ${className}`}>
       <span className="mb-1 block">{label}</span>
       {children}
     </label>
@@ -15,11 +16,11 @@ export function Field({ label, children, className = "" }: { label: string; chil
 
 export function Panel({ title, action, children }: { title?: ReactNode; action?: ReactNode; children: ReactNode }) {
   return (
-    <section className="rounded-lg border bg-card">
+    <section className="min-w-0 rounded-lg border bg-card">
       {title && (
-        <div className="flex items-baseline justify-between gap-3 border-b px-4 py-3">
-          <h2 className="text-sm font-semibold">{title}</h2>
-          {action}
+        <div className="grid grid-cols-1 items-baseline gap-3 border-b px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <h2 className="min-w-0 text-sm font-semibold">{title}</h2>
+          <div className="shrink-0">{action}</div>
         </div>
       )}
       {children}
@@ -35,17 +36,17 @@ export function FormPanel({ title, onClose, onSubmit, saving, error, children }:
       onSubmit={(e) => { e.preventDefault(); onSubmit(); }}
       className="mb-5 rounded-lg border border-primary/40 bg-card"
     >
-      <div className="flex items-center justify-between border-b px-4 py-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3">
         <h2 className="text-sm font-semibold">{title}</h2>
-        <button type="button" aria-label="Fechar" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+        <Button variant="ghost" size="icon" type="button" aria-label="Fechar" onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></Button>
       </div>
       <div className="grid gap-3 p-4 sm:grid-cols-2">{children}</div>
-      <div className="flex items-center justify-end gap-3 border-t px-4 py-3">
-        {error && <p className="mr-auto text-xs text-destructive">{error}</p>}
-        <button type="button" onClick={onClose} className="h-9 rounded-[6px] border px-3 text-sm hover:bg-muted">Cancelar</button>
-        <button disabled={saving} className="inline-flex h-9 items-center gap-2 rounded-[6px] bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60">
+      <div className="flex flex-wrap items-center justify-end gap-3 border-t px-4 py-3">
+        {error && <p role="alert" className="w-full text-xs text-destructive">{error}</p>}
+        <Button variant="outline" type="button" onClick={onClose}>Cancelar</Button>
+        <Button disabled={saving}>
           {saving && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
-        </button>
+        </Button>
       </div>
     </form>
   );
