@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { brl, dataBR, isoLocal, addDias, diasEntre } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS, useMe } from "@/lib/staff";
+import { statusRecebimento } from "@/lib/cobranca";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: pageHead("Início", "Agenda do dia, orçamentos pendentes e ordens de serviço."),
@@ -128,6 +129,39 @@ function FinanceiroResumo({ enabled }: { enabled: boolean }) {
   );
 }
 
+function ReceberResumo({ enabled }: { enabled: boolean }) {
+  const q = useQuery({
+    queryKey: ["dash-receber"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("recebimentos").select("valor_total, valor_pago, vencimento").neq("status", "pago");
+      if (error) throw error;
+      const hoje = isoLocal();
+      let total = 0, atraso = 0, n = 0;
+      for (const r of data) {
+        const saldo = Number(r.valor_total) - Number(r.valor_pago);
+        if (saldo <= 0) continue;
+        total += saldo;
+        if (statusRecebimento({ valor_total: Number(r.valor_total), valor_pago: Number(r.valor_pago), vencimento: r.vencimento }, hoje) === "atrasado") { atraso += saldo; n++; }
+      }
+      return { total, atraso, n };
+    },
+  });
+  return (
+    <Link to="/receber" className="mt-5 grid grid-cols-2 overflow-hidden rounded-lg border bg-card hover:bg-muted/40">
+      <div className="border-r p-4">
+        <div className="text-xs text-muted-foreground">A receber</div>
+        <div className="mt-1 text-2xl font-semibold tabular-nums">{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.total ?? 0)}</div>
+      </div>
+      <div className="p-4">
+        <div className="text-xs text-muted-foreground">Em atraso</div>
+        <div className="mt-1 text-2xl font-semibold tabular-nums text-destructive">{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.atraso ?? 0)}</div>
+        <div className="mt-1 text-xs text-muted-foreground">{q.data ? `${q.data.n} cobrança(s)` : ""}</div>
+      </div>
+    </Link>
+  );
+}
+
 function Dashboard() {
   const me = useMe();
   const q = useDashboard(!!me.data?.isStaff);
@@ -156,6 +190,7 @@ function Dashboard() {
         ))}
       </div>
 
+      <ReceberResumo enabled={!!me.data?.isStaff} />
       <FinanceiroResumo enabled={!!me.data?.isStaff} />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">

@@ -9,6 +9,7 @@ import { addDias, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS, STATUS_AG, TIPOS } from "@/lib/staff";
 import { useClientes, useTecnicos } from "./-shared";
+import { WhatsButton } from "@/components/WhatsButton";
 
 export const Route = createFileRoute("/_authenticated/agenda")({
   head: pageHead("Agenda", "Agenda semanal de serviços por dia e técnico."),
@@ -36,7 +37,7 @@ function Agenda() {
     queryKey: ["agenda", inicio],
     queryFn: async () => {
       const { data, error } = await supabase.from("appointments")
-        .select("id, data, hora, nome_contato, whatsapp, categoria, tipo, endereco, status, origem, tecnico_id, profiles:tecnico_id(nome)")
+        .select("id, client_id, data, hora, nome_contato, whatsapp, categoria, tipo, endereco, status, origem, tecnico_id, profiles:tecnico_id(nome)")
         .gte("data", inicio).lte("data", fim).order("data").order("hora");
       if (error) throw error;
       return data;
@@ -128,6 +129,17 @@ function Agenda() {
                           <Link to="/pedidos/$id" params={{ id: a.id }} className="block truncate text-sm font-medium hover:underline">{a.nome_contato}</Link>
                           <div className="truncate text-xs text-muted-foreground">{a.categoria} · {a.tipo}{a.profiles?.nome ? ` · ${a.profiles.nome}` : ""}</div>
                           <div className="truncate text-xs text-muted-foreground">{a.endereco}</div>
+                          {a.status !== "Cancelada" && a.status !== "Concluída" && (() => {
+                            const vars = { nome: a.nome_contato, servico: `${a.tipo} (${a.categoria})`, data: dataBR(a.data ?? d), hora: a.hora ?? "", tecnico: a.profiles?.nome ?? "a definir" };
+                            const p = { telefone: a.whatsapp, clienteId: a.client_id, referenciaId: a.id, vars };
+                            return (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                <WhatsButton label="Confirmar" chave="confirmacao" {...p} />
+                                <WhatsButton label="Lembrar amanhã" chave="vespera" {...p} />
+                                <WhatsButton label="A caminho" chave="a_caminho" {...p} />
+                              </div>
+                            );
+                          })()}
                         </div>
                         <div className="col-start-2 sm:col-start-auto"><StatusSelect value={a.status} options={STATUS_AG} onChange={(s) => status.mutate({ id: a.id, s })} /></div>
                       </li>
