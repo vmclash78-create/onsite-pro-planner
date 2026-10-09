@@ -29,6 +29,13 @@
       "when": 1791553485066,
       "tag": "0003_financeiro_auto_os",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791553798065,
+      "tag": "0004_receber_pix_whatsapp",
+      "breakpoints": true
     }
   ]
 }
