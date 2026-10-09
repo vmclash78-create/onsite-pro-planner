@@ -381,6 +381,47 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_items: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          ordem: number
+          quantidade: number
+          quote_id: string
+          tipo: string
+          valor_unitario: number
+        }
+        Insert: {
+          created_at?: string
+          descricao: string
+          id?: string
+          ordem?: number
+          quantidade?: number
+          quote_id: string
+          tipo?: string
+          valor_unitario?: number
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          ordem?: number
+          quantidade?: number
+          quote_id?: string
+          tipo?: string
+          valor_unitario?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           client_id: string
@@ -389,7 +430,10 @@ export type Database = {
           enviado_em: string | null
           id: string
           numero: number
+          observacoes: string | null
+          service_order_id: string | null
           status: string
+          validade_dias: number
           valor: number
         }
         Insert: {
@@ -399,7 +443,10 @@ export type Database = {
           enviado_em?: string | null
           id?: string
           numero?: number
+          observacoes?: string | null
+          service_order_id?: string | null
           status?: string
+          validade_dias?: number
           valor?: number
         }
         Update: {
@@ -409,7 +456,10 @@ export type Database = {
           enviado_em?: string | null
           id?: string
           numero?: number
+          observacoes?: string | null
+          service_order_id?: string | null
           status?: string
+          validade_dias?: number
           valor?: number
         }
         Relationships: [
@@ -418,6 +468,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
