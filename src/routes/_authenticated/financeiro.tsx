@@ -115,7 +115,7 @@ function Financeiro() {
   );
 }
 
-function Kpi({ label, value, cls, sub }: { label: string; value: string; cls: string; sub?: string }) {
+function Kpi({ label, value, cls, sub }: { label: string; value: string; cls: string; sub?: string | undefined }) {
   return (
     <div className="rounded-lg border bg-card p-4">
       <div className="text-xs text-muted-foreground">{label}</div>
