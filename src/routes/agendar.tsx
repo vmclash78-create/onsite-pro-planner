@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
+import { Snowflake } from "lucide-react";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
@@ -63,7 +64,7 @@ function Agendar() {
   const [ok, setOk] = useState(false);
 
   const diaSel = dias.find((d) => iso(d) === data);
-  const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "short", day: "numeric", month: "long" }).replace(".", "")} · ${hora ?? ""}` : "";
+  const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
@@ -95,7 +96,18 @@ function Agendar() {
   );
 
   if (ok) {
-    const msg = `Olá! Pedido ${protocolo}. Quero agendar: ${tipo} (${area}). ${resumo}. Nome: ${nome}. CEP: ${cep}. ${desc}`;
+    const msg = [
+      `Olá, VM Climatização! Acabei de fazer um pedido pelo site.`,
+      ``,
+      `*Protocolo:* ${protocolo}`,
+      `*Serviço:* ${tipo} de ${area.toLowerCase()}`,
+      `*Quando:* ${resumo}`,
+      `*Nome:* ${nome}`,
+      `*CEP:* ${cep}`,
+      desc.trim() ? `*Problema:* ${desc.trim()}` : "",
+      ``,
+      `Aguardo a confirmação. Obrigado!`,
+    ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
     return (
       <div className="vm-ag"><div className="w">
         <Brand />
@@ -219,8 +231,8 @@ function Agendar() {
 function Brand() {
   return (
     <header className="brand">
-      <div className="logo">VM</div>
-      <div><b>{company.name}</b><span>{company.city}/{company.state}</span></div>
+      <div className="logo"><Snowflake size={20} strokeWidth={2} aria-hidden /></div>
+      <div><b>{company.name}</b><span>Ar-condicionado · Gesso · Elétrica · {company.city}/{company.state}</span></div>
     </header>
   );
 }
