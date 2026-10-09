@@ -64,7 +64,7 @@ function Agendar() {
   const [ok, setOk] = useState(false);
 
   const diaSel = dias.find((d) => iso(d) === data);
-  const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "short", day: "numeric", month: "long" }).replace(".", "")} · ${hora ?? ""}` : "";
+  const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
