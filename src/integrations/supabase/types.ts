@@ -445,6 +445,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      horarios_ocupados: {
+        Args: { _fim: string; _inicio: string }
+        Returns: {
+          data: string
+          hora: string
+        }[]
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
