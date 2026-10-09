@@ -8,6 +8,13 @@
       "when": 1791412140694,
       "tag": "0000_core_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791553259764,
+      "tag": "0001_financeiro_estoque",
+      "breakpoints": true
     }
   ]
 }

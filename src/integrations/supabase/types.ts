@@ -179,6 +179,36 @@ export type Database = {
           },
         ]
       }
+      financial_entries: {
+        Row: {
+          categoria: string
+          created_at: string
+          data: string
+          descricao: string
+          id: string
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          data?: string
+          descricao: string
+          id?: string
+          tipo: string
+          valor?: number
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          data?: string
+          descricao?: string
+          id?: string
+          tipo?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           apelido: string
@@ -354,6 +384,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stock_items: {
+        Row: {
+          created_at: string
+          custo: number
+          id: string
+          minimo: number
+          nome: string
+          quantidade: number
+          unidade: string
+        }
+        Insert: {
+          created_at?: string
+          custo?: number
+          id?: string
+          minimo?: number
+          nome: string
+          quantidade?: number
+          unidade?: string
+        }
+        Update: {
+          created_at?: string
+          custo?: number
+          id?: string
+          minimo?: number
+          nome?: string
+          quantidade?: number
+          unidade?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
