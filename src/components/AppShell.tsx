@@ -73,6 +73,16 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
 
   let body: ReactNode = children;
   if (me.isLoading) body = <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>;
+  else if (!me.data)
+    body = (
+      <>
+        <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-warning/40 bg-card px-4 py-3 text-sm">
+          <p className="min-w-0 text-muted-foreground">Você não está conectado: as listas ficam vazias e os botões de criar e salvar ficam escondidos. Entre uma vez e o navegador lembra sua conta.</p>
+          <Button asChild size="sm"><Link to="/auth">Entrar</Link></Button>
+        </div>
+        {children}
+      </>
+    );
   else if (me.data && !me.data.isStaff)
     body = (
       <div className="max-w-md rounded-lg border bg-card p-5 text-sm">

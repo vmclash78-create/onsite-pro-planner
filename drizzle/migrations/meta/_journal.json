@@ -36,6 +36,13 @@
       "when": 1791553798065,
       "tag": "0004_receber_pix_whatsapp",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791557752612,
+      "tag": "0005_quote_items",
+      "breakpoints": true
     }
   ]
 }
