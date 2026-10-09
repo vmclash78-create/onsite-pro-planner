@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2,
+  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package,
 } from "lucide-react";
 import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,8 @@ export const navItems = [
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/orcamentos", label: "Orçamentos", icon: FileText },
   { to: "/ordens", label: "Ordens de serviço", icon: Wrench },
+  { to: "/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/estoque", label: "Estoque", icon: Package },
   { to: "/equipe", label: "Equipe", icon: HardHat },
   { to: "/locais", label: "Locais", icon: MapPin },
   { to: "/lembretes", label: "Lembretes", icon: BellRing },
