@@ -186,6 +186,7 @@ export type Database = {
           data: string
           descricao: string
           id: string
+          service_order_id: string | null
           tipo: string
           valor: number
         }
@@ -195,6 +196,7 @@ export type Database = {
           data?: string
           descricao: string
           id?: string
+          service_order_id?: string | null
           tipo: string
           valor?: number
         }
@@ -204,10 +206,19 @@ export type Database = {
           data?: string
           descricao?: string
           id?: string
+          service_order_id?: string | null
           tipo?: string
           valor?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "financial_entries_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: true
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       locations: {
         Row: {
