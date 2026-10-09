@@ -28,7 +28,7 @@ function Estoque() {
       return data;
     },
   });
-  const inval = () => { qc.invalidateQueries({ queryKey: ["estoque"] }); qc.invalidateQueries({ queryKey: ["financeiro"] }); };
+  const inval = () => { qc.invalidateQueries({ queryKey: ["estoque"] }); qc.invalidateQueries({ queryKey: ["financeiro"] }); qc.invalidateQueries({ queryKey: ["dash-fin"] }); };
 
   const salvar = useMutation({
     mutationFn: async () => {

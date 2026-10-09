@@ -31,7 +31,7 @@ function Financeiro() {
       return data;
     },
   });
-  const inval = () => qc.invalidateQueries({ queryKey: ["financeiro"] });
+  const inval = () => { qc.invalidateQueries({ queryKey: ["financeiro"] }); qc.invalidateQueries({ queryKey: ["dash-fin"] }); };
   const salvar = useMutation({
     mutationFn: async () => {
       const valor = Number(f.valor.replace(/\./g, "").replace(",", "."));

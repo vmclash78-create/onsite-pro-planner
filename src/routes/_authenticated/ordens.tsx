@@ -32,7 +32,7 @@ function Ordens() {
       return data;
     },
   });
-  const inval = () => { qc.invalidateQueries({ queryKey: ["orders"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); };
+  const inval = () => { qc.invalidateQueries({ queryKey: ["orders"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); qc.invalidateQueries({ queryKey: ["financeiro"] }); qc.invalidateQueries({ queryKey: ["dash-fin"] }); };
   const salvar = useMutation({
     mutationFn: async () => {
       if (!f.client_id || !f.descricao.trim()) throw new Error("Preencha cliente e descrição.");

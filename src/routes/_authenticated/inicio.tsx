@@ -45,6 +45,89 @@ function useDashboard(enabled: boolean) {
   });
 }
 
+const MESES = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+function useFinanceiro(enabled: boolean) {
+  return useQuery({
+    queryKey: ["dash-fin"],
+    enabled,
+    queryFn: async () => {
+      const [fin, est] = await Promise.all([
+        supabase.from("financial_entries").select("tipo, valor, data").gte("data", inicioMes(-5)),
+        supabase.from("stock_items").select("id, nome, quantidade, minimo, unidade, custo"),
+      ]);
+      if (fin.error || est.error) throw fin.error || est.error;
+      const meses = Array.from({ length: 6 }, (_, i) => {
+        const ini = inicioMes(i - 5), key = ini.slice(0, 7);
+        const doMes = (fin.data ?? []).filter((e) => e.data.startsWith(key));
+        const ent = doMes.filter((e) => e.tipo === "Entrada").reduce((a, e) => a + Number(e.valor), 0);
+        const sai = doMes.filter((e) => e.tipo === "Saída").reduce((a, e) => a + Number(e.valor), 0);
+        return { label: MESES[Number(key.slice(5)) - 1]!, ent, sai };
+      });
+      const itens = est.data ?? [];
+      return {
+        meses,
+        repor: itens.filter((i) => Number(i.quantidade) <= Number(i.minimo)),
+        valorEstoque: itens.reduce((a, i) => a + Number(i.quantidade) * Number(i.custo), 0),
+      };
+    },
+  });
+}
+
+function FinanceiroResumo({ enabled }: { enabled: boolean }) {
+  const f = useFinanceiro(enabled);
+  const atual = f.data?.meses[5];
+  const res = atual ? atual.ent - atual.sai : 0;
+  const max = Math.max(1, ...(f.data?.meses.flatMap((m) => [m.ent, m.sai]) ?? [1]));
+  return (
+    <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+      <Panel title="Dinheiro do mês" action={<Link to="/financeiro" className="text-xs text-primary hover:underline">Abrir financeiro</Link>}>
+        {f.isLoading || f.error ? <StateRow loading={f.isLoading} error={f.error} /> : (
+          <div className="grid gap-5 p-4 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs text-muted-foreground">{res >= 0 ? "Lucro" : "Prejuízo"}</div>
+                <div className={`text-3xl font-semibold tabular-nums ${res >= 0 ? "text-success" : "text-destructive"}`}>{brl(Math.abs(res))}</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 border-t pt-3">
+                <div><div className="text-xs text-muted-foreground">Entrou</div><div className="text-sm font-medium tabular-nums">{brl(atual?.ent ?? 0)}</div></div>
+                <div><div className="text-xs text-muted-foreground">Saiu</div><div className="text-sm font-medium tabular-nums">{brl(atual?.sai ?? 0)}</div></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex h-36 items-end gap-2 border-b">
+                {f.data?.meses.map((m, i) => (
+                  <div key={i} className="flex h-full flex-1 items-end justify-center gap-1" title={`${m.label}: entrou ${brl(m.ent)}, saiu ${brl(m.sai)}`}>
+                    <div className="w-2.5 rounded-t-sm bg-primary sm:w-3.5" style={{ height: `${(m.ent / max) * 100}%` }} />
+                    <div className="w-2.5 rounded-t-sm bg-muted-foreground/40 sm:w-3.5" style={{ height: `${(m.sai / max) * 100}%` }} />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-1 flex gap-2">{f.data?.meses.map((m, i) => <div key={i} className="flex-1 text-center text-[11px] text-muted-foreground">{m.label}</div>)}</div>
+              <div className="mt-2 flex gap-4 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-sm bg-primary" /> Entradas</span>
+                <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-sm bg-muted-foreground/40" /> Saídas</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </Panel>
+      <Panel title="Estoque para repor" action={<Link to="/estoque" className="text-xs text-primary hover:underline">Abrir estoque</Link>}>
+        <StateRow loading={f.isLoading} error={f.error} empty={f.data?.repor.length === 0} emptyText="Nada abaixo do mínimo." />
+        <ul className="divide-y">
+          {f.data?.repor.slice(0, 5).map((i) => (
+            <li key={i.id} className="flex items-baseline justify-between gap-3 px-4 py-3">
+              <span className="truncate text-sm font-medium">{i.nome}</span>
+              <span className="shrink-0 text-xs tabular-nums text-destructive">{Number(i.quantidade)} {i.unidade} (mín. {Number(i.minimo)})</span>
+            </li>
+          ))}
+        </ul>
+        {f.data && <div className="border-t px-4 py-3 text-xs text-muted-foreground">Valor em estoque: <span className="tabular-nums text-foreground">{brl(f.data.valorEstoque)}</span></div>}
+      </Panel>
+    </div>
+  );
+}
+
 function Dashboard() {
   const me = useMe();
   const q = useDashboard(!!me.data?.isStaff);
@@ -72,6 +155,8 @@ function Dashboard() {
           </div>
         ))}
       </div>
+
+      <FinanceiroResumo enabled={!!me.data?.isStaff} />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <Panel title={<>Agenda de hoje <span className="ml-1 font-normal tabular-nums text-muted-foreground">{dataBR(new Date())}</span></>}
