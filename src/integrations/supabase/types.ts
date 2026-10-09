@@ -144,6 +144,30 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes_empresa: {
+        Row: {
+          atualizado_em: string
+          id: number
+          pix_chave: string | null
+          pix_cidade: string | null
+          pix_nome: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          id?: number
+          pix_chave?: string | null
+          pix_cidade?: string | null
+          pix_nome?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          id?: number
+          pix_chave?: string | null
+          pix_cidade?: string | null
+          pix_nome?: string | null
+        }
+        Relationships: []
+      }
       equipment: {
         Row: {
           created_at: string
@@ -186,6 +210,7 @@ export type Database = {
           data: string
           descricao: string
           id: string
+          recebimento_id: string | null
           service_order_id: string | null
           tipo: string
           valor: number
@@ -196,6 +221,7 @@ export type Database = {
           data?: string
           descricao: string
           id?: string
+          recebimento_id?: string | null
           service_order_id?: string | null
           tipo: string
           valor?: number
@@ -206,11 +232,19 @@ export type Database = {
           data?: string
           descricao?: string
           id?: string
+          recebimento_id?: string | null
           service_order_id?: string | null
           tipo?: string
           valor?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "financial_entries_recebimento_id_fkey"
+            columns: ["recebimento_id"]
+            isOneToOne: false
+            referencedRelation: "recebimentos"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "financial_entries_service_order_id_fkey"
             columns: ["service_order_id"]
@@ -260,6 +294,65 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mensagens_enviadas: {
+        Row: {
+          cliente_id: string | null
+          data: string
+          enviado_por: string
+          id: string
+          referencia_id: string | null
+          tipo: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          data?: string
+          enviado_por?: string
+          id?: string
+          referencia_id?: string | null
+          tipo: string
+        }
+        Update: {
+          cliente_id?: string | null
+          data?: string
+          enviado_por?: string
+          id?: string
+          referencia_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensagens_enviadas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      modelos_mensagem: {
+        Row: {
+          atualizado_em: string
+          chave: string
+          id: string
+          texto: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          chave: string
+          id?: string
+          texto: string
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          chave?: string
+          id?: string
+          texto?: string
+          titulo?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -325,6 +418,60 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recebimentos: {
+        Row: {
+          cliente_id: string
+          criado_em: string
+          forma_pagamento: string | null
+          id: string
+          observacao: string | null
+          ordem_id: string | null
+          status: string
+          valor_pago: number
+          valor_total: number
+          vencimento: string
+        }
+        Insert: {
+          cliente_id: string
+          criado_em?: string
+          forma_pagamento?: string | null
+          id?: string
+          observacao?: string | null
+          ordem_id?: string | null
+          status?: string
+          valor_pago?: number
+          valor_total?: number
+          vencimento?: string
+        }
+        Update: {
+          cliente_id?: string
+          criado_em?: string
+          forma_pagamento?: string | null
+          id?: string
+          observacao?: string | null
+          ordem_id?: string | null
+          status?: string
+          valor_pago?: number
+          valor_total?: number
+          vencimento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recebimentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recebimentos_ordem_id_fkey"
+            columns: ["ordem_id"]
+            isOneToOne: true
+            referencedRelation: "service_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -464,6 +611,10 @@ export type Database = {
         }[]
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      registrar_pagamento: {
+        Args: { _data: string; _forma: string; _rec: string; _valor: number }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "tecnico"

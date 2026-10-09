@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedEquipeRouteImport } from './routes/_authenticated/equipe'
 import { Route as AuthenticatedEstoqueRouteImport } from './routes/_authenticated/estoque'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedLocaisRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedMaisRouteImport } from './routes/_authenticated/mais'
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedOrdensRouteImport } from './routes/_authenticated/ordens'
+import { Route as AuthenticatedReceberRouteImport } from './routes/_authenticated/receber'
 import { Route as AuthenticatedPedidosIndexRouteImport } from './routes/_authenticated/pedidos.index'
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 
@@ -62,6 +64,12 @@ const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEquipeRoute = AuthenticatedEquipeRouteImport.update({
   id: '/equipe',
   path: '/equipe',
@@ -107,6 +115,11 @@ const AuthenticatedOrdensRoute = AuthenticatedOrdensRouteImport.update({
   path: '/ordens',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReceberRoute = AuthenticatedReceberRouteImport.update({
+  id: '/receber',
+  path: '/receber',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPedidosIndexRoute =
   AuthenticatedPedidosIndexRouteImport.update({
     id: '/pedidos/',
@@ -126,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/equipe': typeof AuthenticatedEquipeRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -135,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/mais': typeof AuthenticatedMaisRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
+  '/receber': typeof AuthenticatedReceberRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos/': typeof AuthenticatedPedidosIndexRoute
 }
@@ -145,6 +160,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/clientes': typeof AuthenticatedClientesRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/equipe': typeof AuthenticatedEquipeRoute
   '/estoque': typeof AuthenticatedEstoqueRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -154,6 +170,7 @@ export interface FileRoutesByTo {
   '/mais': typeof AuthenticatedMaisRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
+  '/receber': typeof AuthenticatedReceberRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos': typeof AuthenticatedPedidosIndexRoute
 }
@@ -166,6 +183,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/equipe': typeof AuthenticatedEquipeRoute
   '/_authenticated/estoque': typeof AuthenticatedEstoqueRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -175,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/mais': typeof AuthenticatedMaisRoute
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/ordens': typeof AuthenticatedOrdensRoute
+  '/_authenticated/receber': typeof AuthenticatedReceberRoute
   '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/_authenticated/pedidos/': typeof AuthenticatedPedidosIndexRoute
 }
@@ -187,6 +206,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/agenda'
     | '/clientes'
+    | '/configuracoes'
     | '/equipe'
     | '/estoque'
     | '/financeiro'
@@ -196,6 +216,7 @@ export interface FileRouteTypes {
     | '/mais'
     | '/orcamentos'
     | '/ordens'
+    | '/receber'
     | '/pedidos/$id'
     | '/pedidos/'
   fileRoutesByTo: FileRoutesByTo
@@ -206,6 +227,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/agenda'
     | '/clientes'
+    | '/configuracoes'
     | '/equipe'
     | '/estoque'
     | '/financeiro'
@@ -215,6 +237,7 @@ export interface FileRouteTypes {
     | '/mais'
     | '/orcamentos'
     | '/ordens'
+    | '/receber'
     | '/pedidos/$id'
     | '/pedidos'
   id:
@@ -226,6 +249,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/_authenticated/agenda'
     | '/_authenticated/clientes'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/equipe'
     | '/_authenticated/estoque'
     | '/_authenticated/financeiro'
@@ -235,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mais'
     | '/_authenticated/orcamentos'
     | '/_authenticated/ordens'
+    | '/_authenticated/receber'
     | '/_authenticated/pedidos/$id'
     | '/_authenticated/pedidos/'
   fileRoutesById: FileRoutesById
@@ -296,6 +321,13 @@ declare module '@tanstack/react-router' {
       path: '/clientes'
       fullPath: '/clientes'
       preLoaderRoute: typeof AuthenticatedClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/equipe': {
@@ -361,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdensRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/receber': {
+      id: '/_authenticated/receber'
+      path: '/receber'
+      fullPath: '/receber'
+      preLoaderRoute: typeof AuthenticatedReceberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/pedidos/': {
       id: '/_authenticated/pedidos/'
       path: '/pedidos'
@@ -381,6 +420,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedEquipeRoute: typeof AuthenticatedEquipeRoute
   AuthenticatedEstoqueRoute: typeof AuthenticatedEstoqueRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
@@ -390,6 +430,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMaisRoute: typeof AuthenticatedMaisRoute
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedOrdensRoute: typeof AuthenticatedOrdensRoute
+  AuthenticatedReceberRoute: typeof AuthenticatedReceberRoute
   AuthenticatedPedidosIdRoute: typeof AuthenticatedPedidosIdRoute
   AuthenticatedPedidosIndexRoute: typeof AuthenticatedPedidosIndexRoute
 }
@@ -397,6 +438,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedEquipeRoute: AuthenticatedEquipeRoute,
   AuthenticatedEstoqueRoute: AuthenticatedEstoqueRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
@@ -406,6 +448,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMaisRoute: AuthenticatedMaisRoute,
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedOrdensRoute: AuthenticatedOrdensRoute,
+  AuthenticatedReceberRoute: AuthenticatedReceberRoute,
   AuthenticatedPedidosIdRoute: AuthenticatedPedidosIdRoute,
   AuthenticatedPedidosIndexRoute: AuthenticatedPedidosIndexRoute,
 }

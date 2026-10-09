@@ -6,6 +6,7 @@ import { Field, FormPanel, Panel, StateRow, inputCls } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
 import { addDias, dataBR, diasEntre, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
+import { WhatsButton } from "@/components/WhatsButton";
 
 export const Route = createFileRoute("/_authenticated/lembretes")({
   head: pageHead("Lembretes", "Manutenções preventivas de ar-condicionado por aparelho."),
@@ -29,7 +30,7 @@ function Lembretes() {
   const q = useQuery({
     queryKey: ["equipment"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("equipment").select("id, descricao, ultima_manutencao, intervalo_meses, locations(apelido, bairro, cidade, clients(nome, whatsapp))");
+      const { data, error } = await supabase.from("equipment").select("id, descricao, ultima_manutencao, intervalo_meses, locations(apelido, bairro, cidade, client_id, clients(nome, whatsapp))");
       if (error) throw error;
       const hoje = isoLocal();
       return data.map((e) => {
@@ -82,7 +83,13 @@ function Lembretes() {
                   <span className={e.falta < 0 ? "text-destructive" : e.falta <= 15 ? "text-warning" : ""}>{e.falta < 0 ? `vencida há ${-e.falta} dias` : `faltam ${e.falta} dias`}</span>
                 </div>
               </div>
+              <div className="flex flex-wrap items-start justify-end gap-2">
+              {e.falta < 0 && (
+                <WhatsButton label="Avisar no WhatsApp" chave="preventiva" telefone={e.locations?.clients?.whatsapp} clienteId={e.locations?.client_id ?? null} referenciaId={e.id}
+                  vars={{ nome: e.locations?.clients?.nome ?? "", modelo_aparelho: e.descricao, servico: "manutenção preventiva", data: dataBR(e.proxima) }} />
+              )}
               <button onClick={() => feita.mutate(e.id)} disabled={feita.isPending} className="h-8 rounded-[6px] border px-3 text-xs hover:bg-muted">Manutenção feita</button>
+              </div>
             </li>
           ))}
         </ul>
