@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Printer, Trash2, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS } from "@/lib/staff";
+import { useOrcamento } from "@/lib/orcamento";
 
 export const Route = createFileRoute("/_authenticated/orcamento/$id")({
   head: pageHead("Orçamento", "Itens, valores e impressão do orçamento."),
@@ -19,20 +20,6 @@ export const Route = createFileRoute("/_authenticated/orcamento/$id")({
 const STATUS = ["Rascunho", "Aguardando", "Aprovado", "Recusado"];
 const num = (s: string) => Number(s.replace(/\./g, "").replace(",", ".")) || 0;
 type Item = { id?: string; tipo: string; descricao: string; quantidade: string; valor_unitario: string };
-
-export function useOrcamento(id: string) {
-  return useQuery({
-    queryKey: ["quote", id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("quotes")
-        .select("*, clients(nome, whatsapp, email, documento, locations(endereco, bairro, cidade)), quote_items(id, tipo, descricao, quantidade, valor_unitario, ordem)")
-        .eq("id", id).single();
-      if (error) throw error;
-      data.quote_items.sort((a, b) => a.ordem - b.ordem);
-      return data;
-    },
-  });
-}
 
 function Orcamento() {
   const { id } = Route.useParams();

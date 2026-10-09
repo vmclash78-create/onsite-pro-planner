@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
@@ -14,10 +14,11 @@ export const Route = createFileRoute("/_authenticated/orcamentos")({
 });
 
 const STATUS = ["Rascunho", "Aguardando", "Aprovado", "Recusado"];
-const vazio = { client_id: "", descricao: "", valor: "" };
+const vazio = { client_id: "", descricao: "" };
 
 function Orcamentos() {
   const qc = useQueryClient();
+  const nav = useNavigate();
   const clientes = useClientes();
   const [aberto, setAberto] = useState(false);
   const [filtro, setFiltro] = useState("Todos");
@@ -33,12 +34,12 @@ function Orcamentos() {
   const inval = () => { qc.invalidateQueries({ queryKey: ["quotes"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); };
   const salvar = useMutation({
     mutationFn: async () => {
-      const valor = Number(f.valor.replace(/\./g, "").replace(",", "."));
-      if (!f.client_id || !f.descricao.trim() || !(valor >= 0)) throw new Error("Preencha cliente, descrição e valor.");
-      const { error } = await supabase.from("quotes").insert({ client_id: f.client_id, descricao: f.descricao.trim(), valor });
+      if (!f.client_id || !f.descricao.trim()) throw new Error("Escolha o cliente e descreva o serviço.");
+      const { data, error } = await supabase.from("quotes").insert({ client_id: f.client_id, descricao: f.descricao.trim(), valor: 0, status: "Rascunho" }).select("id").single();
       if (error) throw error;
+      return data.id;
     },
-    onSuccess: () => { setF(vazio); setAberto(false); inval(); },
+    onSuccess: (id) => { setF(vazio); setAberto(false); inval(); nav({ to: "/orcamento/$id", params: { id } }); },
   });
   const status = useMutation({
     mutationFn: async ({ id, s }: { id: string; s: string }) => {
@@ -59,8 +60,7 @@ function Orcamentos() {
               {clientes.data?.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </Field>
-          <Field label="Valor (R$)"><input className={inputCls} value={f.valor} onChange={(e) => setF({ ...f, valor: e.target.value })} inputMode="decimal" placeholder="0,00" required /></Field>
-          <Field label="Descrição" className="sm:col-span-2"><input className={inputCls} value={f.descricao} onChange={(e) => setF({ ...f, descricao: e.target.value })} required /></Field>
+          <Field label="Serviço (os itens e valores vêm na próxima tela)"><input className={inputCls} value={f.descricao} onChange={(e) => setF({ ...f, descricao: e.target.value })} required /></Field>
         </FormPanel>
       )}
       <Panel title={`${lista.length} orçamento(s)`} action={
@@ -73,7 +73,7 @@ function Orcamentos() {
             <li key={o.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:grid-cols-[5rem_minmax(0,1fr)_8rem_auto]">
               <div className="hidden text-xs tabular-nums text-muted-foreground sm:block">ORC-{String(o.numero).padStart(4, "0")}</div>
               <div className="min-w-0">
-                <div className="truncate text-sm font-medium">{o.clients?.nome}</div>
+                <Link to="/orcamento/$id" params={{ id: o.id }} className="block truncate text-sm font-medium hover:underline">{o.clients?.nome}</Link>
                 <div className="truncate text-xs text-muted-foreground">{o.descricao}{o.enviado_em ? ` · ${dataBR(o.enviado_em)}` : ""}</div>
               </div>
               <div className="text-right text-sm tabular-nums">{brl(Number(o.valor))}</div>

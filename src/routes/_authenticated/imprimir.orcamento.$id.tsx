@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { company } from "@/lib/company";
 import { addDias, brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
-import { useOrcamento } from "./orcamento.$id";
+import { useOrcamento } from "@/lib/orcamento";
 
 export const Route = createFileRoute("/_authenticated/imprimir/orcamento/$id")({
   head: pageHead("Imprimir orçamento", "Orçamento para impressão e assinatura."),
