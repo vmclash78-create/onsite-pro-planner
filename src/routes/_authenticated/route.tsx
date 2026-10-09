@@ -1,8 +1,11 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
-// MODO TESTE: verificação de login desativada temporariamente.
-// Para reativar, restaurar o beforeLoad que redireciona para /auth.
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/auth" });
+  },
   component: () => <Outlet />,
 });
