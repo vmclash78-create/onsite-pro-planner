@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package,
@@ -59,6 +59,15 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
   const crumbs = breadcrumb ?? ["Painel", title];
   const me = useMe();
   const sair = useSignOut();
+  const qc = useQueryClient();
+  useEffect(() => {
+    const ch = supabase.channel("appointments-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => {
+        for (const k of ["pedidos", "agenda", "dashboard"]) qc.invalidateQueries({ queryKey: [k] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [qc]);
 
   let body: ReactNode = children;
   if (me.isLoading) body = <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>;

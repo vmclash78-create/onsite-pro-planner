@@ -41,6 +41,10 @@ export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((d) => pedidoSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!data.visita && data.data && data.hora) {
+      const { data: livre } = await supabaseAdmin.rpc("horarios_ocupados", { _inicio: data.data, _fim: data.data });
+      if (livre?.some((o) => o.hora === data.hora)) throw new Error("HORARIO_OCUPADO");
+    }
     const { data: row, error } = await supabaseAdmin
       .from("appointments")
       .insert({

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
@@ -28,8 +29,6 @@ const AREAS: Record<string, [string, string[]]> = {
   Elétrica: ["Pontos, quadros e reparos", ["Ponto novo", "Quadro", "Instalação", "Reparo"]],
 };
 const HORAS: Record<string, string[]> = { Manhã: ["08:00", "09:00", "10:00"], Tarde: ["14:00", "15:00", "16:00"] };
-// Horários ocupados: "AAAA-MM-DD HH:mm"
-const OCUPADOS: string[] = [];
 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("pt-BR", o);
@@ -63,6 +62,17 @@ function Agendar() {
   const [lgpd, setLgpd] = useState(false);
   const [ok, setOk] = useState(false);
 
+  const ocup = useQuery({
+    queryKey: ["ocupados", iso(dias[0]!)],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("horarios_ocupados", { _inicio: iso(dias[0]!), _fim: iso(dias[dias.length - 1]!) });
+      if (error) throw error;
+      return data.map((o) => `${o.data} ${o.hora}`);
+    },
+    refetchInterval: 20_000,
+    refetchOnWindowFocus: true,
+  });
+  const OCUPADOS = ocup.data ?? [];
   const diaSel = dias.find((d) => iso(d) === data);
   const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
@@ -81,7 +91,12 @@ function Agendar() {
       }
       const r = await criar({ data: { categoria: area as "Refrigeração" | "Gesso" | "Elétrica", tipo, visita, data, hora, nome, whatsapp: whats, cep, descricao: desc, fotos: paths, lgpd: true } });
       setProtocolo(r.protocolo); setOk(true); window.scrollTo(0, 0);
-    } catch {
+    } catch (e) {
+      if (e instanceof Error && e.message.includes("HORARIO_OCUPADO")) {
+        void ocup.refetch(); setHora(null); go(2);
+        setErroEnvio("Esse horário acabou de ser ocupado. Escolha outro.");
+        return;
+      }
       setErroEnvio("Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.");
     } finally { setEnviando(false); }
   };
