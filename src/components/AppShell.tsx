@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store,
+  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store, Eye,
 } from "lucide-react";
 import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,21 +84,11 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
 
   let body: ReactNode = children;
   if (me.isLoading) body = <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>;
-  else if (!me.data)
-    body = (
-      <>
-        <div className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-warning/40 bg-card px-4 py-3 text-sm">
-          <p className="min-w-0 text-muted-foreground">Você não está conectado: as listas ficam vazias e os botões de criar e salvar ficam escondidos. Entre uma vez e o navegador lembra sua conta.</p>
-          <Button asChild size="sm"><Link to="/auth">Entrar</Link></Button>
-        </div>
-        {children}
-      </>
-    );
-  else if (me.data && !me.data.isStaff)
+  else if (!me.data || !me.data.isStaff)
     body = (
       <div className="max-w-md rounded-lg border bg-card p-5 text-sm">
         <p className="font-medium">Aguardando liberação</p>
-        <p className="mt-1 text-muted-foreground">Sua conta ({me.data.email}) foi criada. Peça para o administrador liberar seu acesso na tela Equipe.</p>
+        <p className="mt-1 text-muted-foreground">Sua conta ({me.data?.email ?? ""}) foi criada. Peça para o administrador liberar seu acesso na tela Equipe.</p>
       </div>
     );
 
@@ -106,19 +96,27 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar py-4 text-sidebar-foreground lg:flex">
         <Brand />
-        <nav className="mt-6 flex flex-col gap-0.5 px-2">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <Link key={to} to={to}
-              className="relative flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              activeProps={{ className: "bg-sidebar-accent !text-sidebar-accent-foreground font-medium before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-primary" }}>
-              <Icon className={ICON} strokeWidth={1.75} />{label}
-            </Link>
+        <nav className="mt-5 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
+          {navGroups.map((g) => (
+            <div key={g.titulo}>
+              <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</div>
+              <div className="flex flex-col gap-0.5">
+                {g.itens.map(({ to, label, icon: Icon }) => (
+                  <Link key={to} to={to}
+                    className="relative flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    activeProps={{ className: "bg-sidebar-accent !text-sidebar-accent-foreground font-medium before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-primary" }}>
+                    <Icon className={ICON} strokeWidth={1.75} />{label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           ))}
-          <Link to="/agendar" className="mt-3 flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent">
-            <ExternalLink className={ICON} strokeWidth={1.75} /> Página de agendamento
-          </Link>
+          <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-3">
+            <Link to="/catalogo" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><Eye className={ICON} strokeWidth={1.75} /> Ver como o cliente vê</Link>
+            <Link to="/agendar" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><ExternalLink className={ICON} strokeWidth={1.75} /> Página de agendamento</Link>
+          </div>
         </nav>
-        <div className="mt-auto border-t border-sidebar-border px-5 pt-4 text-xs leading-relaxed text-muted-foreground">
+        <div className="mt-3 border-t border-sidebar-border px-5 pt-4 text-xs leading-relaxed text-muted-foreground">
           <div className="truncate text-sm font-medium text-sidebar-accent-foreground">{me.data?.nome ?? ""}</div>
           <div>{me.data?.isAdmin ? "Administrador" : me.data?.isStaff ? "Técnico" : "Sem acesso"}</div>
           <button onClick={sair} className="mt-2 inline-flex items-center gap-1.5 text-sidebar-foreground hover:text-foreground"><LogOut className="h-3.5 w-3.5" /> Sair</button>
@@ -150,7 +148,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
         {[
           { to: "/inicio", label: "Início", icon: LayoutDashboard },
           { to: "/agenda", label: "Agenda", icon: CalendarDays },
-          { to: "/clientes", label: "Clientes", icon: Users },
+          { to: "/pedidos", label: "Pedidos", icon: Inbox },
           { to: "/mais", label: "Mais", icon: MoreHorizontal },
         ].map(({ to, label, icon: Icon }) => (
           <Link key={to} to={to} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground" activeProps={{ className: "!text-primary font-medium" }}>
