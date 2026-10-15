@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
@@ -58,7 +58,7 @@ function Clientes() {
         <ul className="divide-y">
           {lista.map((c) => (
             <li key={c.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_10rem_minmax(0,1fr)] sm:gap-4">
-              <div className="truncate text-sm font-medium">{c.nome}</div>
+              <Link to="/cliente/$id" params={{ id: c.id }} className="truncate text-sm font-medium text-primary hover:underline">{c.nome}</Link>
               <div className="text-sm tabular-nums text-muted-foreground">{c.whatsapp ?? "—"}</div>
               <div className="truncate text-xs text-muted-foreground sm:text-sm">{c.locations[0] ? `${c.locations[0].endereco} — ${c.locations[0].bairro ?? ""}, ${c.locations[0].cidade}` : "Sem endereço"}{c.locations.length > 1 ? ` (+${c.locations.length - 1})` : ""}</div>
             </li>

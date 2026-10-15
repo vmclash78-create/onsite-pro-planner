@@ -27,7 +27,9 @@ import { Route as AuthenticatedMaisRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedOrdensRouteImport } from './routes/_authenticated/ordens'
 import { Route as AuthenticatedReceberRouteImport } from './routes/_authenticated/receber'
+import { Route as AuthenticatedClienteIdRouteImport } from './routes/_authenticated/cliente.$id'
 import { Route as AuthenticatedOrcamentoIdRouteImport } from './routes/_authenticated/orcamento.$id'
+import { Route as AuthenticatedOrdemIdRouteImport } from './routes/_authenticated/ordem.$id'
 import { Route as AuthenticatedPedidosIndexRouteImport } from './routes/_authenticated/pedidos.index'
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 import { Route as AuthenticatedImprimirOrcamentoIdRouteImport } from './routes/_authenticated/imprimir.orcamento.$id'
@@ -122,12 +124,22 @@ const AuthenticatedReceberRoute = AuthenticatedReceberRouteImport.update({
   path: '/receber',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedClienteIdRoute = AuthenticatedClienteIdRouteImport.update({
+  id: '/cliente/$id',
+  path: '/cliente/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrcamentoIdRoute =
   AuthenticatedOrcamentoIdRouteImport.update({
     id: '/orcamento/$id',
     path: '/orcamento/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrdemIdRoute = AuthenticatedOrdemIdRouteImport.update({
+  id: '/ordem/$id',
+  path: '/ordem/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPedidosIndexRoute =
   AuthenticatedPedidosIndexRouteImport.update({
     id: '/pedidos/',
@@ -164,7 +176,9 @@ export interface FileRoutesByFullPath {
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
   '/receber': typeof AuthenticatedReceberRoute
+  '/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -187,7 +201,9 @@ export interface FileRoutesByTo {
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
   '/receber': typeof AuthenticatedReceberRoute
+  '/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -212,7 +228,9 @@ export interface FileRoutesById {
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/ordens': typeof AuthenticatedOrdensRoute
   '/_authenticated/receber': typeof AuthenticatedReceberRoute
+  '/_authenticated/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/_authenticated/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/_authenticated/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/_authenticated/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/_authenticated/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -237,7 +255,9 @@ export interface FileRouteTypes {
     | '/orcamentos'
     | '/ordens'
     | '/receber'
+    | '/cliente/$id'
     | '/orcamento/$id'
+    | '/ordem/$id'
     | '/pedidos/$id'
     | '/pedidos/'
     | '/imprimir/orcamento/$id'
@@ -260,7 +280,9 @@ export interface FileRouteTypes {
     | '/orcamentos'
     | '/ordens'
     | '/receber'
+    | '/cliente/$id'
     | '/orcamento/$id'
+    | '/ordem/$id'
     | '/pedidos/$id'
     | '/pedidos'
     | '/imprimir/orcamento/$id'
@@ -284,7 +306,9 @@ export interface FileRouteTypes {
     | '/_authenticated/orcamentos'
     | '/_authenticated/ordens'
     | '/_authenticated/receber'
+    | '/_authenticated/cliente/$id'
     | '/_authenticated/orcamento/$id'
+    | '/_authenticated/ordem/$id'
     | '/_authenticated/pedidos/$id'
     | '/_authenticated/pedidos/'
     | '/_authenticated/imprimir/orcamento/$id'
@@ -426,11 +450,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceberRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cliente/$id': {
+      id: '/_authenticated/cliente/$id'
+      path: '/cliente/$id'
+      fullPath: '/cliente/$id'
+      preLoaderRoute: typeof AuthenticatedClienteIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orcamento/$id': {
       id: '/_authenticated/orcamento/$id'
       path: '/orcamento/$id'
       fullPath: '/orcamento/$id'
       preLoaderRoute: typeof AuthenticatedOrcamentoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ordem/$id': {
+      id: '/_authenticated/ordem/$id'
+      path: '/ordem/$id'
+      fullPath: '/ordem/$id'
+      preLoaderRoute: typeof AuthenticatedOrdemIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pedidos/': {
@@ -471,7 +509,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedOrdensRoute: typeof AuthenticatedOrdensRoute
   AuthenticatedReceberRoute: typeof AuthenticatedReceberRoute
+  AuthenticatedClienteIdRoute: typeof AuthenticatedClienteIdRoute
   AuthenticatedOrcamentoIdRoute: typeof AuthenticatedOrcamentoIdRoute
+  AuthenticatedOrdemIdRoute: typeof AuthenticatedOrdemIdRoute
   AuthenticatedPedidosIdRoute: typeof AuthenticatedPedidosIdRoute
   AuthenticatedPedidosIndexRoute: typeof AuthenticatedPedidosIndexRoute
   AuthenticatedImprimirOrcamentoIdRoute: typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -491,7 +531,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedOrdensRoute: AuthenticatedOrdensRoute,
   AuthenticatedReceberRoute: AuthenticatedReceberRoute,
+  AuthenticatedClienteIdRoute: AuthenticatedClienteIdRoute,
   AuthenticatedOrcamentoIdRoute: AuthenticatedOrcamentoIdRoute,
+  AuthenticatedOrdemIdRoute: AuthenticatedOrdemIdRoute,
   AuthenticatedPedidosIdRoute: AuthenticatedPedidosIdRoute,
   AuthenticatedPedidosIndexRoute: AuthenticatedPedidosIndexRoute,
   AuthenticatedImprimirOrcamentoIdRoute: AuthenticatedImprimirOrcamentoIdRoute,
