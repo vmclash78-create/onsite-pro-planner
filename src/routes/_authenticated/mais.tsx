@@ -25,7 +25,7 @@ function Mais() {
             <h2 className="mb-1.5 px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</h2>
             <div className="divide-y rounded-lg border bg-card">
               {g.itens.map(({ to, label, icon: Icon }) => (
-                <Link key={to} to={to} className={row}>
+                <Link key={to} to={to as "/inicio"} className={row}>
                   <Icon className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
                   <span className="flex-1">{label}</span>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />

@@ -9,7 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
 import { Button } from "@/components/ui/button";
 
-export const navGroups = [
+type NavItem = { to: string; label: string; icon: typeof Users };
+export const navGroups: { titulo: string; itens: NavItem[] }[] = [
   { titulo: "Dia a dia", itens: [
     { to: "/inicio", label: "Início", icon: LayoutDashboard },
     { to: "/agenda", label: "Agenda", icon: CalendarDays },
@@ -32,7 +33,7 @@ export const navGroups = [
     { to: "/locais", label: "Endereços", icon: MapPin },
     { to: "/configuracoes", label: "Configurações", icon: Settings },
   ] },
-] as const;
+];
 
 export const navItems = navGroups.flatMap((g) => g.itens);
 const MOBILE = ["/inicio", "/agenda", "/pedidos"];
@@ -102,7 +103,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
               <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</div>
               <div className="flex flex-col gap-0.5">
                 {g.itens.map(({ to, label, icon: Icon }) => (
-                  <Link key={to} to={to}
+                  <Link key={to} to={to as "/inicio"}
                     className="relative flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     activeProps={{ className: "bg-sidebar-accent !text-sidebar-accent-foreground font-medium before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-primary" }}>
                     <Icon className={ICON} strokeWidth={1.75} />{label}
