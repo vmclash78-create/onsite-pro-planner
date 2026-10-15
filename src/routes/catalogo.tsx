@@ -36,7 +36,7 @@ function Catalogo() {
   const itens = (q.data ?? []).filter((i) => cat === "Todos" || i.categoria === cat);
   const obras = itens.filter((i) => i.tipo === "Obra");
   const ofertas = itens.filter((i) => i.tipo !== "Obra");
-  const zap = (t: string) => `https://wa.me/${company.whatsappUrl.replace(/\D/g, "").slice(-13)}?text=${encodeURIComponent(`Olá! Tenho interesse em: ${t}`)}`;
+  const zap = (t: string) => `${company.whatsappUrl}?text=${encodeURIComponent(`Olá! Tenho interesse em: ${t}`)}`;
 
   return (
     <div className="min-h-screen bg-background">
