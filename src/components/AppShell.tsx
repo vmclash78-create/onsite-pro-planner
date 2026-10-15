@@ -9,24 +9,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
 import { Button } from "@/components/ui/button";
 
-export const navItems = [
-  { to: "/inicio", label: "Início", icon: LayoutDashboard },
-  { to: "/agenda", label: "Agenda", icon: CalendarDays },
-  { to: "/pedidos", label: "Pedidos", icon: Inbox },
-  { to: "/clientes", label: "Clientes", icon: Users },
-  { to: "/orcamentos", label: "Orçamentos", icon: FileText },
-  { to: "/ordens", label: "Ordens de serviço", icon: Wrench },
-  { to: "/financeiro", label: "Financeiro", icon: Wallet },
-  { to: "/receber", label: "A receber", icon: HandCoins },
-  { to: "/estoque", label: "Estoque", icon: Package },
-  { to: "/equipe", label: "Equipe", icon: HardHat },
-  { to: "/locais", label: "Locais", icon: MapPin },
-  { to: "/lembretes", label: "Lembretes", icon: BellRing },
-  { to: "/vitrine", label: "Vitrine", icon: Store },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
+export const navGroups = [
+  { titulo: "Dia a dia", itens: [
+    { to: "/inicio", label: "Início", icon: LayoutDashboard },
+    { to: "/agenda", label: "Agenda", icon: CalendarDays },
+    { to: "/pedidos", label: "Pedidos do site", icon: Inbox },
+    { to: "/ordens", label: "Ordens de serviço", icon: Wrench },
+  ] },
+  { titulo: "Clientes e vendas", itens: [
+    { to: "/clientes", label: "Clientes", icon: Users },
+    { to: "/orcamentos", label: "Orçamentos", icon: FileText },
+    { to: "/lembretes", label: "Preventivas", icon: BellRing },
+    { to: "/vitrine", label: "Minha vitrine", icon: Store },
+  ] },
+  { titulo: "Dinheiro e estoque", itens: [
+    { to: "/receber", label: "A receber", icon: HandCoins },
+    { to: "/financeiro", label: "Caixa", icon: Wallet },
+    { to: "/estoque", label: "Estoque", icon: Package },
+  ] },
+  { titulo: "Empresa", itens: [
+    { to: "/equipe", label: "Equipe", icon: HardHat },
+    { to: "/locais", label: "Endereços", icon: MapPin },
+    { to: "/configuracoes", label: "Configurações", icon: Settings },
+  ] },
 ] as const;
 
-export const moreItems = navItems.filter((n) => !["/inicio", "/agenda", "/clientes"].includes(n.to));
+export const navItems = navGroups.flatMap((g) => g.itens);
+const MOBILE = ["/inicio", "/agenda", "/pedidos"];
+export const moreGroups = navGroups.map((g) => ({ ...g, itens: g.itens.filter((i) => !MOBILE.includes(i.to)) })).filter((g) => g.itens.length);
 
 const ICON = "h-4 w-4 shrink-0";
 
