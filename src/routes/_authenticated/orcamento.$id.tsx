@@ -11,6 +11,7 @@ import { brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS } from "@/lib/staff";
 import { useOrcamento } from "@/lib/orcamento";
+import { CalcGesso } from "@/components/CalcGesso";
 
 export const Route = createFileRoute("/_authenticated/orcamento/$id")({
   head: pageHead("Orçamento", "Itens, valores e impressão do orçamento."),
@@ -129,6 +130,9 @@ function Orcamento() {
               <div className="flex justify-between gap-8 text-base font-semibold"><span>Total</span><span className="tabular-nums">{brl(total)}</span></div>
             </div>
           </Panel>
+
+          <CalcGesso onAdd={(novos) => setItens([...itens, ...novos])} />
+
 
           {(salvar.error || converter.error) && <p role="alert" className="text-xs text-destructive">{(salvar.error ?? converter.error)?.message}</p>}
           <div className="flex flex-wrap items-center gap-2">

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
@@ -86,7 +86,7 @@ function Ordens() {
             <li key={o.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:grid-cols-[5rem_minmax(0,1fr)_7rem_auto]">
               <div className="hidden text-xs tabular-nums text-muted-foreground sm:block">OS-{String(o.numero).padStart(4, "0")}</div>
               <div className="min-w-0">
-                <div className="truncate text-sm font-medium">{o.clients?.nome}</div>
+                <Link to="/ordem/$id" params={{ id: o.id }} className="block truncate text-sm font-medium text-primary hover:underline">{o.clients?.nome}</Link>
                 <div className="truncate text-xs text-muted-foreground">{o.categoria} · {o.descricao}</div>
                 <div className="text-xs tabular-nums text-muted-foreground">{o.inicio ? `Início ${dataBR(o.inicio)}` : ""}{o.concluida_em ? ` · concluída ${dataBR(o.concluida_em)}` : ""}{o.profiles?.nome ? ` · ${o.profiles.nome}` : ""}</div>
               </div>

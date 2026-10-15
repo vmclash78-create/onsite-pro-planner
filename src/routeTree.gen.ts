@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AgendarRouteImport } from './routes/agendar'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
@@ -27,7 +28,10 @@ import { Route as AuthenticatedMaisRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
 import { Route as AuthenticatedOrdensRouteImport } from './routes/_authenticated/ordens'
 import { Route as AuthenticatedReceberRouteImport } from './routes/_authenticated/receber'
+import { Route as AuthenticatedVitrineRouteImport } from './routes/_authenticated/vitrine'
+import { Route as AuthenticatedClienteIdRouteImport } from './routes/_authenticated/cliente.$id'
 import { Route as AuthenticatedOrcamentoIdRouteImport } from './routes/_authenticated/orcamento.$id'
+import { Route as AuthenticatedOrdemIdRouteImport } from './routes/_authenticated/ordem.$id'
 import { Route as AuthenticatedPedidosIndexRouteImport } from './routes/_authenticated/pedidos.index'
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 import { Route as AuthenticatedImprimirOrcamentoIdRouteImport } from './routes/_authenticated/imprimir.orcamento.$id'
@@ -49,6 +53,11 @@ const AgendarRoute = AgendarRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogoRoute = CatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -122,12 +131,27 @@ const AuthenticatedReceberRoute = AuthenticatedReceberRouteImport.update({
   path: '/receber',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVitrineRoute = AuthenticatedVitrineRouteImport.update({
+  id: '/vitrine',
+  path: '/vitrine',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedClienteIdRoute = AuthenticatedClienteIdRouteImport.update({
+  id: '/cliente/$id',
+  path: '/cliente/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrcamentoIdRoute =
   AuthenticatedOrcamentoIdRouteImport.update({
     id: '/orcamento/$id',
     path: '/orcamento/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOrdemIdRoute = AuthenticatedOrdemIdRouteImport.update({
+  id: '/ordem/$id',
+  path: '/ordem/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPedidosIndexRoute =
   AuthenticatedPedidosIndexRouteImport.update({
     id: '/pedidos/',
@@ -150,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/catalogo': typeof CatalogoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/clientes': typeof AuthenticatedClientesRoute
@@ -164,7 +189,10 @@ export interface FileRoutesByFullPath {
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
   '/receber': typeof AuthenticatedReceberRoute
+  '/vitrine': typeof AuthenticatedVitrineRoute
+  '/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -173,6 +201,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/catalogo': typeof CatalogoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/clientes': typeof AuthenticatedClientesRoute
@@ -187,7 +216,10 @@ export interface FileRoutesByTo {
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/ordens': typeof AuthenticatedOrdensRoute
   '/receber': typeof AuthenticatedReceberRoute
+  '/vitrine': typeof AuthenticatedVitrineRoute
+  '/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -198,6 +230,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/agendar': typeof AgendarRoute
   '/auth': typeof AuthRoute
+  '/catalogo': typeof CatalogoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
@@ -212,7 +245,10 @@ export interface FileRoutesById {
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/ordens': typeof AuthenticatedOrdensRoute
   '/_authenticated/receber': typeof AuthenticatedReceberRoute
+  '/_authenticated/vitrine': typeof AuthenticatedVitrineRoute
+  '/_authenticated/cliente/$id': typeof AuthenticatedClienteIdRoute
   '/_authenticated/orcamento/$id': typeof AuthenticatedOrcamentoIdRoute
+  '/_authenticated/ordem/$id': typeof AuthenticatedOrdemIdRoute
   '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/_authenticated/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/_authenticated/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -223,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/catalogo'
     | '/privacidade'
     | '/agenda'
     | '/clientes'
@@ -237,7 +274,10 @@ export interface FileRouteTypes {
     | '/orcamentos'
     | '/ordens'
     | '/receber'
+    | '/vitrine'
+    | '/cliente/$id'
     | '/orcamento/$id'
+    | '/ordem/$id'
     | '/pedidos/$id'
     | '/pedidos/'
     | '/imprimir/orcamento/$id'
@@ -246,6 +286,7 @@ export interface FileRouteTypes {
     | '/'
     | '/agendar'
     | '/auth'
+    | '/catalogo'
     | '/privacidade'
     | '/agenda'
     | '/clientes'
@@ -260,7 +301,10 @@ export interface FileRouteTypes {
     | '/orcamentos'
     | '/ordens'
     | '/receber'
+    | '/vitrine'
+    | '/cliente/$id'
     | '/orcamento/$id'
+    | '/ordem/$id'
     | '/pedidos/$id'
     | '/pedidos'
     | '/imprimir/orcamento/$id'
@@ -270,6 +314,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/agendar'
     | '/auth'
+    | '/catalogo'
     | '/privacidade'
     | '/_authenticated/agenda'
     | '/_authenticated/clientes'
@@ -284,7 +329,10 @@ export interface FileRouteTypes {
     | '/_authenticated/orcamentos'
     | '/_authenticated/ordens'
     | '/_authenticated/receber'
+    | '/_authenticated/vitrine'
+    | '/_authenticated/cliente/$id'
     | '/_authenticated/orcamento/$id'
+    | '/_authenticated/ordem/$id'
     | '/_authenticated/pedidos/$id'
     | '/_authenticated/pedidos/'
     | '/_authenticated/imprimir/orcamento/$id'
@@ -295,6 +343,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AgendarRoute: typeof AgendarRoute
   AuthRoute: typeof AuthRoute
+  CatalogoRoute: typeof CatalogoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
 }
 
@@ -326,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo': {
+      id: '/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof CatalogoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -426,11 +482,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceberRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/vitrine': {
+      id: '/_authenticated/vitrine'
+      path: '/vitrine'
+      fullPath: '/vitrine'
+      preLoaderRoute: typeof AuthenticatedVitrineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cliente/$id': {
+      id: '/_authenticated/cliente/$id'
+      path: '/cliente/$id'
+      fullPath: '/cliente/$id'
+      preLoaderRoute: typeof AuthenticatedClienteIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orcamento/$id': {
       id: '/_authenticated/orcamento/$id'
       path: '/orcamento/$id'
       fullPath: '/orcamento/$id'
       preLoaderRoute: typeof AuthenticatedOrcamentoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ordem/$id': {
+      id: '/_authenticated/ordem/$id'
+      path: '/ordem/$id'
+      fullPath: '/ordem/$id'
+      preLoaderRoute: typeof AuthenticatedOrdemIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pedidos/': {
@@ -471,7 +548,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedOrdensRoute: typeof AuthenticatedOrdensRoute
   AuthenticatedReceberRoute: typeof AuthenticatedReceberRoute
+  AuthenticatedVitrineRoute: typeof AuthenticatedVitrineRoute
+  AuthenticatedClienteIdRoute: typeof AuthenticatedClienteIdRoute
   AuthenticatedOrcamentoIdRoute: typeof AuthenticatedOrcamentoIdRoute
+  AuthenticatedOrdemIdRoute: typeof AuthenticatedOrdemIdRoute
   AuthenticatedPedidosIdRoute: typeof AuthenticatedPedidosIdRoute
   AuthenticatedPedidosIndexRoute: typeof AuthenticatedPedidosIndexRoute
   AuthenticatedImprimirOrcamentoIdRoute: typeof AuthenticatedImprimirOrcamentoIdRoute
@@ -491,7 +571,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedOrdensRoute: AuthenticatedOrdensRoute,
   AuthenticatedReceberRoute: AuthenticatedReceberRoute,
+  AuthenticatedVitrineRoute: AuthenticatedVitrineRoute,
+  AuthenticatedClienteIdRoute: AuthenticatedClienteIdRoute,
   AuthenticatedOrcamentoIdRoute: AuthenticatedOrcamentoIdRoute,
+  AuthenticatedOrdemIdRoute: AuthenticatedOrdemIdRoute,
   AuthenticatedPedidosIdRoute: AuthenticatedPedidosIdRoute,
   AuthenticatedPedidosIndexRoute: AuthenticatedPedidosIndexRoute,
   AuthenticatedImprimirOrcamentoIdRoute: AuthenticatedImprimirOrcamentoIdRoute,
@@ -505,6 +588,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AgendarRoute: AgendarRoute,
   AuthRoute: AuthRoute,
+  CatalogoRoute: CatalogoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
 }
 export const routeTree = rootRouteImport

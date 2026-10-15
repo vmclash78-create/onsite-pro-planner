@@ -114,6 +114,48 @@ export type Database = {
           },
         ]
       }
+      catalogo_itens: {
+        Row: {
+          a_partir: boolean
+          ativo: boolean
+          categoria: string
+          created_at: string
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          ordem: number
+          preco: number | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          a_partir?: boolean
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          preco?: number | null
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          a_partir?: boolean
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          preco?: number | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           created_at: string
@@ -170,28 +212,43 @@ export type Database = {
       }
       equipment: {
         Row: {
+          ambiente: string | null
+          btus: number | null
           created_at: string
           descricao: string
+          gas: string | null
           id: string
           intervalo_meses: number
           location_id: string
+          marca: string | null
           ultima_manutencao: string | null
+          voltagem: string | null
         }
         Insert: {
+          ambiente?: string | null
+          btus?: number | null
           created_at?: string
           descricao: string
+          gas?: string | null
           id?: string
           intervalo_meses?: number
           location_id: string
+          marca?: string | null
           ultima_manutencao?: string | null
+          voltagem?: string | null
         }
         Update: {
+          ambiente?: string | null
+          btus?: number | null
           created_at?: string
           descricao?: string
+          gas?: string | null
           id?: string
           intervalo_meses?: number
           location_id?: string
+          marca?: string | null
           ultima_manutencao?: string | null
+          voltagem?: string | null
         }
         Relationships: [
           {
@@ -353,6 +410,38 @@ export type Database = {
           titulo?: string
         }
         Relationships: []
+      }
+      os_fotos: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          service_order_id: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          service_order_id: string
+          tipo?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          service_order_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "os_fotos_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -533,6 +622,45 @@ export type Database = {
           },
         ]
       }
+      service_order_items: {
+        Row: {
+          created_at: string
+          id: string
+          quantidade: number
+          service_order_id: string
+          stock_item_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantidade?: number
+          service_order_id: string
+          stock_item_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantidade?: number
+          service_order_id?: string
+          stock_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_order_items_service_order_id_fkey"
+            columns: ["service_order_id"]
+            isOneToOne: false
+            referencedRelation: "service_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_order_items_stock_item_id_fkey"
+            columns: ["stock_item_id"]
+            isOneToOne: false
+            referencedRelation: "stock_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_orders: {
         Row: {
           appointment_id: string | null
@@ -541,8 +669,12 @@ export type Database = {
           concluida_em: string | null
           created_at: string
           descricao: string
+          equipment_id: string | null
+          estoque_baixado: boolean
+          garantia_dias: number
           id: string
           inicio: string | null
+          location_id: string | null
           numero: number
           status: string
           tecnico_id: string | null
@@ -555,8 +687,12 @@ export type Database = {
           concluida_em?: string | null
           created_at?: string
           descricao: string
+          equipment_id?: string | null
+          estoque_baixado?: boolean
+          garantia_dias?: number
           id?: string
           inicio?: string | null
+          location_id?: string | null
           numero?: number
           status?: string
           tecnico_id?: string | null
@@ -569,8 +705,12 @@ export type Database = {
           concluida_em?: string | null
           created_at?: string
           descricao?: string
+          equipment_id?: string | null
+          estoque_baixado?: boolean
+          garantia_dias?: number
           id?: string
           inicio?: string | null
+          location_id?: string | null
           numero?: number
           status?: string
           tecnico_id?: string | null
@@ -589,6 +729,20 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_orders_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
           {

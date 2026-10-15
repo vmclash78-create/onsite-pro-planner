@@ -20,3 +20,5 @@
 - AI triage runs server-side in src/lib/triagem.server.ts (Lovable AI Gateway, Responses API, structured output) and is admin-only — keeps the key and prompts off the client.
 - Completed service orders create a `recebimentos` row (trigger os_financeiro); revenue reaches financial_entries only via the admin-only `registrar_pagamento` RPC — cash basis, no double counting.
 - Pix BR Code, phone normalization and WhatsApp templates live in src/lib/cobranca.ts; WhatsApp sends are wa.me links logged in `mensagens_enviadas` — no paid API.
+- Public catalog (/catalogo) reads catalogo_itens via anon RLS (ativo only); images in public bucket catalogo — only showcase data is public.
+- Completing a service order deducts its service_order_items from stock and refreshes the linked equipment's last maintenance (trigger os_conclusao) — stock and preventive dates stay consistent.
