@@ -43,6 +43,13 @@
       "when": 1791557752612,
       "tag": "0005_quote_items",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792102079952,
+      "tag": "0006_ficha_os_pecas_catalogo",
+      "breakpoints": true
     }
   ]
 }
