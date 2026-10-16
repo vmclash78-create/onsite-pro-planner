@@ -13,23 +13,20 @@ const TEXTO: [number, number, number] = [15, 23, 42];
 
 type Img = { data: string; w: number; h: number };
 
-async function carregar(url?: string): Promise<Img | null> {
+// Carrega e reduz a imagem (logos e fotos vêm enormes), mantendo o PDF leve
+// para enviar pelo WhatsApp.
+async function carregar(url?: string, max = 1000): Promise<Img | null> {
   if (!url) return null;
   try {
     const blob = await (await fetch(url)).blob();
-    const data = await new Promise<string>((ok, erro) => {
-      const r = new FileReader();
-      r.onload = () => ok(r.result as string);
-      r.onerror = erro;
-      r.readAsDataURL(blob);
-    });
-    const { w, h } = await new Promise<{ w: number; h: number }>((ok, erro) => {
-      const i = new Image();
-      i.onload = () => ok({ w: i.naturalWidth, h: i.naturalHeight });
-      i.onerror = erro;
-      i.src = data;
-    });
-    return { data, w, h };
+    const bmp = await createImageBitmap(blob);
+    const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    c.getContext("2d")!.drawImage(bmp, 0, 0, w, h);
+    const png = blob.type.includes("png");
+    return { data: c.toDataURL(png ? "image/png" : "image/jpeg", 0.82), w, h };
   } catch {
     return null;
   }
