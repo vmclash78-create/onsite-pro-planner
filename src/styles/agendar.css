@@ -116,7 +116,7 @@
 .vm-ag .b{height:48px}
 }
 /* Visita para orçamento como cartão */
-.vm-ag .ou{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--mut);font-size:12px;font-weight:600}
+.vm-ag .ou{display:flex;align-items:center;gap:10px;margin:clamp(20px,9vh,72px) 0 12px;color:var(--mut);font-size:12px;font-weight:600}
 .vm-ag .ou::before,.vm-ag .ou::after{content:"";flex:1;height:1px;background:var(--line)}
 .vm-ag .visit2{display:grid;grid-template-columns:40px minmax(0,1fr) 22px;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1.5px solid var(--bd);background:var(--surface)}
 .vm-ag .visit2 .vi{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:color-mix(in oklab,var(--ac) 10%,var(--surface));color:var(--ac)}
