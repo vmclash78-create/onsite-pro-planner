@@ -212,7 +212,7 @@ function Agendar() {
               </div>
             ))}
             <div className="ou"><span>ou</span></div>
-            <button type="button" className={`visit2 ${visita ? "on" : ""}`} aria-pressed={visita} onClick={() => { setVisita(true); setData(null); setHora(null); }}>
+            <button type="button" className={`visit2 ${visita ? "on" : ""}`} aria-pressed={visita} onClick={() => { if (visita) { setVisita(false); } else { setVisita(true); setData(null); setHora(null); } }}>
               <span className="vi"><House size={20} /></span>
               <span className="vt"><b>Prefiro uma visita para orçamento</b><small>Sem horário fixo. Combinamos pelo WhatsApp.</small></span>
               <span className={`rd ${visita ? "on" : ""}`} />
