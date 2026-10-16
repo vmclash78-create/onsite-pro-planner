@@ -3,7 +3,8 @@ import logoH from "@/assets/logo-horizontal.png.asset.json";
 import marca from "@/assets/marca-dagua.png.asset.json";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Download, Loader2, Printer, ShieldCheck } from "lucide-react";
+import { FileText, Loader2, MessageCircle, ShieldCheck } from "lucide-react";
+import { linkWhatsApp, normalizarTelefone } from "@/lib/cobranca";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,12 +59,14 @@ function ImprimirOS() {
   const temFotos = fotos("antes").length + fotos("depois").length > 0;
   const equipamento = ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : "";
   const endereco = loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : "";
-  async function baixarPdf() {
+  async function abrirPdf() {
     if (!o) return;
+    // Abre a aba já no toque (senão o celular bloqueia), depois coloca o PDF nela.
+    const aba = window.open("", "_blank");
     setGerando(true);
     try {
       const { gerarPdfOS } = await import("@/lib/osPdf");
-      await gerarPdfOS({
+      const blob = await gerarPdfOS({
         codigo, status: o.status, inicio: o.inicio, concluida_em: o.concluida_em, categoria: o.categoria,
         descricao: o.descricao, valor: o.valor != null ? Number(o.valor) : null, garantia_dias: o.garantia_dias,
         cliente: o.clients, endereco, equipamento,
@@ -71,19 +74,34 @@ function ImprimirOS() {
         fotosAntes: fotos("antes").map((f) => o.urls[f.path]), fotosDepois: fotos("depois").map((f) => o.urls[f.path]),
         logoUrl: logoH.url, marcaUrl: marca.url,
       });
+      const url = URL.createObjectURL(new File([blob], `${codigo}.pdf`, { type: "application/pdf" }));
+      if (aba) aba.location.href = url;
+      else {
+        const a = document.createElement("a");
+        a.href = url; a.download = `${codigo}.pdf`;
+        document.body.appendChild(a); a.click(); a.remove();
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 120_000);
     } catch {
+      aba?.close();
       toast.error("Não foi possível gerar o PDF. Tente de novo.");
     } finally {
       setGerando(false);
     }
   }
+  const tel = normalizarTelefone(o.clients?.whatsapp);
+  const msgWa = `Olá, ${o.clients?.nome ?? ""}! Aqui é da ${company.name}. Sua ordem de serviço ${codigo} (${o.categoria ?? "serviço"}) está ${o.status === "concluida" ? "concluída" : "registrada"}${o.valor != null ? `, no valor de ${brl(Number(o.valor))}` : ""}. Garantia de ${o.garantia_dias ?? 90} dias. Vou te enviar o PDF da OS por aqui. Obrigado!`;
 
   return (
     <div className="min-h-screen bg-muted/50 py-6 print:bg-background print:py-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}>
       <div className="mx-auto mb-4 flex max-w-[210mm] flex-wrap justify-end gap-2 px-4 print:hidden">
-        <Button variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir</Button>
-        <Button disabled={gerando} onClick={baixarPdf}>
-          {gerando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} Baixar PDF
+        {tel && (
+          <Button variant="outline" asChild>
+            <a href={linkWhatsApp(tel, msgWa)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp do cliente</a>
+          </Button>
+        )}
+        <Button disabled={gerando} onClick={abrirPdf}>
+          {gerando ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />} Abrir PDF (salvar / imprimir)
         </Button>
       </div>
       <div className="px-3 sm:px-4 print:px-0">

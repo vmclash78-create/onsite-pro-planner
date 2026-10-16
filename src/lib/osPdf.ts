@@ -228,15 +228,5 @@ export async function gerarPdfOS(o: OSParaPdf) {
     doc.setFont("helvetica", "normal").setFontSize(7.5).setTextColor(...CINZA).text(String(papel), xx + aw / 2, y + 8.5, { align: "center" });
   });
 
-  const nomeArq = `${o.codigo}.pdf`;
-  const blob = doc.output("blob");
-  const file = new File([blob], nomeArq, { type: "application/pdf" });
-  // No celular, abre o menu de compartilhar (Salvar em Arquivos, WhatsApp...).
-  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  if (nav.canShare?.({ files: [file] })) {
-    try { await nav.share({ files: [file], title: nomeArq }); return; } catch (e) {
-      if ((e as Error).name === "AbortError") return;
-    }
-  }
-  doc.save(nomeArq);
+  return doc.output("blob");
 }
