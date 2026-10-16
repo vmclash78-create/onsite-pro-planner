@@ -113,7 +113,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
             </div>
           ))}
           <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-3">
-            <Link to="/catalogo" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><Eye className={ICON} strokeWidth={1.75} /> Ver como o cliente vê</Link>
+            <Link to="/agendar" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><Eye className={ICON} strokeWidth={1.75} /> Ver como o cliente vê</Link>
             <Link to="/agendar" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><ExternalLink className={ICON} strokeWidth={1.75} /> Página de agendamento</Link>
           </div>
         </nav>

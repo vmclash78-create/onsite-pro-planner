@@ -14,7 +14,7 @@ const row = "flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-muted";
 function Mais() {
   const sair = useSignOut();
   const grupos = [...moreGroups, { titulo: "O que o cliente vê", itens: [
-    { to: "/catalogo", label: "Ver vitrine pública", icon: Eye },
+    { to: "/agendar", label: "Ver página do cliente", icon: Eye },
     { to: "/agendar", label: "Página de agendamento", icon: ExternalLink },
   ] }];
   return (
