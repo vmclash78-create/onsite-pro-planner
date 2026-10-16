@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Copy, MessageCircle, Store, CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Field, Panel, StateRow, inputCls } from "@/components/kit";
@@ -21,9 +22,57 @@ function Configuracoes() {
   return (
     <AppShell title="Configurações">
       {!admin && me.data && <p className="mb-4 text-sm text-muted-foreground">Somente administradores podem alterar estas configurações.</p>}
-      <PixConfig admin={admin} />
+      <LinksCompartilhar />
+      <div className="mt-5"><PixConfig admin={admin} /></div>
       <div className="mt-5"><Modelos admin={admin} /></div>
     </AppShell>
+  );
+}
+
+function LinkCard({ titulo, descricao, caminho, icon: Icon, mensagem }: { titulo: string; descricao: string; caminho: string; icon: typeof Store; mensagem: string }) {
+  const url = `${window.location.origin}${caminho}`;
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado.");
+    } catch {
+      toast.error("Não foi possível copiar. Selecione e copie manualmente.");
+    }
+  };
+  const whats = `https://wa.me/?text=${encodeURIComponent(`${mensagem} ${url}`)}`;
+  return (
+    <div className="p-4">
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 shrink-0 text-primary" strokeWidth={1.75} />
+        <div className="min-w-0">
+          <div className="text-sm font-medium">{titulo}</div>
+          <div className="text-xs text-muted-foreground">{descricao}</div>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center gap-2 rounded-[6px] border bg-muted/50 px-3 py-2">
+        <span className="min-w-0 flex-1 truncate text-xs tabular-nums text-muted-foreground">{url}</span>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" onClick={copiar}><Copy className="h-3.5 w-3.5" /> Copiar link</Button>
+        <Button size="sm" variant="outline" asChild>
+          <a href={whats} target="_blank" rel="noreferrer"><MessageCircle className="h-3.5 w-3.5" /> Enviar no WhatsApp</a>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function LinksCompartilhar() {
+  return (
+    <Panel title="Links para compartilhar com o cliente">
+      <p className="border-b px-4 py-2 text-xs text-muted-foreground">Copie ou envie pelo WhatsApp. Qualquer pessoa com o link acessa, sem precisar de senha.</p>
+      <div className="divide-y sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        <LinkCard titulo="Vitrine (sua loja)" descricao="Serviços, aparelhos e fotos de obras" caminho="/catalogo" icon={Store}
+          mensagem="Olá! Conheça os serviços e aparelhos da VM Climatização & Acabamentos:" />
+        <LinkCard titulo="Agendamento" descricao="Página para o cliente pedir um serviço" caminho="/agendar" icon={CalendarDays}
+          mensagem="Olá! Agende seu serviço com a VM Climatização & Acabamentos por aqui:" />
+      </div>
+    </Panel>
   );
 }
 
