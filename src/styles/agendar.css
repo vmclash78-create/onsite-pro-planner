@@ -137,3 +137,39 @@
 .vm-ag .turno span{font-size:13px;opacity:.75}
 .vm-ag .turno.on{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
 .vm-ag .turno.off{opacity:.4;cursor:not-allowed}
+
+/* ===== Refinamento visual profissional ===== */
+.vm-ag .w{padding-top:16px}
+.vm-ag .brand{grid-template-columns:52px minmax(0,1fr);gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 6px 20px -12px color-mix(in oklab,var(--ac) 45%,transparent)}
+.vm-ag .brand img{width:52px!important;height:52px!important;padding:6px;border-radius:12px;background:color-mix(in oklab,var(--ac) 8%,var(--bg))}
+.vm-ag .brand b{font:800 16px/1.2 Archivo,sans-serif;letter-spacing:-.01em}
+.vm-ag .brand span{display:block;margin-top:2px;font-size:12px;line-height:1.35}
+.vm-ag .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:16px;padding:4px;border-radius:14px;background:var(--muted)}
+.vm-ag .tabs button{height:42px;border-radius:10px;font-size:14px;font-weight:600;color:var(--mut);transition:all .2s}
+.vm-ag .tabs button.on{background:var(--surface);color:var(--ac);box-shadow:0 2px 8px -2px color-mix(in oklab,var(--ink) 20%,transparent)}
+.vm-ag .step{margin-top:24px;color:var(--ac);text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+.vm-ag .bars i{height:5px;border-radius:99px;transition:background .3s}
+.vm-ag h1{font-size:28px;letter-spacing:-.02em;margin-top:16px}
+.vm-ag .areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.vm-ag .area{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 6px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);transition:all .2s}
+.vm-ag .area svg{width:44px;height:44px;padding:11px;border-radius:12px;background:var(--muted);color:var(--mut);transition:all .2s}
+.vm-ag .area b{font-size:14px;font-weight:700}
+.vm-ag .area.on{border-color:var(--ac);background:color-mix(in oklab,var(--ac) 7%,var(--surface));box-shadow:0 8px 20px -12px var(--ac)}
+.vm-ag .area.on svg{background:var(--ac);color:var(--on-accent)}
+.vm-ag .area.on b{color:var(--ac)}
+.vm-ag .areas + .sub{font-size:13px;margin-top:12px!important;padding:10px 12px;border-radius:10px;background:var(--muted)}
+.vm-ag .lb{text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+.vm-ag .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vm-ag .chip{height:50px;border-radius:12px;border:1.5px solid var(--line);font-weight:600;transition:all .2s}
+.vm-ag .chip.on,.vm-ag .chip.on:hover{background:var(--ac);border-color:var(--ac);color:var(--on-accent);box-shadow:0 8px 20px -12px var(--ac)}
+.vm-ag .day{border-radius:14px;border-color:var(--line)}
+.vm-ag .day.on,.vm-ag .day.on:hover{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
+.vm-ag .hr,.vm-ag .turno{border-radius:12px}
+.vm-ag input.t,.vm-ag textarea{border-radius:12px;border-color:var(--line);transition:border-color .2s,box-shadow .2s}
+.vm-ag input.t:focus,.vm-ag textarea:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in oklab,var(--ac) 18%,transparent)}
+.vm-ag .ph{border-radius:12px;color:var(--ac);background:color-mix(in oklab,var(--ac) 5%,var(--bg))}
+.vm-ag .ft{border-top:1px solid var(--line);margin:0 -20px;padding-left:20px;padding-right:20px;background:color-mix(in oklab,var(--bg) 92%,transparent);backdrop-filter:blur(8px)}
+.vm-ag .b{border-radius:14px}
+.vm-ag .go,.vm-ag a.go{box-shadow:0 10px 24px -12px var(--ac)}
+.vm-ag .go:disabled{opacity:.4;box-shadow:none}
+.vm-ag .card{border-radius:14px}
