@@ -165,3 +165,24 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-step, .animate-pop, .check-path { animation: none; stroke-dashoffset: 0; }
 }
+
+
+/* Remove Lovable badge - Estilos para ocultar completamente o elemento e evitar vazamento visual ou de acessibilidade */
+#lovable-badge,
+[class*="lovable-badge"],
+[id*="lovable-badge"],
+iframe[src*="lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  overflow: hidden !important;
+  z-index: -1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+}
