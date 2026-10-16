@@ -66,11 +66,9 @@ function LinksCompartilhar() {
   return (
     <Panel title="Links para compartilhar com o cliente">
       <p className="border-b px-4 py-2 text-xs text-muted-foreground">Copie ou envie pelo WhatsApp. Qualquer pessoa com o link acessa, sem precisar de senha.</p>
-      <div className="divide-y sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-        <LinkCard titulo="Vitrine (sua loja)" descricao="Serviços, aparelhos e fotos de obras" caminho="/catalogo" icon={Store}
-          mensagem="Olá! Conheça os serviços e aparelhos da VM Climatização & Acabamentos:" />
-        <LinkCard titulo="Agendamento" descricao="Página para o cliente pedir um serviço" caminho="/agendar" icon={CalendarDays}
-          mensagem="Olá! Agende seu serviço com a VM Climatização & Acabamentos por aqui:" />
+      <div>
+        <LinkCard titulo="Página do cliente (vitrine + agendamento)" descricao="Serviços, preços, fotos de obras e agendamento na mesma página" caminho="/agendar" icon={Store}
+          mensagem="Olá! Conheça os serviços da VM Climatização & Acabamentos e agende por aqui:" />
       </div>
     </Panel>
   );
