@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Download, Loader2, Printer, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { gerarPdfOS } from "@/lib/osPdf";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { company } from "@/lib/company";
@@ -63,6 +62,7 @@ function ImprimirOS() {
     if (!o) return;
     setGerando(true);
     try {
+      const { gerarPdfOS } = await import("@/lib/osPdf");
       await gerarPdfOS({
         codigo, status: o.status, inicio: o.inicio, concluida_em: o.concluida_em, categoria: o.categoria,
         descricao: o.descricao, valor: o.valor != null ? Number(o.valor) : null, garantia_dias: o.garantia_dias,
