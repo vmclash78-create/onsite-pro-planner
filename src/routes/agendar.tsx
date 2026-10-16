@@ -7,7 +7,7 @@ import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine } from "@/components/Vitrine";
-import { Snowflake } from "lucide-react";
+import { Layers, Snowflake, Zap } from "lucide-react";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
@@ -61,6 +61,7 @@ function Agendar() {
   const criar = useServerFn(criarPedido);
   const preparar = useServerFn(prepararFotos);
   const [lgpd, setLgpd] = useState(false);
+  const [aba, setAba] = useState<"agendar" | "vitrine">("agendar");
   const [ok, setOk] = useState(false);
 
   const ocup = useQuery({
@@ -139,26 +140,34 @@ function Agendar() {
     );
   }
 
+  const ICONES: Record<string, typeof Snowflake> = { Refrigeração: Snowflake, Gesso: Layers, Elétrica: Zap };
   return (
     <div className="vm-ag"><div className="w">
       <Brand />
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={aba === "agendar"} className={aba === "agendar" ? "on" : ""} onClick={() => setAba("agendar")}>Agendar</button>
+        <button role="tab" aria-selected={aba === "vitrine"} className={aba === "vitrine" ? "on" : ""} onClick={() => setAba("vitrine")}>Preços e obras</button>
+      </div>
+      {aba === "vitrine" ? (
+        <main className="mn pb-10 pt-6"><Vitrine onAgendar={() => { setAba("agendar"); go(1); }} /></main>
+      ) : (<>
       <main className="mn">
         {step === 1 && (
           <>
-            <section className="mb-8">
-              <Vitrine onAgendar={() => document.getElementById("form-agendar")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
-            </section>
-            <div id="form-agendar" className="scroll-mt-4" />
             {head("O que você precisa?")}
             <p className="sub">Escolha a área e o tipo de serviço.</p>
-            <div className="list">
-              {Object.keys(AREAS).map((a) => (
-                <Button variant="ghost" key={a} className="row" aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); }}>
-                  <div><b>{a}</b><span>{AREAS[a]![0]}</span></div>
-                  <i className={`rd ${area === a ? "on" : ""}`} />
-                </Button>
-              ))}
+            <div className="areas">
+              {Object.keys(AREAS).map((a) => {
+                const Ic = ICONES[a]!;
+                return (
+                  <button key={a} className={`area ${area === a ? "on" : ""}`} aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); }}>
+                    <Ic size={22} strokeWidth={1.75} aria-hidden />
+                    <b>{a}</b>
+                  </button>
+                );
+              })}
             </div>
+            <p className="sub mt-3">{AREAS[area]![0]}</p>
             <div className="lb">Tipo de serviço</div>
             <div className="chips">
               {AREAS[area]![1].map((t) => (
@@ -249,6 +258,7 @@ function Agendar() {
         {erroEnvio && <p className="alt envio-erro" role="alert">{erroEnvio}</p>}
         {step === 1 && <p className="alt">Prefere falar direto? <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
       </footer>
+      </>)}
     </div></div>
   );
 }
