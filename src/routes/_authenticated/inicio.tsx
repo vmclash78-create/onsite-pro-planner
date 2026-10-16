@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { BellRing } from "lucide-react";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Panel, StateRow, Status } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
@@ -162,6 +163,26 @@ function ReceberResumo({ enabled }: { enabled: boolean }) {
   );
 }
 
+function AvisoPedidos({ enabled }: { enabled: boolean }) {
+  const q = useQuery({
+    queryKey: ["pedidos", "pendentes-count"],
+    enabled,
+    queryFn: async () => {
+      const { count, error } = await supabase.from("appointments").select("id", { count: "exact", head: true }).eq("status", "Pendente");
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  if (!q.data) return null;
+  return (
+    <Link to="/pedidos" className="mb-5 flex items-center gap-3 rounded-lg border border-primary/40 bg-primary/5 px-4 py-3 text-sm hover:bg-primary/10">
+      <BellRing className="h-4 w-4 shrink-0 text-primary" />
+      <span className="flex-1"><b className="tabular-nums">{q.data}</b> {q.data === 1 ? "pedido novo aguardando" : "pedidos novos aguardando"} confirmação</span>
+      <span className="text-xs font-medium text-primary">Ver pedidos</span>
+    </Link>
+  );
+}
+
 function Dashboard() {
   const me = useMe();
   const q = useDashboard(!!me.data?.isStaff);
@@ -180,6 +201,7 @@ function Dashboard() {
 
   return (
     <AppShell title="Início" actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
+      <AvisoPedidos enabled={!!me.data?.isStaff} />
       <div className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card lg:grid-cols-4">
         {kpis.map((k, i) => (
           <div key={k.r} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 3 ? "lg:border-r-0" : ""}`}>

@@ -84,7 +84,7 @@ function Lembretes() {
                 </div>
               </div>
               <div className="flex flex-wrap items-start justify-end gap-2">
-              {e.falta < 0 && (
+              {e.falta <= 15 && (
                 <WhatsButton label="Avisar no WhatsApp" chave="preventiva" telefone={e.locations?.clients?.whatsapp} clienteId={e.locations?.client_id ?? null} referenciaId={e.id}
                   vars={{ nome: e.locations?.clients?.nome ?? "", modelo_aparelho: e.descricao, servico: "manutenção preventiva", data: dataBR(e.proxima) }} />
               )}

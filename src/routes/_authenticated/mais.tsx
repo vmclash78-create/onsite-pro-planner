@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, ExternalLink, Eye, LogOut } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
+import { LinkCliente } from "@/components/LinkCliente";
 import { AppShell, moreGroups, useSignOut } from "@/components/AppShell";
 import { company } from "@/lib/company";
 import { pageHead } from "@/lib/seo";
@@ -13,13 +14,11 @@ const row = "flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-muted";
 
 function Mais() {
   const sair = useSignOut();
-  const grupos = [...moreGroups, { titulo: "O que o cliente vê", itens: [
-    { to: "/agendar", label: "Ver página do cliente", icon: Eye },
-    { to: "/agendar", label: "Página de agendamento", icon: ExternalLink },
-  ] }];
+  const grupos = moreGroups;
   return (
     <AppShell title="Mais">
       <div className="space-y-5">
+        <LinkCliente />
         {grupos.map((g) => (
           <section key={g.titulo}>
             <h2 className="mb-1.5 px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</h2>

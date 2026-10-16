@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Printer, Trash2, Wrench } from "lucide-react";
+import { FileText, Plus, Trash2, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Field, Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
@@ -93,7 +93,7 @@ function Orcamento() {
 
   return (
     <AppShell title={codigo} breadcrumb={["Painel", "Orçamentos", codigo]}
-      actions={d && <Button asChild variant="outline"><Link to="/imprimir/orcamento/$id" params={{ id }} target="_blank"><Printer className="h-4 w-4" /> <span className="hidden sm:inline">Imprimir para assinar</span></Link></Button>}>
+      actions={d && <Button asChild variant="outline"><Link to="/imprimir/orcamento/$id" params={{ id }} ><FileText className="h-4 w-4" /> <span className="hidden sm:inline">Ver PDF</span></Link></Button>}>
       {q.isLoading || q.error || !d ? <Panel><StateRow loading={q.isLoading} error={q.error ?? (!d ? "x" : null)} /></Panel> : (
         <div className="space-y-5">
           <Panel title={d.clients?.nome} action={<StatusSelect value={d.status} options={STATUS} onChange={(s) => status.mutate(s)} />}>
@@ -137,7 +137,7 @@ function Orcamento() {
           {(salvar.error || converter.error) && <p role="alert" className="text-xs text-destructive">{(salvar.error ?? converter.error)?.message}</p>}
           <div className="flex flex-wrap items-center gap-2">
             <Button onClick={() => salvar.mutate()} disabled={salvar.isPending}>Salvar orçamento</Button>
-            <Button asChild variant="outline"><Link to="/imprimir/orcamento/$id" params={{ id }} target="_blank"><Printer className="h-4 w-4" /> Imprimir para assinar</Link></Button>
+            <Button asChild variant="outline"><Link to="/imprimir/orcamento/$id" params={{ id }} ><FileText className="h-4 w-4" /> Ver PDF do orçamento</Link></Button>
             {d.service_order_id ? <span className="text-xs text-muted-foreground">Já convertido em ordem de serviço.</span> : (
               <span className="flex items-center gap-2">
                 <select aria-label="Categoria da ordem" className={`${inputCls} h-9 w-36`} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
