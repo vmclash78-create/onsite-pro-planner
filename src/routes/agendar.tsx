@@ -7,7 +7,7 @@ import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine } from "@/components/Vitrine";
-import { House, Layers, Zap } from "lucide-react";
+import { House, Layers, Snowflake, Zap } from "lucide-react";
 import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
 
