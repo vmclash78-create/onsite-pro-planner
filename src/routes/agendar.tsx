@@ -294,8 +294,8 @@ function Agendar() {
 function Brand() {
   return (
     <header className="brand">
-      <img src={logoH.url} alt="" style={{width:56,height:36,objectFit:"contain"}} />
-      <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
+      <img src={logoH.url} alt="" style={{ objectFit: "contain" }} />
+      <div style={{ minWidth: 0 }}><b>{company.name}</b><span>Climatização · Gesso · Elétrica</span><span>{company.city}/{company.state} e região</span></div>
     </header>
   );
 }

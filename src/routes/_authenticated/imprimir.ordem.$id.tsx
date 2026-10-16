@@ -64,13 +64,11 @@ function ImprimirOS() {
           <div className="h-2 bg-primary" />
           <img src={marca.url} alt="" aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 w-[70%] -translate-x-1/2 -translate-y-1/2 opacity-[0.07] print:opacity-[0.07]" />
           <header className="flex flex-col gap-4 px-4 pt-5 pb-5 sm:flex-row sm:items-stretch sm:justify-between sm:gap-6 sm:px-[14mm] sm:pt-[10mm] print:flex-row print:px-[14mm]">
-            <div className="flex min-w-0 items-center gap-3">
-              <img src={logoH.url} alt={company.name} className="h-14 w-auto shrink-0 object-contain sm:h-16" />
-              <div className="min-w-0">
-                <div className="text-[16px] font-bold leading-tight sm:text-[17px]">{company.name}</div>
-                <div className="text-[10px] uppercase tracking-[0.14em] text-primary">Climatização · Gesso · Elétrica</div>
-                <div className="mt-1 text-[10px] text-muted-foreground">{company.addressDisplay}</div>
-                <div className="text-[10px] text-muted-foreground">WhatsApp {company.phoneDisplay} · {company.instagram}</div>
+            <div className="min-w-0 space-y-3">
+              <img src={logoH.url} alt={company.name} className="h-16 w-auto max-w-full object-contain sm:h-[72px]" />
+              <div className="space-y-0.5 border-l-2 border-primary pl-3 text-[10px] text-muted-foreground">
+                <div>{company.addressDisplay}</div>
+                <div>WhatsApp {company.phoneDisplay} · {company.instagram}</div>
               </div>
             </div>
             <div className="w-full shrink-0 rounded-md border-2 border-primary text-left sm:w-auto sm:min-w-[58mm] sm:text-right print:w-auto print:min-w-[58mm] print:text-right">
