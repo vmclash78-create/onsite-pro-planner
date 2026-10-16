@@ -98,17 +98,19 @@ export async function gerarPdfOS(o: OSParaPdf) {
   doc.text(company.addressDisplay, M + 3, y + 24);
   doc.text(`WhatsApp ${company.phoneDisplay} · ${company.instagram}`, M + 3, y + 28);
 
-  const bw = 62, bx = W - M - bw;
+  // Cartão da OS: conteúdo centralizado, sem lado vazio.
+  const bw = 62, bx = W - M - bw, cx = bx + bw / 2;
   doc.setDrawColor(...AZUL).setLineWidth(0.6).roundedRect(bx, y, bw, 30, 1.5, 1.5, "S");
   doc.setFillColor(...AZUL).rect(bx, y, bw, 7, "F");
   doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(255, 255, 255);
-  doc.text("ORDEM DE SERVIÇO", bx + bw / 2, y + 4.8, { align: "center" });
-  doc.setFontSize(14).setTextColor(...TEXTO).text(`Nº ${o.codigo}`, bx + bw - 3, y + 14, { align: "right" });
-  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...CINZA);
-  let by = y + 19;
-  doc.text(`Situação: ${o.status}`, bx + bw - 3, by, { align: "right" });
-  if (o.inicio) { by += 4; doc.text(`Início: ${dataBR(o.inicio)}`, bx + bw - 3, by, { align: "right" }); }
-  if (o.concluida_em) { by += 4; doc.text(`Conclusão: ${dataBR(o.concluida_em)}`, bx + bw - 3, by, { align: "right" }); }
+  doc.text("ORDEM DE SERVIÇO", cx, y + 4.8, { align: "center" });
+  doc.setFontSize(15).setTextColor(...TEXTO).text(`Nº ${o.codigo}`, cx, y + 14.5, { align: "center" });
+  doc.setFontSize(7.5);
+  const sw = doc.getTextWidth(o.status.toUpperCase()) + 6;
+  doc.setFillColor(...FUNDO).roundedRect(cx - sw / 2, y + 16.8, sw, 4.6, 2.3, 2.3, "F");
+  doc.setTextColor(...AZUL).text(o.status.toUpperCase(), cx, y + 20, { align: "center" });
+  const datas = [o.inicio && `Início ${dataBR(o.inicio)}`, o.concluida_em && `Conclusão ${dataBR(o.concluida_em)}`].filter(Boolean).join("  ·  ");
+  if (datas) doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(...CINZA).text(datas, cx, y + 26.5, { align: "center" });
   y += 38;
 
   const titulo = (n: string, t: string) => {
@@ -127,43 +129,66 @@ export async function gerarPdfOS(o: OSParaPdf) {
     return 4 + linhas.length * 4;
   };
 
-  // 1. Cliente
+  // 1. Cliente — só mostra o que existe; sem CPF, o telefone sobe e o endereço ocupa a linha toda.
   titulo("1", "Dados do cliente");
-  const c2 = CW * 0.66;
-  doc.setFillColor(...FUNDO).roundedRect(M, y - 1, CW, 22, 1.5, 1.5, "F");
-  campo("Nome / Razão social", o.cliente?.nome ?? "", M + 3, c2 - 6, y + 3);
-  campo("CPF / CNPJ", o.cliente?.documento ?? "", M + c2, CW - c2 - 3, y + 3);
-  campo("Endereço do atendimento", o.endereco ?? "", M + 3, c2 - 6, y + 13);
-  campo("Telefone", o.cliente?.whatsapp ?? "", M + c2, CW - c2 - 3, y + 13);
-  y += 28;
+  const c2 = CW * 0.62;
+  const doc1 = o.cliente?.documento?.trim();
+  const tel = o.cliente?.whatsapp?.trim();
+  const direita1: [string, string] | null = doc1 ? ["CPF / CNPJ", doc1] : tel ? ["Telefone", tel] : null;
+  const direita2: [string, string] | null = doc1 && tel ? ["Telefone", tel] : null;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const endL = (doc.splitTextToSize(o.endereco || "—", (direita2 ? c2 : CW) - 6) as string[]).length;
+  const boxH = 18 + endL * 4;
+  doc.setFillColor(...FUNDO).roundedRect(M, y - 1, CW, boxH, 1.5, 1.5, "F");
+  campo("Nome / Razão social", o.cliente?.nome ?? "", M + 3, (direita1 ? c2 : CW) - 6, y + 3);
+  if (direita1) campo(direita1[0], direita1[1], M + c2, CW - c2 - 3, y + 3);
+  campo("Endereço do atendimento", o.endereco ?? "", M + 3, (direita2 ? c2 : CW) - 6, y + 13);
+  if (direita2) campo(direita2[0], direita2[1], M + c2, CW - c2 - 3, y + 13);
+  y += boxH + 6;
 
-  // 2. Serviço
+  // 2. Serviço — descrição integrada num fundo suave; nada de caixa vazia.
   titulo("2", "Serviço executado");
-  campo("Especialidade", o.categoria ?? "", M, CW * 0.3, y);
-  campo("Equipamento atendido", o.equipamento ?? "", M + CW * 0.34, CW * 0.66, y);
+  if (o.equipamento) {
+    campo("Especialidade", o.categoria ?? "", M, CW * 0.3, y);
+    campo("Equipamento atendido", o.equipamento, M + CW * 0.34, CW * 0.66, y);
+  } else {
+    campo("Especialidade", o.categoria ?? "", M, CW, y);
+  }
   y += 10;
-  const desc = doc.splitTextToSize(o.descricao || "—", CW - 6) as string[];
-  const dh = 8 + desc.length * 4;
-  garantirEspaco(dh);
-  doc.setDrawColor(226, 232, 240).setLineWidth(0.3).roundedRect(M, y, CW, dh, 1.5, 1.5, "S");
-  doc.setFont("helvetica", "bold").setFontSize(6.5).setTextColor(...CINZA).text("DESCRIÇÃO TÉCNICA", M + 3, y + 4);
-  doc.setFont("helvetica", "normal").setFontSize(9).setTextColor(...TEXTO).text(desc, M + 3, y + 8.5);
-  y += dh + 8;
+  if (o.descricao?.trim()) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    const desc = doc.splitTextToSize(o.descricao.trim(), CW - 8) as string[];
+    const dh = 9 + desc.length * 4;
+    garantirEspaco(dh);
+    doc.setFillColor(...FUNDO).roundedRect(M, y, CW, dh, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "bold").setFontSize(6.5).setTextColor(...CINZA).text("DESCRIÇÃO TÉCNICA", M + 4, y + 4.5);
+    doc.setFont("helvetica", "normal").setFontSize(9).setTextColor(...TEXTO).text(desc, M + 4, y + 9);
+    y += dh + 6;
+  } else {
+    y += 2;
+  }
 
-  // 3. Materiais
-  titulo("3", "Peças e materiais aplicados");
-  autoTable(doc, {
-    startY: y,
-    margin: { left: M, right: M, bottom: 14 },
-    head: [["Item", "Quantidade"]],
-    body: o.itens.length ? o.itens.map((i) => [i.nome, i.quantidade]) : [["Nenhum material lançado.", ""]],
-    styles: { font: "helvetica", fontSize: 9, textColor: TEXTO, cellPadding: 2 },
-    headStyles: { fillColor: AZUL, textColor: [255, 255, 255], fontStyle: "bold" },
-    alternateRowStyles: { fillColor: FUNDO },
-    columnStyles: { 1: { halign: "right", cellWidth: 35 } },
-    didDrawPage: (d) => { if (d.pageNumber > 1) moldura(); },
-  });
-  y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 3;
+  // 3. Materiais — sem peças, vira uma linha de mão de obra (sem tabela vazia).
+  titulo(o.itens.length ? "3" : "3", o.itens.length ? "Peças e materiais aplicados" : "Itens do serviço");
+  if (o.itens.length) {
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M, bottom: 14 },
+      head: [["Item", "Quantidade"]],
+      body: o.itens.map((i) => [i.nome, i.quantidade]),
+      styles: { font: "helvetica", fontSize: 9, textColor: TEXTO, cellPadding: 2 },
+      headStyles: { fillColor: AZUL, textColor: [255, 255, 255], fontStyle: "bold" },
+      alternateRowStyles: { fillColor: FUNDO },
+      columnStyles: { 1: { halign: "right", cellWidth: 35 } },
+      didDrawPage: (d) => { if (d.pageNumber > 1) moldura(); },
+    });
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 3;
+  } else {
+    doc.setFillColor(...FUNDO).roundedRect(M, y - 1, CW, 9, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "normal").setFontSize(9).setTextColor(...TEXTO)
+      .text(`Mão de obra — ${o.categoria ? `serviço de ${o.categoria.toLowerCase()}` : "serviço técnico especializado"}`, M + 4, y + 4.8);
+    y += 11;
+  }
   garantirEspaco(12);
   const tw = 72;
   doc.setFillColor(...AZUL).roundedRect(W - M - tw, y, tw, 9, 1.5, 1.5, "F");
