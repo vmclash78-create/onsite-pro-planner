@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, MessageCircle, Sparkles, X } from "lucide-react";
+import { company } from "@/lib/company";
 import { AppShell } from "@/components/AppShell";
 import { Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +110,18 @@ function Pedido() {
                 <div><dt className="text-xs text-muted-foreground">Endereço</dt><dd>{p.endereco ?? "—"}</dd></div>
                 <div><dt className="text-xs text-muted-foreground">Recebido</dt><dd className="tabular-nums">{dataBR(p.created_at)} · {p.origem === "site" ? "pelo site" : "pelo painel"}</dd></div>
               </dl>
+              <div className="border-t p-4">
+                <a
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 sm:w-auto"
+                  target="_blank" rel="noreferrer"
+                  onClick={() => { if (p.status === "Pendente") status.mutate("Agendada"); }}
+                  href={`https://wa.me/55${p.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
+                    `Prezado(a) ${p.nome_contato}, a ${company.name} confirma sua solicitação de ${p.categoria} (${p.tipo}) ` +
+                    (p.visita_orcamento || !p.data ? "na modalidade de visita técnica. Entraremos em contato para definir a data." : `para ${dataBR(p.data)}${p.hora ? ` às ${p.hora}` : ""}.`) +
+                    ` Endereço: ${p.endereco ?? "a confirmar"}. Em caso de dúvidas, permanecemos à disposição.`
+                  )}`}
+                ><MessageCircle className="h-4 w-4" /> Confirmar pelo WhatsApp</a>
+              </div>
             </Panel>
 
             <Panel title="Descrição do problema" action={descricao !== (p.descricao ?? "") ? (
