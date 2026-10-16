@@ -35,6 +35,7 @@ import { Route as AuthenticatedOrdemIdRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPedidosIndexRouteImport } from './routes/_authenticated/pedidos.index'
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 import { Route as AuthenticatedImprimirOrcamentoIdRouteImport } from './routes/_authenticated/imprimir.orcamento.$id'
+import { Route as AuthenticatedImprimirOrdemIdRouteImport } from './routes/_authenticated/imprimir.ordem.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -169,6 +170,12 @@ const AuthenticatedImprimirOrcamentoIdRoute =
     path: '/imprimir/orcamento/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedImprimirOrdemIdRoute =
+  AuthenticatedImprimirOrdemIdRouteImport.update({
+    id: '/imprimir/ordem/$id',
+    path: '/imprimir/ordem/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
+  '/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -223,6 +231,7 @@ export interface FileRoutesByTo {
   '/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/pedidos': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
+  '/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -252,6 +261,7 @@ export interface FileRoutesById {
   '/_authenticated/pedidos/$id': typeof AuthenticatedPedidosIdRoute
   '/_authenticated/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/_authenticated/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
+  '/_authenticated/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/pedidos/$id'
     | '/pedidos/'
     | '/imprimir/orcamento/$id'
+    | '/imprimir/ordem/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/pedidos/$id'
     | '/pedidos'
     | '/imprimir/orcamento/$id'
+    | '/imprimir/ordem/$id'
   id:
     | '__root__'
     | '/'
@@ -336,6 +348,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pedidos/$id'
     | '/_authenticated/pedidos/'
     | '/_authenticated/imprimir/orcamento/$id'
+    | '/_authenticated/imprimir/ordem/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -531,6 +544,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImprimirOrcamentoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/imprimir/ordem/$id': {
+      id: '/_authenticated/imprimir/ordem/$id'
+      path: '/imprimir/ordem/$id'
+      fullPath: '/imprimir/ordem/$id'
+      preLoaderRoute: typeof AuthenticatedImprimirOrdemIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -555,6 +575,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPedidosIdRoute: typeof AuthenticatedPedidosIdRoute
   AuthenticatedPedidosIndexRoute: typeof AuthenticatedPedidosIndexRoute
   AuthenticatedImprimirOrcamentoIdRoute: typeof AuthenticatedImprimirOrcamentoIdRoute
+  AuthenticatedImprimirOrdemIdRoute: typeof AuthenticatedImprimirOrdemIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -578,6 +599,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPedidosIdRoute: AuthenticatedPedidosIdRoute,
   AuthenticatedPedidosIndexRoute: AuthenticatedPedidosIndexRoute,
   AuthenticatedImprimirOrcamentoIdRoute: AuthenticatedImprimirOrcamentoIdRoute,
+  AuthenticatedImprimirOrdemIdRoute: AuthenticatedImprimirOrdemIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
