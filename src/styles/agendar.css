@@ -84,3 +84,15 @@
 .vm-ag .hr.on,.vm-ag .hr.on:hover{background:var(--ac);color:var(--on-accent)}
 .vm-ag .chip.on:hover,.vm-ag .day.on:hover{background:var(--ink);color:var(--on-accent)}
 @media(hover:hover){.vm-ag .hr:not(.on):not(.off):hover,.vm-ag .chip:not(.on):hover,.vm-ag .day:not(.on):not(.off):hover{border-color:var(--ac)}}
+/* Abas e cards de área */
+.vm-ag .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:14px;padding:4px;background:var(--muted);border-radius:10px}
+.vm-ag .tabs button{height:40px;border-radius:7px;font-weight:600;font-size:14px;color:var(--mut)}
+.vm-ag .tabs button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px color-mix(in oklab,var(--ink) 12%,transparent)}
+.vm-ag .step{margin-top:20px}
+.vm-ag h1{font-size:26px;margin:14px 0 4px}
+.vm-ag .areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.vm-ag .area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:88px;border-radius:12px;border:1.5px solid var(--bd);background:var(--surface);color:var(--mut)}
+.vm-ag .area b{font-size:14px;color:var(--ink)}
+.vm-ag .area.on{border-color:var(--ac);background:color-mix(in oklab,var(--ac) 8%,var(--surface));color:var(--ac)}
+.vm-ag .lb{margin:20px 0 10px}
+@media(min-width:768px){.vm-ag .step{margin-top:28px}.vm-ag h1{font-size:30px}.vm-ag .area{height:100px}}
