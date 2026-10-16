@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import logoH from "@/assets/logo-simbolo.png.asset.json";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -294,8 +293,8 @@ function Agendar() {
 function Brand() {
   return (
     <header className="brand">
-      <img src={logoH.url} alt="" style={{ objectFit: "contain" }} />
-      <div style={{ minWidth: 0 }}><b>{company.name}</b><span>Climatização · Gesso · Elétrica</span><span>{company.city}/{company.state} e região</span></div>
+      <div className="logo"><Snowflake size={20} strokeWidth={2} aria-hidden /></div>
+      <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
     </header>
   );
 }
