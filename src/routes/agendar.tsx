@@ -76,7 +76,7 @@ function Agendar() {
   });
   const OCUPADOS = ocup.data ?? [];
   const diaSel = dias.find((d) => iso(d) === data);
-  const resumo = visita ? "Visita para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
+  const resumo = visita ? "Visita técnica para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
@@ -114,7 +114,7 @@ function Agendar() {
 
   if (ok) {
     const msg = [
-      `Olá, VM Climatização! Acabei de fazer um pedido pelo site.`,
+      `Olá, VM Climatização! Registrei uma solicitação de atendimento pelo site.`,
       ``,
       `*Protocolo:* ${protocolo}`,
       `*Serviço:* ${tipo} de ${area.toLowerCase()}`,
@@ -129,12 +129,12 @@ function Agendar() {
       <div className="vm-ag"><div className="w">
         <Brand />
         <main className="mn">
-          <h1 style={{ marginTop: 56 }}>Pedido recebido</h1>
-          <p className="sub">Protocolo {protocolo}. Nossa equipe vai confirmar o horário pelo WhatsApp. Se quiser agilizar, envie a mensagem abaixo.</p>
+          <h1 style={{ marginTop: 56 }}>Solicitação registrada com sucesso</h1>
+          <p className="sub">Protocolo de atendimento: {protocolo}. Sua solicitação foi registrada e nossa equipe entrará em contato pelo WhatsApp para confirmar o atendimento.</p>
           <div className="card"><div><b>{tipo} · {area}</b><span>{resumo}</span></div></div>
         </main>
         <footer className="ft">
-          <a className="b go" href={`${company.whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">Enviar pelo WhatsApp</a>
+          <a className="b go" href={`${company.whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">Confirmar solicitação via WhatsApp</a>
         </footer>
       </div></div>
     );
@@ -145,8 +145,8 @@ function Agendar() {
     <div className="vm-ag"><div className="w">
       <Brand />
       <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={aba === "agendar"} className={aba === "agendar" ? "on" : ""} onClick={() => setAba("agendar")}>Agendar</button>
-        <button role="tab" aria-selected={aba === "vitrine"} className={aba === "vitrine" ? "on" : ""} onClick={() => setAba("vitrine")}>Preços e obras</button>
+        <button role="tab" aria-selected={aba === "agendar"} className={aba === "agendar" ? "on" : ""} onClick={() => setAba("agendar")}>Agendamento</button>
+        <button role="tab" aria-selected={aba === "vitrine"} className={aba === "vitrine" ? "on" : ""} onClick={() => setAba("vitrine")}>Serviços e portfólio</button>
       </div>
       {aba === "vitrine" ? (
         <main className="mn pb-10 pt-6"><Vitrine onAgendar={() => { setAba("agendar"); go(1); }} /></main>
@@ -154,8 +154,8 @@ function Agendar() {
       <main className="mn">
         {step === 1 && (
           <>
-            {head("O que você precisa?")}
-            <p className="sub">Escolha a área e o tipo de serviço.</p>
+            {head("Selecione a especialidade")}
+            <p className="sub">Indique a área de atuação e a modalidade de atendimento.</p>
             <div className="areas">
               {Object.keys(AREAS).map((a) => {
                 const Ic = ICONES[a]!;
@@ -168,7 +168,7 @@ function Agendar() {
               })}
             </div>
             <p className="sub mt-3">{AREAS[area]![0]}</p>
-            <div className="lb">Tipo de serviço</div>
+            <div className="lb">Modalidade de atendimento</div>
             <div className="chips">
               {AREAS[area]![1].map((t) => (
                 <Button variant="ghost" key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => setTipo(t)}>{t}</Button>
@@ -179,7 +179,7 @@ function Agendar() {
 
         {step === 2 && (
           <>
-            {head("Quando fica bom?")}
+            {head("Data e horário de preferência")}
             <p className="sub" style={{ textTransform: "capitalize" }}>{fmt(dias[0]!, { month: "long", year: "numeric" })}</p>
             <div className="days">
               {dias.map((d) => {
@@ -214,7 +214,7 @@ function Agendar() {
             <div className="ou"><span>ou</span></div>
             <button type="button" className={`visit2 ${visita ? "on" : ""}`} aria-pressed={visita} onClick={() => { if (visita) { setVisita(false); } else { setVisita(true); setData(null); setHora(null); } }}>
               <span className="vi"><House size={20} /></span>
-              <span className="vt"><b>Prefiro uma visita para orçamento</b><small>Sem horário fixo. Combinamos pelo WhatsApp.</small></span>
+              <span className="vt"><b>Solicitar visita técnica para orçamento</b><small>Sem horário definido. Nossa equipe entrará em contato.</small></span>
               <span className={`rd ${visita ? "on" : ""}`} />
             </button>
           </>
@@ -222,21 +222,21 @@ function Agendar() {
 
         {step === 3 && (
           <>
-            {head("Seus dados")}
+            {head("Dados do solicitante")}
             <div className="card">
               <div><b>{tipo} · {area}</b><span>{resumo}</span></div>
               <Button variant="link" className="lnk" onClick={() => go(1)}>Alterar</Button>
             </div>
-            <label className="f" htmlFor="nome">Nome</label>
-            <input className="t" id="nome" autoComplete="name" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-            <label className="f" htmlFor="whats">WhatsApp</label>
+            <label className="f" htmlFor="nome">Nome completo</label>
+            <input className="t" id="nome" autoComplete="name" placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
+            <label className="f" htmlFor="whats">Telefone (WhatsApp)</label>
             <input className="t" id="whats" inputMode="tel" autoComplete="tel" placeholder="(88) 90000-0000" value={whats} onChange={(e) => setWhats(maskWhats(e.target.value))} />
             <label className="f" htmlFor="cep">CEP</label>
             <input className="t" id="cep" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCep(e.target.value))} />
-            <label className="f" htmlFor="desc">O que está acontecendo?</label>
-            <textarea id="desc" placeholder="Descreva o problema" value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <label className="f" htmlFor="desc">Descrição da necessidade</label>
+            <textarea id="desc" placeholder="Informe detalhes do equipamento ou do serviço desejado" value={desc} onChange={(e) => setDesc(e.target.value)} />
             <label className="ph" style={{ position: "relative" }}>
-              {fotos.length ? `${fotos.length} de 3 fotos` : "Adicionar fotos (até 3)"}
+              {fotos.length ? `${fotos.length} de 3 fotos` : "Anexar fotos do local ou equipamento (até 3)"}
               <input type="file" accept="image/*" multiple onChange={(e) => { setFotos([...fotos, ...(e.target.files ?? [])].slice(0, 3)); e.target.value = ""; }} />
             </label>
             <ul className="fl">
@@ -246,7 +246,7 @@ function Agendar() {
             </ul>
             <div className="lg">
               <input type="checkbox" id="lgpd" checked={lgpd} onChange={(e) => setLgpd(e.target.checked)} />
-              <label htmlFor="lgpd">Concordo com o uso dos meus dados para contato sobre este agendamento, conforme a <Link to="/privacidade">política de privacidade</Link>.</label>
+              <label htmlFor="lgpd">Autorizo o tratamento dos meus dados para contato e atendimento técnico, conforme a <Link to="/privacidade">política de privacidade</Link>.</label>
             </div>
           </>
         )}
@@ -255,10 +255,10 @@ function Agendar() {
       <footer className="ft">
         <div className="bt">
           {step > 1 && <Button variant="ghost" className="b bk" onClick={() => go(step - 1)}>Voltar</Button>}
-          <Button className="b go" disabled={!pode || enviando} onClick={next}>{step < 3 ? "Continuar" : enviando ? "Enviando..." : "Confirmar agendamento"}</Button>
+          <Button className="b go" disabled={!pode || enviando} onClick={next}>{step < 3 ? "Continuar" : enviando ? "Enviando..." : "Concluir solicitação"}</Button>
         </div>
         {erroEnvio && <p className="alt envio-erro" role="alert">{erroEnvio}</p>}
-        {step === 1 && <p className="alt">Prefere falar direto? <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
+        {step === 1 && <p className="alt">Atendimento direto: <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
       </footer>
       </>)}
     </div></div>
@@ -269,7 +269,7 @@ function Brand() {
   return (
     <header className="brand">
       <div className="logo"><Snowflake size={20} strokeWidth={2} aria-hidden /></div>
-      <div><b>{company.name}</b><span>Ar-condicionado · Gesso · Elétrica · {company.city}/{company.state}</span></div>
+      <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
     </header>
   );
 }
