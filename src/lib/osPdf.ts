@@ -13,23 +13,22 @@ const TEXTO: [number, number, number] = [15, 23, 42];
 
 type Img = { data: string; w: number; h: number };
 
-async function carregar(url?: string): Promise<Img | null> {
+// Carrega e reduz a imagem (logos e fotos vêm enormes), mantendo o PDF leve
+// para enviar pelo WhatsApp.
+async function carregar(url?: string, max = 1000): Promise<Img | null> {
   if (!url) return null;
   try {
     const blob = await (await fetch(url)).blob();
-    const data = await new Promise<string>((ok, erro) => {
-      const r = new FileReader();
-      r.onload = () => ok(r.result as string);
-      r.onerror = erro;
-      r.readAsDataURL(blob);
-    });
-    const { w, h } = await new Promise<{ w: number; h: number }>((ok, erro) => {
-      const i = new Image();
-      i.onload = () => ok({ w: i.naturalWidth, h: i.naturalHeight });
-      i.onerror = erro;
-      i.src = data;
-    });
-    return { data, w, h };
+    const bmp = await createImageBitmap(blob);
+    const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = "#ffffff"; // folha é branca: fundo transparente vira branco
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(bmp, 0, 0, w, h);
+    return { data: c.toDataURL("image/jpeg", 0.85), w, h };
   } catch {
     return null;
   }
@@ -60,8 +59,8 @@ export async function gerarPdfOS(o: OSParaPdf) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, H = 297, M = 14, CW = W - M * 2;
   const [logo, marca, ...fotos] = await Promise.all([
-    carregar(o.logoUrl), carregar(o.marcaUrl),
-    ...o.fotosAntes.map(carregar), ...o.fotosDepois.map(carregar),
+    carregar(o.logoUrl, 900), carregar(o.marcaUrl, 700),
+    ...o.fotosAntes.map((u) => carregar(u, 600)), ...o.fotosDepois.map((u) => carregar(u, 600)),
   ]);
   const antes = fotos.slice(0, o.fotosAntes.length);
   const depois = fotos.slice(o.fotosAntes.length);

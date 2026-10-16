@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import logoH from "@/assets/logo-horizontal.png.asset.json";
 import marca from "@/assets/marca-dagua.png.asset.json";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { FileText, Loader2, MessageCircle, ShieldCheck } from "lucide-react";
+
+import { ArrowLeft, Download, Loader2, MessageCircle, ShieldCheck } from "lucide-react";
 import { linkWhatsApp, normalizarTelefone } from "@/lib/cobranca";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -30,28 +30,30 @@ const Campo = ({ r, v }: { r: string; v: React.ReactNode }) => (
   </div>
 );
 
+async function carregarOS(id: string) {
+  const { data, error } = await supabase.from("service_orders")
+    .select("id, numero, categoria, descricao, status, valor, inicio, concluida_em, equipment_id, garantia_dias, clients(nome, whatsapp, documento, locations(endereco, bairro, cidade, equipment(id, descricao, marca, btus))), service_order_items(id, quantidade, stock_items(nome, unidade)), os_fotos(id, tipo, path)")
+    .eq("id", id).maybeSingle();
+  if (error) throw error;
+  let urls: Record<string, string> = {};
+  const paths = data?.os_fotos.map((f) => f.path) ?? [];
+  if (paths.length) {
+    const { data: s } = await supabase.storage.from("pedidos").createSignedUrls(paths, 3600);
+    urls = Object.fromEntries((s ?? []).map((x) => [x.path ?? "", x.signedUrl ?? ""]));
+  }
+  return data ? { ...data, urls } : null;
+}
+type OSDados = NonNullable<Awaited<ReturnType<typeof carregarOS>>>;
+
 function ImprimirOS() {
   const { id } = Route.useParams();
-  const [gerando, setGerando] = useState(false);
-  const q = useQuery({
-    queryKey: ["ordem-print", id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("service_orders")
-        .select("id, numero, categoria, descricao, status, valor, inicio, concluida_em, equipment_id, garantia_dias, clients(nome, whatsapp, documento, locations(endereco, bairro, cidade, equipment(id, descricao, marca, btus))), service_order_items(id, quantidade, stock_items(nome, unidade)), os_fotos(id, tipo, path)")
-        .eq("id", id).maybeSingle();
-      if (error) throw error;
-      let urls: Record<string, string> = {};
-      const paths = data?.os_fotos.map((f) => f.path) ?? [];
-      if (paths.length) {
-        const { data: s } = await supabase.storage.from("pedidos").createSignedUrls(paths, 3600);
-        urls = Object.fromEntries((s ?? []).map((x) => [x.path ?? "", x.signedUrl ?? ""]));
-      }
-      return data ? { ...data, urls } : null;
-    },
-  });
-  const o = q.data;
+  const q = useQuery({ queryKey: ["ordem-print", id], queryFn: () => carregarOS(id) });
   if (q.isLoading) return <p className="p-8 text-sm text-muted-foreground">Carregando...</p>;
-  if (q.error || !o) return <p className="p-8 text-sm text-destructive">Não foi possível carregar a ordem de serviço.</p>;
+  if (q.error || !q.data) return <p className="p-8 text-sm text-destructive">Não foi possível carregar a ordem de serviço.</p>;
+  return <FolhaOS id={id} o={q.data} />;
+}
+
+function FolhaOS({ id, o }: { id: string; o: OSDados }) {
   const loc = o.clients?.locations?.[0];
   const ap = o.clients?.locations.flatMap((l) => l.equipment).find((e) => e.id === o.equipment_id);
   const codigo = `OS-${String(o.numero).padStart(4, "0")}`;
@@ -59,13 +61,14 @@ function ImprimirOS() {
   const temFotos = fotos("antes").length + fotos("depois").length > 0;
   const equipamento = ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : "";
   const endereco = loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : "";
-  async function abrirPdf() {
-    if (!o) return;
-    // Abre a aba já no toque (senão o celular bloqueia), depois coloca o PDF nela.
-    const aba = window.open("", "_blank");
-    setGerando(true);
-    try {
-      const { gerarPdfOS } = await import("@/lib/osPdf");
+
+  // O PDF é montado assim que a tela abre: a pré-visualização mostra o arquivo
+  // real e o botão de baixar entrega na hora (o iPhone exige isso no toque).
+  const pdf = useQuery({
+    queryKey: ["ordem-pdf", id, o],
+    staleTime: Infinity,
+    queryFn: async () => {
+      const [{ gerarPdfOS }, { paginasDoPdf }] = await Promise.all([import("@/lib/osPdf"), import("@/lib/pdfPreview")]);
       const blob = await gerarPdfOS({
         codigo, status: o.status, inicio: o.inicio, concluida_em: o.concluida_em, categoria: o.categoria,
         descricao: o.descricao, valor: o.valor != null ? Number(o.valor) : null, garantia_dias: o.garantia_dias,
@@ -74,37 +77,52 @@ function ImprimirOS() {
         fotosAntes: fotos("antes").map((f) => o.urls[f.path]), fotosDepois: fotos("depois").map((f) => o.urls[f.path]),
         logoUrl: logoH.url, marcaUrl: marca.url,
       });
-      const url = URL.createObjectURL(new File([blob], `${codigo}.pdf`, { type: "application/pdf" }));
-      if (aba) aba.location.href = url;
-      else {
-        const a = document.createElement("a");
-        a.href = url; a.download = `${codigo}.pdf`;
-        document.body.appendChild(a); a.click(); a.remove();
-      }
-      setTimeout(() => URL.revokeObjectURL(url), 120_000);
-    } catch {
-      aba?.close();
-      toast.error("Não foi possível gerar o PDF. Tente de novo.");
-    } finally {
-      setGerando(false);
-    }
+      const file = new File([blob], `${codigo}.pdf`, { type: "application/pdf" });
+      const paginas = await paginasDoPdf(blob);
+      return { file, paginas };
+    },
+  });
+
+  function baixarPdf() {
+    if (!pdf.data) return;
+    // Chamado direto no toque, sem esperar nada — senão o celular bloqueia.
+    import("@/lib/pdfPreview").then(({ entregarArquivo }) => entregarArquivo(pdf.data.file)).catch(() => toast.error("Não foi possível baixar o PDF."));
   }
   const tel = normalizarTelefone(o.clients?.whatsapp);
-  const msgWa = `Olá, ${o.clients?.nome ?? ""}! Aqui é da ${company.name}. Sua ordem de serviço ${codigo} (${o.categoria ?? "serviço"}) está ${o.status === "concluida" ? "concluída" : "registrada"}${o.valor != null ? `, no valor de ${brl(Number(o.valor))}` : ""}. Garantia de ${o.garantia_dias ?? 90} dias. Vou te enviar o PDF da OS por aqui. Obrigado!`;
+  const msgWa = `Olá, ${o.clients?.nome ?? ""}! Aqui é da ${company.name}. Sua ordem de serviço ${codigo} (${o.categoria ?? "serviço"}) está ${o.status === "Concluída" ? "concluída" : "registrada"}${o.valor != null ? `, no valor de ${brl(Number(o.valor))}` : ""}. Garantia de ${o.garantia_dias} dias. Segue o PDF da OS. Obrigado!`;
+  const paginas = pdf.data?.paginas;
 
   return (
-    <div className="min-h-screen bg-muted/50 py-6 print:bg-background print:py-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}>
-      <div className="mx-auto mb-4 flex max-w-[210mm] flex-wrap justify-end gap-2 px-4 print:hidden">
-        {tel && (
-          <Button variant="outline" asChild>
-            <a href={linkWhatsApp(tel, msgWa)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp do cliente</a>
+    <div className="min-h-screen bg-muted/50 pb-8 print:bg-background print:py-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}>
+      <div className="sticky top-0 z-10 mb-4 border-b bg-background/95 backdrop-blur print:hidden">
+        <div className="mx-auto flex max-w-[210mm] items-center gap-3 px-4 py-2.5">
+          <Link to="/ordem/$id" params={{ id }} aria-label="Voltar para a ordem" className="-ml-2 inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted">
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Ordem de serviço</div>
+            <div className="truncate text-sm font-semibold tabular-nums">{codigo} · {o.clients?.nome}</div>
+          </div>
+          {tel && (
+            <Button variant="outline" size="icon" asChild>
+              <a href={linkWhatsApp(tel, msgWa)} target="_blank" rel="noreferrer" aria-label="Enviar pelo WhatsApp do cliente"><MessageCircle className="h-4 w-4" /></a>
+            </Button>
+          )}
+          <Button size="sm" className="h-9" disabled={!pdf.data} onClick={baixarPdf}>
+            {pdf.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            <span>Baixar PDF</span>
           </Button>
-        )}
-        <Button disabled={gerando} onClick={abrirPdf}>
-          {gerando ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />} Abrir PDF (salvar / imprimir)
-        </Button>
+        </div>
       </div>
-      <div className="px-3 sm:px-4 print:px-0">
+      {pdf.error && <p className="mx-auto mb-3 max-w-[210mm] px-4 text-xs text-destructive print:hidden">Não foi possível montar o PDF. Atualize a página e tente de novo.</p>}
+      {paginas && (
+        <div className="mx-auto flex max-w-[210mm] flex-col gap-3 px-3 sm:px-4 print:hidden">
+          {paginas.map((src, i) => (
+            <img key={src.slice(-40) + i} src={src} alt={`${codigo} — página ${i + 1}`} className="w-full rounded-md border bg-background shadow-lg" />
+          ))}
+        </div>
+      )}
+      <div className={`px-3 sm:px-4 print:px-0 ${paginas ? "hidden print:block" : ""}`}>
         <article className="print-area relative mx-auto flex w-full max-w-[210mm] flex-col overflow-hidden rounded-md print:rounded-none sm:min-h-[297mm] print:min-h-[297mm] print:w-[210mm] bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
           <div className="h-2 bg-primary" />
           <img src={marca.url} alt="" aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 w-[70%] -translate-x-1/2 -translate-y-1/2 opacity-[0.07] print:opacity-[0.07]" />
