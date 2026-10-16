@@ -59,7 +59,7 @@ function Vitrine() {
 
   return (
     <AppShell title="Vitrine" actions={<div className="flex gap-2">
-      <Button asChild variant="outline"><Link to="/catalogo" target="_blank"><ExternalLink className="h-4 w-4" /><span className="hidden sm:inline">Ver página</span></Link></Button>
+      <Button asChild variant="outline"><Link to="/agendar" target="_blank"><ExternalLink className="h-4 w-4" /><span className="hidden sm:inline">Ver página</span></Link></Button>
       <PrimaryButton label="Novo item" onClick={() => setAberto(true)} />
     </div>}>
       {aberto && (

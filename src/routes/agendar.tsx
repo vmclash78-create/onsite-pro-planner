@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
+import { Vitrine } from "@/components/Vitrine";
 import { Snowflake } from "lucide-react";
 import "@/styles/agendar.css";
 
@@ -144,6 +145,10 @@ function Agendar() {
       <main className="mn">
         {step === 1 && (
           <>
+            <section className="mb-8">
+              <Vitrine onAgendar={() => document.getElementById("form-agendar")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+            </section>
+            <div id="form-agendar" className="scroll-mt-4" />
             {head("O que você precisa?")}
             <p className="sub">Escolha a área e o tipo de serviço.</p>
             <div className="list">
@@ -169,11 +174,15 @@ function Agendar() {
             <p className="sub" style={{ textTransform: "capitalize" }}>{fmt(dias[0]!, { month: "long", year: "numeric" })}</p>
             <div className="days">
               {dias.map((d) => {
-                const off = d.getDay() === 0, on = data === iso(d) && !visita;
+                const todasHoras = [...HORAS["Manhã"]!, ...HORAS["Tarde"]!];
+                const lotado = todasHoras.every((h) => OCUPADOS.includes(`${iso(d)} ${h}`));
+                const off = d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
                 return (
                   <Button variant="ghost" key={iso(d)} className={`day ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
+                    title={lotado ? "Dia sem horários livres" : undefined}
                     onClick={() => { setData(iso(d)); setHora(null); setVisita(false); }}>
                     <small>{fmt(d, { weekday: "short" }).replace(".", "")}</small><strong>{d.getDate()}</strong>
+                    {lotado && <small className="lotado">lotado</small>}
                   </Button>
                 );
               })}
@@ -183,11 +192,12 @@ function Agendar() {
                 <div className="lb">{p}</div>
                 <div className="grid">
                   {HORAS[p]!.map((h) => {
-                    const off = !data || OCUPADOS.includes(`${data} ${h}`), on = hora === h && !visita;
+                    const ocupado = !!data && OCUPADOS.includes(`${data} ${h}`);
+                    const off = !data || ocupado, on = hora === h && !visita;
                     return (
                       <Button variant="ghost" key={h} className={`hr ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
-                        onClick={() => { setHora(h); setVisita(false); }}>{h}</Button>
-                    );
+                        onClick={() => { setHora(h); setVisita(false); }}>{ocupado ? <span className="ocp">{h}<small>ocupado</small></span> : h}</Button>
+                     );
                   })}
                 </div>
               </div>

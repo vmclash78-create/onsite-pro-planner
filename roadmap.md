@@ -12,3 +12,4 @@
 - [x] Fase 1: contas a receber, cobrança por Pix e avisos pelo WhatsApp
 - [x] Ficha do cliente, peças e fotos na OS, garantia, calculadora de gesso, vitrine pública
 - [ ] Próximas: PDF da OS, comissão de técnicos
+- [x] Unir vitrine + agendamento em uma página pública única (/agendar), /catalogo redireciona

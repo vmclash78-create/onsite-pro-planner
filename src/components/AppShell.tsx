@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store, Eye,
+  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store, Eye,
 } from "lucide-react";
 import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,8 +113,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
             </div>
           ))}
           <div className="flex flex-col gap-0.5 border-t border-sidebar-border pt-3">
-            <Link to="/catalogo" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><Eye className={ICON} strokeWidth={1.75} /> Ver como o cliente vê</Link>
-            <Link to="/agendar" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><ExternalLink className={ICON} strokeWidth={1.75} /> Página de agendamento</Link>
+<Link to="/agendar" target="_blank" className="flex items-center gap-3 rounded-[6px] px-3 py-2 text-sm hover:bg-sidebar-accent"><Eye className={ICON} strokeWidth={1.75} /> Ver como o cliente vê</Link>
           </div>
         </nav>
         <div className="mt-3 border-t border-sidebar-border px-5 pt-4 text-xs leading-relaxed text-muted-foreground">

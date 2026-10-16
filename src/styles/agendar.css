@@ -36,6 +36,11 @@
 .vm-ag .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .vm-ag .hr{height:46px;border-radius:8px;border:1.5px solid var(--bd);background:var(--surface);font-weight:600}
 .vm-ag .hr.on{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
+.vm-ag .hr.off{opacity:.45;border-style:dashed;cursor:not-allowed}
+.vm-ag .hr .ocp{display:flex;flex-direction:column;line-height:1.1;text-decoration:line-through}
+.vm-ag .hr .ocp small{font-size:10px;font-weight:500;text-decoration:none}
+.vm-ag .day.off{opacity:.4;border-style:dashed;cursor:not-allowed}
+.vm-ag .day .lotado{display:block;font-size:9px;font-weight:600;text-transform:uppercase;margin-top:1px}
 .vm-ag .visit{display:block;width:100%;height:auto;white-space:normal;text-align:left;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
 .vm-ag .visit b{display:block;font-size:15px;color:var(--ac)}
 .vm-ag .visit span{display:block;font-size:13px;color:var(--mut);margin-top:3px}
