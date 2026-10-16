@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Printer } from "lucide-react";
+import { Printer, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { company } from "@/lib/company";
@@ -12,7 +12,18 @@ export const Route = createFileRoute("/_authenticated/imprimir/ordem/$id")({
   component: ImprimirOS,
 });
 
-const Rot = ({ children }: { children: React.ReactNode }) => <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{children}</div>;
+const Titulo = ({ n, children }: { n: string; children: React.ReactNode }) => (
+  <div className="mb-2 flex items-center gap-2 border-b-2 border-primary pb-1">
+    <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-primary text-[10px] font-bold text-primary-foreground">{n}</span>
+    <h2 className="text-[11px] font-bold uppercase tracking-[0.12em] text-primary">{children}</h2>
+  </div>
+);
+const Campo = ({ r, v }: { r: string; v: React.ReactNode }) => (
+  <div>
+    <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{r}</div>
+    <div className="font-medium">{v || "—"}</div>
+  </div>
+);
 
 function ImprimirOS() {
   const { id } = Route.useParams();
@@ -39,90 +50,123 @@ function ImprimirOS() {
   const ap = o.clients?.locations.flatMap((l) => l.equipment).find((e) => e.id === o.equipment_id);
   const codigo = `OS-${String(o.numero).padStart(4, "0")}`;
   const fotos = (t: string) => o.os_fotos.filter((f) => f.tipo === t);
+  const temFotos = fotos("antes").length + fotos("depois").length > 0;
 
   return (
-    <div className="min-h-screen bg-muted/40 py-6 print:bg-background print:py-0">
+    <div className="min-h-screen bg-muted/50 py-6 print:bg-background print:py-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}>
       <div className="mx-auto mb-4 flex max-w-[210mm] justify-end px-4 print:hidden">
         <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir / Salvar PDF</Button>
       </div>
-      <article className="mx-auto max-w-[210mm] bg-background p-[14mm] text-[12px] leading-relaxed text-foreground shadow-sm print:p-0 print:shadow-none">
-        <header className="flex items-start justify-between gap-6 border-b pb-4">
-          <div>
-            <div className="text-lg font-semibold">{company.name}</div>
-            <div className="text-muted-foreground">{company.addressDisplay}</div>
-            <div className="text-muted-foreground">WhatsApp {company.phoneDisplay} · Instagram {company.instagram}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-base font-semibold">ORDEM DE SERVIÇO</div>
-            <div className="tabular-nums">{codigo}</div>
-            <div className="text-muted-foreground">Situação: {o.status}</div>
-            {o.inicio && <div className="tabular-nums text-muted-foreground">Início {dataBR(o.inicio)}</div>}
-            {o.concluida_em && <div className="tabular-nums text-muted-foreground">Conclusão {dataBR(o.concluida_em)}</div>}
-          </div>
-        </header>
-
-        <section className="grid grid-cols-2 gap-4 border-b py-4">
-          <div>
-            <Rot>Cliente</Rot>
-            <div className="font-medium">{o.clients?.nome}</div>
-            {o.clients?.documento && <div>CPF/CNPJ: {o.clients.documento}</div>}
-            {o.clients?.whatsapp && <div>Telefone: {o.clients.whatsapp}</div>}
-          </div>
-          <div>
-            <Rot>Local do serviço</Rot>
-            <div>{loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""}` : "—"}</div>
-            {loc && <div>{loc.cidade}</div>}
-          </div>
-        </section>
-
-        <section className="grid grid-cols-2 gap-4 border-b py-4">
-          <div><Rot>Especialidade</Rot><div>{o.categoria}</div></div>
-          <div><Rot>Equipamento atendido</Rot><div>{ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : "—"}</div></div>
-          <div className="col-span-2"><Rot>Serviço executado</Rot><p className="whitespace-pre-line">{o.descricao}</p></div>
-        </section>
-
-        <section className="border-b py-4">
-          <Rot>Peças e materiais aplicados</Rot>
-          {o.service_order_items.length === 0 ? <div>Nenhum material lançado.</div> : (
-            <table className="mt-1 w-full border-collapse">
-              <tbody>
-                {o.service_order_items.map((i) => (
-                  <tr key={i.id} className="border-b last:border-0">
-                    <td className="py-1">{i.stock_items?.nome}</td>
-                    <td className="py-1 text-right tabular-nums">{String(i.quantidade).replace(".", ",")} {i.stock_items?.unidade}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <div className="mt-3 flex justify-end gap-6 text-sm font-semibold"><span>Valor total</span><span className="tabular-nums">{o.valor != null ? brl(Number(o.valor)) : "—"}</span></div>
-        </section>
-
-        {(["antes", "depois"] as const).map((t) => fotos(t).length > 0 && (
-          <section key={t} className="border-b py-4 break-inside-avoid">
-            <Rot>Registro fotográfico — {t}</Rot>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              {fotos(t).map((f) => <img key={f.id} src={o.urls[f.path]} alt={`Foto ${t}`} className="aspect-square w-full rounded object-cover" />)}
+      <div className="overflow-x-auto px-2 print:overflow-visible print:px-0">
+        <article className="mx-auto flex min-h-[297mm] w-[210mm] flex-col bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
+          <div className="h-2 bg-primary" />
+          <header className="flex items-stretch justify-between gap-6 px-[14mm] pt-[10mm] pb-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-primary text-xl font-black tracking-tight text-primary-foreground">VM</div>
+              <div>
+                <div className="text-[17px] font-bold leading-tight">{company.name}</div>
+                <div className="text-[10px] uppercase tracking-[0.14em] text-primary">Climatização · Gesso · Elétrica</div>
+                <div className="mt-1 text-[10px] text-muted-foreground">{company.addressDisplay}</div>
+                <div className="text-[10px] text-muted-foreground">WhatsApp {company.phoneDisplay} · {company.instagram}</div>
+              </div>
             </div>
-          </section>
-        ))}
+            <div className="min-w-[58mm] rounded-md border-2 border-primary text-right">
+              <div className="whitespace-nowrap bg-primary px-3 py-1.5 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-primary-foreground">Ordem de Serviço</div>
+              <div className="space-y-0.5 px-3 py-2">
+                <div className="whitespace-nowrap text-lg font-bold tabular-nums">Nº {codigo}</div>
+                <div className="text-[10px] text-muted-foreground">Situação: <b className="text-foreground">{o.status}</b></div>
+                {o.inicio && <div className="text-[10px] tabular-nums text-muted-foreground">Início: {dataBR(o.inicio)}</div>}
+                {o.concluida_em && <div className="text-[10px] tabular-nums text-muted-foreground">Conclusão: {dataBR(o.concluida_em)}</div>}
+              </div>
+            </div>
+          </header>
 
-        <section className="py-4">
-          <Rot>Termo de garantia</Rot>
-          <p>
-            {o.garantia_dias > 0
-              ? `Os serviços descritos possuem garantia de ${o.garantia_dias} dias${o.concluida_em ? `, válida até ${dataBR(addDias(o.concluida_em, o.garantia_dias))}` : " a contar da conclusão"}, cobrindo defeitos de execução. A garantia não abrange mau uso, intervenção de terceiros, oscilações da rede elétrica ou desgaste natural.`
-              : "Serviço executado sem garantia."}
-          </p>
-          <p className="mt-2 text-muted-foreground">Declaro que o serviço foi executado e entregue em pleno funcionamento.</p>
-          <p className="mt-3">{company.city}/{company.state}, ____ de ______________ de ________.</p>
-        </section>
+          <main className="flex-1 space-y-5 px-[14mm]">
+            <section>
+              <Titulo n="1">Dados do cliente</Titulo>
+              <div className="grid grid-cols-3 gap-3 rounded-md bg-muted/60 p-3">
+                <div className="col-span-2"><Campo r="Nome / Razão social" v={o.clients?.nome} /></div>
+                <Campo r="CPF / CNPJ" v={o.clients?.documento} />
+                <div className="col-span-2"><Campo r="Endereço do atendimento" v={loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : ""} /></div>
+                <Campo r="Telefone" v={o.clients?.whatsapp} />
+              </div>
+            </section>
 
-        <section className="mt-14 grid grid-cols-2 gap-10 text-center">
-          <div><div className="border-t border-foreground pt-1.5 font-medium">{o.clients?.nome}</div><div className="text-muted-foreground">Cliente</div></div>
-          <div><div className="border-t border-foreground pt-1.5 font-medium">{company.name}</div><div className="text-muted-foreground">Técnico responsável</div></div>
-        </section>
-      </article>
+            <section>
+              <Titulo n="2">Serviço executado</Titulo>
+              <div className="grid grid-cols-3 gap-3">
+                <Campo r="Especialidade" v={o.categoria} />
+                <div className="col-span-2"><Campo r="Equipamento atendido" v={ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : ""} /></div>
+                <div className="col-span-3 rounded-md border p-3"><div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Descrição técnica</div><p className="whitespace-pre-line">{o.descricao}</p></div>
+              </div>
+            </section>
+
+            <section>
+              <Titulo n="3">Peças e materiais aplicados</Titulo>
+              <table className="w-full border-collapse overflow-hidden rounded-md">
+                <thead><tr className="bg-primary text-primary-foreground"><th className="px-3 py-1.5 text-left font-semibold">Item</th><th className="w-32 px-3 py-1.5 text-right font-semibold">Quantidade</th></tr></thead>
+                <tbody>
+                  {o.service_order_items.length === 0 ? <tr><td colSpan={2} className="border-b px-3 py-2 text-muted-foreground">Nenhum material lançado.</td></tr> :
+                    o.service_order_items.map((i) => (
+                      <tr key={i.id} className="border-b even:bg-muted/50">
+                        <td className="px-3 py-1.5">{i.stock_items?.nome}</td>
+                        <td className="px-3 py-1.5 text-right tabular-nums">{String(i.quantidade).replace(".", ",")} {i.stock_items?.unidade}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              <div className="mt-2 flex justify-end">
+                <div className="flex min-w-[70mm] items-center justify-between rounded-md bg-primary px-4 py-2 text-primary-foreground">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.14em]">Valor total</span>
+                  <span className="text-base font-bold tabular-nums">{o.valor != null ? brl(Number(o.valor)) : "—"}</span>
+                </div>
+              </div>
+            </section>
+
+            {temFotos && (
+              <section className="break-inside-avoid">
+                <Titulo n="4">Registro fotográfico</Titulo>
+                <div className="grid grid-cols-2 gap-4">
+                  {(["antes", "depois"] as const).map((t) => (
+                    <div key={t}>
+                      <div className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{t === "antes" ? "Antes" : "Depois"}</div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {fotos(t).map((f) => <img key={f.id} src={o.urls[f.path]} alt={`Foto ${t}`} className="aspect-square w-full rounded border object-cover" />)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section className="break-inside-avoid">
+              <Titulo n={temFotos ? "5" : "4"}>Termo de garantia</Titulo>
+              <div className="flex gap-3 rounded-md border-l-4 border-primary bg-muted/60 p-3">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p>
+                    {o.garantia_dias > 0
+                      ? `Os serviços descritos possuem garantia de ${o.garantia_dias} dias${o.concluida_em ? `, válida até ${dataBR(addDias(o.concluida_em, o.garantia_dias))}` : " a contar da conclusão"}, cobrindo defeitos de execução. A garantia não abrange mau uso, intervenção de terceiros, oscilações da rede elétrica ou desgaste natural.`
+                      : "Serviço executado sem garantia."}
+                  </p>
+                  <p className="mt-1 text-muted-foreground">Declaro que o serviço foi executado e entregue em pleno funcionamento.</p>
+                </div>
+              </div>
+              <p className="mt-3">{company.city}/{company.state}, ____ de ______________ de ________.</p>
+            </section>
+
+            <section className="grid grid-cols-2 gap-12 pt-12 text-center break-inside-avoid">
+              <div><div className="border-t border-foreground pt-1.5 font-semibold">{o.clients?.nome}</div><div className="text-[10px] text-muted-foreground">Cliente</div></div>
+              <div><div className="border-t border-foreground pt-1.5 font-semibold">{company.name}</div><div className="text-[10px] text-muted-foreground">Técnico responsável</div></div>
+            </section>
+          </main>
+
+          <footer className="mt-8 flex items-center justify-between bg-primary px-[14mm] py-2 text-[9px] text-primary-foreground">
+            <span>{company.name} · {company.addressDisplay}</span>
+            <span className="tabular-nums">{codigo} · WhatsApp {company.phoneDisplay}</span>
+          </footer>
+        </article>
+      </div>
     </div>
   );
 }
