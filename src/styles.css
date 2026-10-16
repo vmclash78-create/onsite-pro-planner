@@ -186,3 +186,18 @@ iframe[src*="lovable"] {
   border: none !important;
   outline: none !important;
 }
+
+/* Impressão: mostra apenas a folha marcada com .print-area (ex.: Ordem de Serviço) */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  @page { size: A4; margin: 10mm; }
+}
