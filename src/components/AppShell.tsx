@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import simbolo from "@/assets/logo-simbolo.png.asset.json";
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -44,7 +45,7 @@ const ICON = "h-4 w-4 shrink-0";
 function Brand() {
   return (
     <div className="flex items-center gap-2.5 px-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">VM</div>
+      <img src={simbolo.url} alt="" className="h-10 w-10 shrink-0 object-contain" />
       <div className="min-w-0 leading-tight">
         <div className="text-sm font-semibold text-sidebar-accent-foreground">VM Climatização & Acabamentos</div>
         <div className="truncate text-xs text-muted-foreground">Hidrolândia/CE</div>

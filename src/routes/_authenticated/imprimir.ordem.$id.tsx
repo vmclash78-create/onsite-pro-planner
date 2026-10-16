@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import logoH from "@/assets/logo-horizontal.png.asset.json";
+import marca from "@/assets/marca-dagua.png.asset.json";
 import { useQuery } from "@tanstack/react-query";
 import { Printer, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,11 +60,12 @@ function ImprimirOS() {
         <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir / Salvar PDF</Button>
       </div>
       <div className="px-3 sm:px-4 print:px-0">
-        <article className="mx-auto flex w-full max-w-[210mm] flex-col overflow-hidden rounded-md print:rounded-none sm:min-h-[297mm] print:min-h-[297mm] print:w-[210mm] bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
+        <article className="relative mx-auto flex w-full max-w-[210mm] flex-col overflow-hidden rounded-md print:rounded-none sm:min-h-[297mm] print:min-h-[297mm] print:w-[210mm] bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
           <div className="h-2 bg-primary" />
+          <img src={marca.url} alt="" aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 w-[70%] -translate-x-1/2 -translate-y-1/2 opacity-[0.07] print:opacity-[0.07]" />
           <header className="flex flex-col gap-4 px-4 pt-5 pb-5 sm:flex-row sm:items-stretch sm:justify-between sm:gap-6 sm:px-[14mm] sm:pt-[10mm] print:flex-row print:px-[14mm]">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-primary text-xl font-black tracking-tight text-primary-foreground">VM</div>
+              <img src={logoH.url} alt={company.name} className="h-14 w-auto shrink-0 object-contain sm:h-16" />
               <div className="min-w-0">
                 <div className="text-[16px] font-bold leading-tight sm:text-[17px]">{company.name}</div>
                 <div className="text-[10px] uppercase tracking-[0.14em] text-primary">Climatização · Gesso · Elétrica</div>
