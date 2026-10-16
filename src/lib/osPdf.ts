@@ -57,8 +57,8 @@ export async function gerarPdfOS(o: OSParaPdf) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, H = 297, M = 14, CW = W - M * 2;
   const [logo, marca, ...fotos] = await Promise.all([
-    carregar(o.logoUrl), carregar(o.marcaUrl),
-    ...o.fotosAntes.map(carregar), ...o.fotosDepois.map(carregar),
+    carregar(o.logoUrl, 900), carregar(o.marcaUrl, 700),
+    ...o.fotosAntes.map((u) => carregar(u, 600)), ...o.fotosDepois.map((u) => carregar(u, 600)),
   ]);
   const antes = fotos.slice(0, o.fotosAntes.length);
   const depois = fotos.slice(o.fotosAntes.length);
