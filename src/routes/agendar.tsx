@@ -7,7 +7,8 @@ import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine } from "@/components/Vitrine";
-import { House, Layers, Snowflake, Zap } from "lucide-react";
+import { House, Layers, Zap } from "lucide-react";
+import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
@@ -293,7 +294,7 @@ function Agendar() {
 function Brand() {
   return (
     <header className="brand">
-      <div className="logo"><Snowflake size={20} strokeWidth={2} aria-hidden /></div>
+      <div className="logo"><img src={logoSimbolo.url} alt="VM Climatização" width={22} height={22} /></div>
       <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
     </header>
   );
