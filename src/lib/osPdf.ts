@@ -24,9 +24,11 @@ async function carregar(url?: string, max = 1000): Promise<Img | null> {
     const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
     const c = document.createElement("canvas");
     c.width = w; c.height = h;
-    c.getContext("2d")!.drawImage(bmp, 0, 0, w, h);
-    const png = blob.type.includes("png");
-    return { data: c.toDataURL(png ? "image/png" : "image/jpeg", 0.82), w, h };
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = "#ffffff"; // folha é branca: fundo transparente vira branco
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(bmp, 0, 0, w, h);
+    return { data: c.toDataURL("image/jpeg", 0.85), w, h };
   } catch {
     return null;
   }
