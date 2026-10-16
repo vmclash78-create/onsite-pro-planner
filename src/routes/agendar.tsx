@@ -199,7 +199,7 @@ function Agendar() {
             {Object.keys(HORAS).map((p) => (
               <div key={p}>
                 <div className="lb">{p}</div>
-                <div className="grid">
+                <div className="horas">
                   {HORAS[p]!.map((h) => {
                     const ocupado = !!data && OCUPADOS.includes(`${data} ${h}`);
                     const off = !data || ocupado, on = hora === h && !visita;

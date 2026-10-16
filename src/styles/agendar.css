@@ -33,7 +33,7 @@
 .vm-ag .day strong{display:block;font:800 22px Archivo,sans-serif;margin-top:2px}
 .vm-ag .day.on{background:var(--ink);border-color:var(--ink);color:var(--on-accent)}
 .vm-ag .off,.vm-ag .off:disabled{border:1.5px dashed var(--line);background:none;color:var(--off);cursor:default}
-.vm-ag .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vm-ag .horas{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .vm-ag .hr{height:46px;border-radius:8px;border:1.5px solid var(--bd);background:var(--surface);font-weight:600}
 .vm-ag .hr.on{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
 .vm-ag .hr.off{opacity:.45;border-style:dashed;cursor:not-allowed}
@@ -96,3 +96,22 @@
 .vm-ag .area.on{border-color:var(--ac);background:color-mix(in oklab,var(--ac) 8%,var(--surface));color:var(--ac)}
 .vm-ag .lb{margin:20px 0 10px}
 @media(min-width:768px){.vm-ag .step{margin-top:28px}.vm-ag h1{font-size:30px}.vm-ag .area{height:100px}}
+/* Seleções no azul da marca */
+.vm-ag .chip.on,.vm-ag .chip.on:hover,.vm-ag .day.on,.vm-ag .day.on:hover{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
+/* Celular: passo de horário cabe sem rolar */
+@media(max-width:767px){
+.vm-ag .w{padding-top:12px}
+.vm-ag .brand{padding-bottom:10px}
+.vm-ag .tabs{margin-top:10px}
+.vm-ag .step{margin-top:12px}
+.vm-ag h1{font-size:22px;margin:8px 0 2px}
+.vm-ag .days{margin-top:10px}
+.vm-ag .day{width:54px;height:60px}
+.vm-ag .day strong{font-size:19px;margin-top:0}
+.vm-ag .lb{margin:12px 0 6px}
+.vm-ag .hr{height:40px}
+.vm-ag .visit{margin-top:14px;padding-top:10px}
+.vm-ag .visit span{display:none}
+.vm-ag .ft{padding:12px 0 calc(12px + env(safe-area-inset-bottom))}
+.vm-ag .b{height:48px}
+}
