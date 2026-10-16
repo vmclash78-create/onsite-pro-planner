@@ -31,6 +31,13 @@ const AREAS: Record<string, [string, string[]]> = {
 };
 const HORAS: Record<string, string[]> = { Manhã: ["08:00", "09:00", "10:00"], Tarde: ["14:00", "15:00", "16:00"] };
 
+const LONGOS: Record<string, string[]> = { Refrigeração: ["Instalação"], Elétrica: ["Quadro"] };
+const modo = (a: string, t: string) => (a === "Gesso" ? "medicao" : LONGOS[a]?.includes(t) ? "turno" : "pontual");
+const TURNOS = [
+  { p: "Manhã", h: "08:00", faixa: "08h às 12h" },
+  { p: "Tarde", h: "14:00", faixa: "14h às 18h" },
+] as const;
+
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("pt-BR", o);
 const maskWhats = (v: string) => {
@@ -76,7 +83,10 @@ function Agendar() {
   });
   const OCUPADOS = ocup.data ?? [];
   const diaSel = dias.find((d) => iso(d) === data);
-  const resumo = visita ? "Visita técnica para orçamento" : diaSel ? `${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} às ${hora ?? ""}` : "";
+  const md = modo(area, tipo);
+  const turnoSel = TURNOS.find((t) => t.h === hora);
+  const quando = md === "turno" && turnoSel ? `turno da ${turnoSel.p.toLowerCase()} (${turnoSel.faixa})` : `às ${hora ?? ""}`;
+  const resumo = visita ? "Visita técnica para orçamento" : diaSel ? `${md === "medicao" ? "Vistoria e medição: " : ""}${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} ${quando}` : "";
   const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
@@ -160,7 +170,7 @@ function Agendar() {
               {Object.keys(AREAS).map((a) => {
                 const Ic = ICONES[a]!;
                 return (
-                  <button key={a} className={`area ${area === a ? "on" : ""}`} aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); }}>
+                  <button key={a} className={`area ${area === a ? "on" : ""}`} aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); setHora(null); }}>
                     <Ic size={22} strokeWidth={1.75} aria-hidden />
                     <b>{a}</b>
                   </button>
@@ -171,7 +181,7 @@ function Agendar() {
             <div className="lb">Modalidade de atendimento</div>
             <div className="chips">
               {AREAS[area]![1].map((t) => (
-                <Button variant="ghost" key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => setTipo(t)}>{t}</Button>
+                <Button variant="ghost" key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => { setTipo(t); setHora(null); }}>{t}</Button>
               ))}
             </div>
           </>
@@ -179,7 +189,9 @@ function Agendar() {
 
         {step === 2 && (
           <>
-            {head("Data e horário de preferência")}
+            {head(md === "medicao" ? "Vistoria e medição técnica" : md === "turno" ? "Data e turno de atendimento" : "Data e horário de preferência")}
+            {md === "medicao" && <p className="sub aviso">Serviços de gesso iniciam com vistoria no local para medição e orçamento. A execução da obra é agendada após a aprovação.</p>}
+            {md === "turno" && <p className="sub aviso">Este serviço requer de 2h30 a 4h e ocupa um turno completo.</p>}
             <p className="sub" style={{ textTransform: "capitalize" }}>{fmt(dias[0]!, { month: "long", year: "numeric" })}</p>
             <div className="days">
               {dias.map((d) => {
@@ -196,7 +208,20 @@ function Agendar() {
                 );
               })}
             </div>
-            {Object.keys(HORAS).map((p) => (
+            {md === "turno" ? (
+              <div className="turnos">
+                {TURNOS.map((t) => {
+                  const ocupado = !!data && HORAS[t.p]!.some((h) => OCUPADOS.includes(`${data} ${h}`));
+                  const off = visita || !data || ocupado, on = hora === t.h && !visita;
+                  return (
+                    <button type="button" key={t.p} className={`turno ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
+                      onClick={() => { setHora(t.h); setVisita(false); }}>
+                      <b>{t.p}</b><span>{ocupado ? "Indisponível" : t.faixa}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : Object.keys(HORAS).map((p) => (
               <div key={p}>
                 <div className="lb">{p}</div>
                 <div className="horas">

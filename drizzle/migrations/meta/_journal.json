@@ -50,6 +50,13 @@
       "when": 1792102079952,
       "tag": "0006_ficha_os_pecas_catalogo",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792200000000,
+      "tag": "0007_turnos_ocupados",
+      "breakpoints": true
     }
   ]
 }

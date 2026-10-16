@@ -43,7 +43,10 @@ export const criarPedido = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!data.visita && data.data && data.hora) {
       const { data: livre } = await supabaseAdmin.rpc("horarios_ocupados", { _inicio: data.data, _fim: data.data });
-      if (livre?.some((o) => o.hora === data.hora)) throw new Error("HORARIO_OCUPADO");
+      const longo = (data.categoria === "Refrigeração" && data.tipo === "Instalação") || (data.categoria === "Elétrica" && data.tipo === "Quadro");
+      const manha = data.hora < "12:00";
+      const precisa = longo ? (manha ? ["08:00", "09:00", "10:00"] : ["14:00", "15:00", "16:00"]) : [data.hora];
+      if (livre?.some((o) => precisa.includes(o.hora))) throw new Error("HORARIO_OCUPADO");
     }
     const { data: row, error } = await supabaseAdmin
       .from("appointments")
