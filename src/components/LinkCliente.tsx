@@ -9,7 +9,11 @@ const MENSAGEM = "Olá! Conheça os serviços da VM Climatização & Acabamentos
 /** Cartão com o link público de agendamento: copiar, enviar no WhatsApp e ver. */
 export function LinkCliente() {
   const [url, setUrl] = useState("/agendar");
-  useEffect(() => { setUrl(`${window.location.origin}/agendar`); }, []);
+  useEffect(() => {
+    const o = window.location.origin;
+    // Link da prévia só abre para quem está logado no editor: manda sempre o publicado.
+    setUrl(/id-preview|localhost|lovableproject/.test(o) ? "https://onsite-pro-planner.lovable.app/agendar" : `${o}/agendar`);
+  }, []);
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(url);
