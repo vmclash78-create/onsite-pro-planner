@@ -76,7 +76,8 @@
 @media(max-width:359px){.vm-ag .w{padding-left:16px;padding-right:16px}.vm-ag .days{margin-right:-16px;padding-right:16px}.vm-ag h1{font-size:28px}.vm-ag .chip{padding:0 12px}.vm-ag .bk{width:80px}.vm-ag .b{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.vm-ag .mn{animation:none}}
 /* Identidade de refrigeração */
-.vm-ag .logo{background:var(--ac);color:var(--on-accent);border-radius:8px}
+.vm-ag .logo{background:transparent;border-radius:8px}
+.vm-ag .logo img{width:30px;height:30px;object-fit:contain}
 .vm-ag .brand{padding-bottom:14px;border-bottom:2px solid var(--ac)}
 /* Evita que o toque no celular deixe um segundo botão com aparência de selecionado */
 .vm-ag .chip:not(.on):hover,.vm-ag .day:not(.on):not(.off):hover,.vm-ag .hr:not(.on):not(.off):hover,.vm-ag .row:hover,.vm-ag .visit:hover{background:var(--surface);color:var(--ink)}

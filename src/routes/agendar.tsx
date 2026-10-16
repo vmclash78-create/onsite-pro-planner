@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import logoH from "@/assets/logo-simbolo.png.asset.json";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,6 +8,7 @@ import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine } from "@/components/Vitrine";
 import { House, Layers, Snowflake, Zap } from "lucide-react";
+import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
@@ -294,8 +294,8 @@ function Agendar() {
 function Brand() {
   return (
     <header className="brand">
-      <img src={logoH.url} alt="" style={{ objectFit: "contain" }} />
-      <div style={{ minWidth: 0 }}><b>{company.name}</b><span>Climatização · Gesso · Elétrica</span><span>{company.city}/{company.state} e região</span></div>
+      <div className="logo"><img src={logoSimbolo.url} alt="VM Climatização" width={22} height={22} /></div>
+      <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
     </header>
   );
 }
