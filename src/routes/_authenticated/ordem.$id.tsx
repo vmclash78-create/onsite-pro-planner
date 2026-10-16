@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Camera, Loader2, Plus, Printer, Trash2 } from "lucide-react";
+import { Camera, FileText, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Field, Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
@@ -103,7 +103,7 @@ function Ordem() {
 
   return (
     <AppShell title={codigo} breadcrumb={["Painel", "Ordens de serviço", codigo]}>
-      <div className="mb-4 flex justify-end"><Link to="/imprimir/ordem/$id" params={{ id }} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm hover:bg-muted"><Printer className="h-4 w-4" /> Imprimir / PDF</Link></div>
+      <div className="mb-4 flex justify-end"><Link to="/imprimir/ordem/$id" params={{ id }} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm hover:bg-muted"><FileText className="h-4 w-4" /> Ver PDF da OS</Link></div>
       {q.isLoading || q.error || !o ? <Panel><StateRow loading={q.isLoading} error={q.error} empty={!o} emptyText="Ordem não encontrada." /></Panel> : (
         <div className="space-y-5">
           <Panel title={<Link to="/cliente/$id" params={{ id: o.client_id }} className="hover:underline">{o.clients?.nome}</Link>} action={<StatusSelect value={o.status} options={STATUS} onChange={(s) => upd.mutate({ status: s })} />}>

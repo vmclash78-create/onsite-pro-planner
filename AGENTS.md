@@ -22,4 +22,4 @@
 - Pix BR Code, phone normalization and WhatsApp templates live in src/lib/cobranca.ts; WhatsApp sends are wa.me links logged in `mensagens_enviadas` — no paid API.
 - Public catalog (/catalogo) reads catalogo_itens via anon RLS (ativo only); images in public bucket catalogo — only showcase data is public.
 - Completing a service order deducts its service_order_items from stock and refreshes the linked equipment's last maintenance (trigger os_conclusao) — stock and preventive dates stay consistent.
-- Service order PDFs are generated client-side with jsPDF in src/lib/osPdf.ts (real A4 file, shared/downloaded) — browser print inside the preview frame captures the whole screen.
+- Service order PDFs are generated client-side with jsPDF (src/lib/osPdf.ts) on page open, previewed as page images via pdfjs-dist v4 (src/lib/pdfPreview.ts; v5 needs browser APIs older phones lack) and delivered synchronously on tap (share sheet on touch, download otherwise) — browser print and window.open fail inside the preview frame and on iOS.
