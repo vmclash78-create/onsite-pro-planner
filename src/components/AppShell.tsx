@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, ExternalLink, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store, Eye,
+  LayoutDashboard, Users, MapPin, FileText, CalendarDays, Wrench, HardHat, BellRing, Plus, MoreHorizontal, ChevronRight, Inbox, LogOut, Loader2, Wallet, Package, HandCoins, Settings, Store, Eye,
 } from "lucide-react";
 import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
