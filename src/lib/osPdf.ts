@@ -91,8 +91,8 @@ export async function gerarPdfOS(o: OSParaPdf) {
 
   // Cabeçalho
   if (logo) {
-    const lh = 18, lw = Math.min((lh * logo.w) / logo.h, 105);
-    doc.addImage(logo.data, fmt(logo.data), M, y, lw, (lw * logo.h) / logo.w > lh ? lh : (lw * logo.h) / logo.w);
+    const lw = Math.min((18 * logo.w) / logo.h, 105);
+    doc.addImage(logo.data, fmt(logo.data), M, y, lw, (lw * logo.h) / logo.w);
   }
   doc.setDrawColor(...AZUL).setLineWidth(0.6).line(M, y + 21, M, y + 29);
   doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...CINZA);
@@ -188,9 +188,9 @@ export async function gerarPdfOS(o: OSParaPdf) {
           const s = Math.max(lado / f.w, lado / f.h);
           const dw = f.w * s, dh2 = f.h * s;
           doc.saveGraphicsState();
-          doc.rect(fx, fy, lado, lado, null as never);
-          (doc as unknown as { clip: () => jsPDF }).clip();
-          (doc as unknown as { discardPath: () => jsPDF }).discardPath();
+          doc.rect(fx, fy, lado, lado, null);
+          doc.clip();
+          doc.discardPath();
           doc.addImage(f.data, fmt(f.data), fx - (dw - lado) / 2, fy - (dh2 - lado) / 2, dw, dh2);
           doc.restoreGraphicsState();
         }

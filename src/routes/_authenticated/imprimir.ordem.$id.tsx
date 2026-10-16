@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import logoH from "@/assets/logo-horizontal.png.asset.json";
 import marca from "@/assets/marca-dagua.png.asset.json";
 import { useQuery } from "@tanstack/react-query";
-import { Printer, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { Download, Loader2, Printer, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+import { gerarPdfOS } from "@/lib/osPdf";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { company } from "@/lib/company";
@@ -29,6 +32,7 @@ const Campo = ({ r, v }: { r: string; v: React.ReactNode }) => (
 
 function ImprimirOS() {
   const { id } = Route.useParams();
+  const [gerando, setGerando] = useState(false);
   const q = useQuery({
     queryKey: ["ordem-print", id],
     queryFn: async () => {
@@ -53,11 +57,34 @@ function ImprimirOS() {
   const codigo = `OS-${String(o.numero).padStart(4, "0")}`;
   const fotos = (t: string) => o.os_fotos.filter((f) => f.tipo === t);
   const temFotos = fotos("antes").length + fotos("depois").length > 0;
+  const equipamento = ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : "";
+  const endereco = loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : "";
+  async function baixarPdf() {
+    if (!o) return;
+    setGerando(true);
+    try {
+      await gerarPdfOS({
+        codigo, status: o.status, inicio: o.inicio, concluida_em: o.concluida_em, categoria: o.categoria,
+        descricao: o.descricao, valor: o.valor != null ? Number(o.valor) : null, garantia_dias: o.garantia_dias,
+        cliente: o.clients, endereco, equipamento,
+        itens: o.service_order_items.map((i) => ({ nome: i.stock_items?.nome ?? "", quantidade: `${String(i.quantidade).replace(".", ",")} ${i.stock_items?.unidade ?? ""}`.trim() })),
+        fotosAntes: fotos("antes").map((f) => o.urls[f.path]), fotosDepois: fotos("depois").map((f) => o.urls[f.path]),
+        logoUrl: logoH.url, marcaUrl: marca.url,
+      });
+    } catch {
+      toast.error("Não foi possível gerar o PDF. Tente de novo.");
+    } finally {
+      setGerando(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-muted/50 py-6 print:bg-background print:py-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" }}>
-      <div className="mx-auto mb-4 flex max-w-[210mm] justify-end px-4 print:hidden">
-        <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir / Salvar PDF</Button>
+      <div className="mx-auto mb-4 flex max-w-[210mm] flex-wrap justify-end gap-2 px-4 print:hidden">
+        <Button variant="outline" onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir</Button>
+        <Button disabled={gerando} onClick={baixarPdf}>
+          {gerando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} Baixar PDF
+        </Button>
       </div>
       <div className="px-3 sm:px-4 print:px-0">
         <article className="print-area relative mx-auto flex w-full max-w-[210mm] flex-col overflow-hidden rounded-md print:rounded-none sm:min-h-[297mm] print:min-h-[297mm] print:w-[210mm] bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
