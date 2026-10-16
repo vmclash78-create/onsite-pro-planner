@@ -152,18 +152,18 @@
 .vm-ag h1{font-size:28px;letter-spacing:-.02em;margin-top:16px}
 .vm-ag .areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
 .vm-ag .area{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 6px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);transition:all .2s}
-.vm-ag .area svg{width:44px;height:44px;padding:11px;border-radius:12px;background:var(--muted);color:var(--mut);transition:all .2s}
+.vm-ag .area svg{width:28px;height:28px;color:var(--mut);transition:color .2s}
 .vm-ag .area b{font-size:14px;font-weight:700}
 .vm-ag .area.on{border-color:var(--ac);background:color-mix(in oklab,var(--ac) 7%,var(--surface));box-shadow:0 8px 20px -12px var(--ac)}
-.vm-ag .area.on svg{background:var(--ac);color:var(--on-accent)}
+.vm-ag .area.on svg{color:var(--ac)}
 .vm-ag .area.on b{color:var(--ac)}
 .vm-ag .areas + .sub{font-size:13px;margin-top:12px!important;padding:10px 12px;border-radius:10px;background:var(--muted)}
 .vm-ag .lb{text-transform:uppercase;letter-spacing:.08em;font-size:11px}
 .vm-ag .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .vm-ag .chip{height:50px;border-radius:12px;border:1.5px solid var(--line);font-weight:600;transition:all .2s}
-.vm-ag .chip.on,.vm-ag .chip.on:hover{background:var(--ac);border-color:var(--ac);color:var(--on-accent);box-shadow:0 8px 20px -12px var(--ac)}
+.vm-ag .chip.on,.vm-ag .chip.on:hover{background:var(--ac)!important;border-color:var(--ac);color:var(--on-accent)!important;box-shadow:0 8px 20px -12px var(--ac)}
 .vm-ag .day{border-radius:14px;border-color:var(--line)}
-.vm-ag .day.on,.vm-ag .day.on:hover{background:var(--ac);border-color:var(--ac);color:var(--on-accent)}
+.vm-ag .day.on,.vm-ag .day.on:hover{background:var(--ac)!important;border-color:var(--ac);color:var(--on-accent)!important}
 .vm-ag .hr,.vm-ag .turno{border-radius:12px}
 .vm-ag input.t,.vm-ag textarea{border-radius:12px;border-color:var(--line);transition:border-color .2s,box-shadow .2s}
 .vm-ag input.t:focus,.vm-ag textarea:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in oklab,var(--ac) 18%,transparent)}
