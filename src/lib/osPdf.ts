@@ -134,8 +134,8 @@ export async function gerarPdfOS(o: OSParaPdf) {
   const c2 = CW * 0.62;
   const doc1 = o.cliente?.documento?.trim();
   const tel = o.cliente?.whatsapp?.trim();
-  const direita1 = doc1 ? ["CPF / CNPJ", doc1] : tel ? ["Telefone", tel] : null;
-  const direita2 = doc1 && tel ? ["Telefone", tel] : null;
+  const direita1: [string, string] | null = doc1 ? ["CPF / CNPJ", doc1] : tel ? ["Telefone", tel] : null;
+  const direita2: [string, string] | null = doc1 && tel ? ["Telefone", tel] : null;
   doc.setFont("helvetica", "normal").setFontSize(9);
   const endL = (doc.splitTextToSize(o.endereco || "—", (direita2 ? c2 : CW) - 6) as string[]).length;
   const boxH = 18 + endL * 4;
