@@ -114,7 +114,7 @@ function Pedido() {
                 <a
                   className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 sm:w-auto"
                   target="_blank" rel="noreferrer"
-                  onClick={() => { if (p.status === "Pendente") status.mutate("Confirmado"); }}
+                  onClick={() => { if (p.status === "Pendente") status.mutate("Agendada"); }}
                   href={`https://wa.me/55${p.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(
                     `Prezado(a) ${p.nome_contato}, a ${company.name} confirma sua solicitação de ${p.categoria} (${p.tipo}) ` +
                     (p.visita_orcamento || !p.data ? "na modalidade de visita técnica. Entraremos em contato para definir a data." : `para ${dataBR(p.data)}${p.hora ? ` às ${p.hora}` : ""}.`) +
