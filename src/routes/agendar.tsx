@@ -174,7 +174,7 @@ function Agendar() {
             <p className="sub" style={{ textTransform: "capitalize" }}>{fmt(dias[0]!, { month: "long", year: "numeric" })}</p>
             <div className="days">
               {dias.map((d) => {
-                const todasHoras = [...HORAS.Manhã!, ...HORAS.Tarde!];
+                const todasHoras = [...HORAS["Manhã"]!, ...HORAS["Tarde"]!];
                 const lotado = todasHoras.every((h) => OCUPADOS.includes(`${iso(d)} ${h}`));
                 const off = d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
                 return (
