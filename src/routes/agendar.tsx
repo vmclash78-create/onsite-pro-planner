@@ -211,10 +211,12 @@ function Agendar() {
                 </div>
               </div>
             ))}
-            <Button variant="ghost" className="visit" onClick={() => { setVisita(true); setData(null); setHora(null); }}>
-              <b>{visita ? "Visita para orçamento selecionada" : "Prefiro uma visita para orçamento"}</b>
-              <span>Sem data fechada. Combinamos pelo WhatsApp.</span>
-            </Button>
+            <div className="ou"><span>ou</span></div>
+            <button type="button" className={`visit2 ${visita ? "on" : ""}`} aria-pressed={visita} onClick={() => { setVisita(true); setData(null); setHora(null); }}>
+              <span className="vi"><House size={20} /></span>
+              <span className="vt"><b>Prefiro uma visita para orçamento</b><small>Sem horário fixo. Combinamos pelo WhatsApp.</small></span>
+              <span className={`rd ${visita ? "on" : ""}`} />
+            </button>
           </>
         )}
 

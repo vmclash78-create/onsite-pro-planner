@@ -27,8 +27,8 @@ export function Vitrine({ onAgendar }: { onAgendar?: () => void }) {
     <div>
       <h2 className="text-xl font-semibold">Serviços e preços</h2>
       <p className="mt-1 text-sm text-muted-foreground">Valores de referência em Hidrolândia e região. O preço final é confirmado na visita ou pelo WhatsApp.</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {FILTROS.map((f) => <Button key={f} size="sm" variant={cat === f ? "default" : "outline"} onClick={() => setCat(f)}>{f}</Button>)}
+      <div className="vt-fils mt-4">
+        {FILTROS.map((f) => <button type="button" key={f} className={`vt-fil ${cat === f ? "on" : ""}`} aria-pressed={cat === f} onClick={() => setCat(f)}>{f}</button>)}
       </div>
       {q.isLoading && <div className="mt-8 flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>}
       {q.error && <p className="mt-8 text-sm text-destructive">Não foi possível carregar. Fale com a gente pelo WhatsApp.</p>}
@@ -46,7 +46,7 @@ export function Vitrine({ onAgendar }: { onAgendar?: () => void }) {
                 {i.preco != null && <div className="text-lg font-semibold tabular-nums">{i.a_partir && <span className="text-xs font-normal text-muted-foreground">a partir de </span>}{brl(Number(i.preco))}</div>}
                 <div className="mt-3 flex gap-2">
                   {onAgendar
-                    ? <Button size="sm" className="flex-1" onClick={onAgendar}>Pedir orçamento</Button>
+                    ? <button type="button" className="vt-go flex-1" onClick={onAgendar}>Pedir orçamento</button>
                     : <Button asChild size="sm" className="flex-1"><a href="/agendar">Pedir orçamento</a></Button>}
                   <Button asChild size="sm" variant="outline" aria-label="Perguntar no WhatsApp"><a href={zap(i.titulo)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /></a></Button>
                 </div>
