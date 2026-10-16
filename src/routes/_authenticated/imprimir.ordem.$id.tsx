@@ -57,20 +57,20 @@ function ImprimirOS() {
       <div className="mx-auto mb-4 flex max-w-[210mm] justify-end px-4 print:hidden">
         <Button onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir / Salvar PDF</Button>
       </div>
-      <div className="overflow-x-auto px-2 print:overflow-visible print:px-0">
-        <article className="mx-auto flex min-h-[297mm] w-[210mm] flex-col bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
+      <div className="px-3 sm:px-4 print:px-0">
+        <article className="mx-auto flex w-full max-w-[210mm] flex-col overflow-hidden rounded-md print:rounded-none sm:min-h-[297mm] print:min-h-[297mm] print:w-[210mm] bg-background text-[11px] leading-relaxed text-foreground shadow-lg print:shadow-none">
           <div className="h-2 bg-primary" />
-          <header className="flex items-stretch justify-between gap-6 px-[14mm] pt-[10mm] pb-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-primary text-xl font-black tracking-tight text-primary-foreground">VM</div>
-              <div>
-                <div className="text-[17px] font-bold leading-tight">{company.name}</div>
+          <header className="flex flex-col gap-4 px-4 pt-5 pb-5 sm:flex-row sm:items-stretch sm:justify-between sm:gap-6 sm:px-[14mm] sm:pt-[10mm] print:flex-row print:px-[14mm]">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md bg-primary text-xl font-black tracking-tight text-primary-foreground">VM</div>
+              <div className="min-w-0">
+                <div className="text-[16px] font-bold leading-tight sm:text-[17px]">{company.name}</div>
                 <div className="text-[10px] uppercase tracking-[0.14em] text-primary">Climatização · Gesso · Elétrica</div>
                 <div className="mt-1 text-[10px] text-muted-foreground">{company.addressDisplay}</div>
                 <div className="text-[10px] text-muted-foreground">WhatsApp {company.phoneDisplay} · {company.instagram}</div>
               </div>
             </div>
-            <div className="min-w-[58mm] rounded-md border-2 border-primary text-right">
+            <div className="w-full shrink-0 rounded-md border-2 border-primary text-left sm:w-auto sm:min-w-[58mm] sm:text-right print:w-auto print:min-w-[58mm] print:text-right">
               <div className="whitespace-nowrap bg-primary px-3 py-1.5 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-primary-foreground">Ordem de Serviço</div>
               <div className="space-y-0.5 px-3 py-2">
                 <div className="whitespace-nowrap text-lg font-bold tabular-nums">Nº {codigo}</div>
@@ -81,30 +81,30 @@ function ImprimirOS() {
             </div>
           </header>
 
-          <main className="flex-1 space-y-5 px-[14mm]">
+          <main className="flex-1 space-y-5 px-4 sm:px-[14mm] print:px-[14mm]">
             <section>
               <Titulo n="1">Dados do cliente</Titulo>
-              <div className="grid grid-cols-3 gap-3 rounded-md bg-muted/60 p-3">
-                <div className="col-span-2"><Campo r="Nome / Razão social" v={o.clients?.nome} /></div>
+              <div className="grid grid-cols-1 gap-3 rounded-md sm:grid-cols-3 print:grid-cols-3 bg-muted/60 p-3">
+                <div className="sm:col-span-2 print:col-span-2"><Campo r="Nome / Razão social" v={o.clients?.nome} /></div>
                 <Campo r="CPF / CNPJ" v={o.clients?.documento} />
-                <div className="col-span-2"><Campo r="Endereço do atendimento" v={loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : ""} /></div>
+                <div className="sm:col-span-2 print:col-span-2"><Campo r="Endereço do atendimento" v={loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : ""} /></div>
                 <Campo r="Telefone" v={o.clients?.whatsapp} />
               </div>
             </section>
 
             <section>
               <Titulo n="2">Serviço executado</Titulo>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 print:grid-cols-3">
                 <Campo r="Especialidade" v={o.categoria} />
-                <div className="col-span-2"><Campo r="Equipamento atendido" v={ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : ""} /></div>
-                <div className="col-span-3 rounded-md border p-3"><div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Descrição técnica</div><p className="whitespace-pre-line">{o.descricao}</p></div>
+                <div className="sm:col-span-2 print:col-span-2"><Campo r="Equipamento atendido" v={ap ? [ap.descricao, ap.marca, ap.btus ? `${ap.btus} BTUs` : ""].filter(Boolean).join(" · ") : ""} /></div>
+                <div className="rounded-md border p-3 sm:col-span-3 print:col-span-3"><div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Descrição técnica</div><p className="whitespace-pre-line">{o.descricao}</p></div>
               </div>
             </section>
 
             <section>
               <Titulo n="3">Peças e materiais aplicados</Titulo>
               <table className="w-full border-collapse overflow-hidden rounded-md">
-                <thead><tr className="bg-primary text-primary-foreground"><th className="px-3 py-1.5 text-left font-semibold">Item</th><th className="w-32 px-3 py-1.5 text-right font-semibold">Quantidade</th></tr></thead>
+                <thead><tr className="bg-primary text-primary-foreground"><th className="px-3 py-1.5 text-left font-semibold">Item</th><th className="w-28 px-3 py-1.5 text-right font-semibold">Quantidade</th></tr></thead>
                 <tbody>
                   {o.service_order_items.length === 0 ? <tr><td colSpan={2} className="border-b px-3 py-2 text-muted-foreground">Nenhum material lançado.</td></tr> :
                     o.service_order_items.map((i) => (
@@ -116,7 +116,7 @@ function ImprimirOS() {
                 </tbody>
               </table>
               <div className="mt-2 flex justify-end">
-                <div className="flex min-w-[70mm] items-center justify-between rounded-md bg-primary px-4 py-2 text-primary-foreground">
+                <div className="flex w-full items-center sm:w-auto sm:min-w-[70mm] print:w-auto print:min-w-[70mm] justify-between rounded-md bg-primary px-4 py-2 text-primary-foreground">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.14em]">Valor total</span>
                   <span className="text-base font-bold tabular-nums">{o.valor != null ? brl(Number(o.valor)) : "—"}</span>
                 </div>
@@ -126,7 +126,7 @@ function ImprimirOS() {
             {temFotos && (
               <section className="break-inside-avoid">
                 <Titulo n="4">Registro fotográfico</Titulo>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 print:grid-cols-2">
                   {(["antes", "depois"] as const).map((t) => (
                     <div key={t}>
                       <div className="mb-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{t === "antes" ? "Antes" : "Depois"}</div>
@@ -155,13 +155,13 @@ function ImprimirOS() {
               <p className="mt-3">{company.city}/{company.state}, ____ de ______________ de ________.</p>
             </section>
 
-            <section className="grid grid-cols-2 gap-12 pt-12 text-center break-inside-avoid">
+            <section className="grid grid-cols-1 gap-12 pt-12 sm:grid-cols-2 print:grid-cols-2 text-center break-inside-avoid">
               <div><div className="border-t border-foreground pt-1.5 font-semibold">{o.clients?.nome}</div><div className="text-[10px] text-muted-foreground">Cliente</div></div>
               <div><div className="border-t border-foreground pt-1.5 font-semibold">{company.name}</div><div className="text-[10px] text-muted-foreground">Técnico responsável</div></div>
             </section>
           </main>
 
-          <footer className="mt-8 flex items-center justify-between bg-primary px-[14mm] py-2 text-[9px] text-primary-foreground">
+          <footer className="mt-8 flex flex-col gap-0.5 bg-primary px-4 sm:flex-row sm:items-center sm:justify-between sm:px-[14mm] print:flex-row print:justify-between print:px-[14mm] py-2 text-[9px] text-primary-foreground">
             <span>{company.name} · {company.addressDisplay}</span>
             <span className="tabular-nums">{codigo} · WhatsApp {company.phoneDisplay}</span>
           </footer>
