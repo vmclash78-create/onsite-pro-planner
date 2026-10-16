@@ -124,15 +124,16 @@ function Agendar() {
   );
 
   if (ok) {
+    const txt = textoArea(area);
     const msg = [
-      `Olá, VM Climatização! Registrei uma solicitação de atendimento pelo site.`,
+      `Olá, VM Climatização & Acabamentos! Registrei ${txt.pedido} pelo site.`,
       ``,
       `*Protocolo:* ${protocolo}`,
       `*Serviço:* ${tipo} de ${area.toLowerCase()}`,
       `*Quando:* ${resumo}`,
       `*Nome:* ${nome}`,
       `*CEP:* ${cep}`,
-      desc.trim() ? `*Problema:* ${desc.trim()}` : "",
+      desc.trim() ? `*${txt.rotulo}:* ${desc.trim()}` : "",
       ``,
       `Aguardo a confirmação. Obrigado!`,
     ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
@@ -260,7 +261,7 @@ function Agendar() {
             <label className="f" htmlFor="cep">CEP</label>
             <input className="t" id="cep" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCep(e.target.value))} />
             <label className="f" htmlFor="desc">Descrição da necessidade</label>
-            <textarea id="desc" placeholder="Informe detalhes do equipamento ou do serviço desejado" value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <textarea id="desc" placeholder={textoArea(area).dica} value={desc} onChange={(e) => setDesc(e.target.value)} />
             <label className="ph" style={{ position: "relative" }}>
               {fotos.length ? `${fotos.length} de 3 fotos` : "Anexar fotos do local ou equipamento (até 3)"}
               <input type="file" accept="image/*" multiple onChange={(e) => { setFotos([...fotos, ...(e.target.files ?? [])].slice(0, 3)); e.target.value = ""; }} />
