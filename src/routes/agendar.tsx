@@ -300,3 +300,10 @@ function Brand() {
     </header>
   );
 }
+
+function textoArea(area: string) {
+  if (area === "Gesso") return { pedido: "uma solicitação de gesso", rotulo: "Detalhes da obra / serviço", dica: "Ex: cômodo, medidas aproximadas e tipo de acabamento desejado" };
+  if (area === "Elétrica") return { pedido: "uma solicitação de serviço elétrico", rotulo: "Detalhes da instalação / serviço", dica: "Ex: quantidade de pontos, luminárias, troca de disjuntores ou revisão geral" };
+  if (area === "Refrigeração") return { pedido: "um agendamento de ar-condicionado", rotulo: "Aparelho / o que está acontecendo", dica: "Ex: marca, BTUs (se souber) e o que está acontecendo (não gela, pinga água...)" };
+  return { pedido: "uma solicitação de atendimento", rotulo: "Detalhes do serviço", dica: "Informe detalhes do serviço desejado" };
+}
