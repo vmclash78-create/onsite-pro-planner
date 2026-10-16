@@ -22,7 +22,8 @@ function Configuracoes() {
   return (
     <AppShell title="Configurações">
       {!admin && me.data && <p className="mb-4 text-sm text-muted-foreground">Somente administradores podem alterar estas configurações.</p>}
-      <PixConfig admin={admin} />
+      <LinksCompartilhar />
+      <div className="mt-5"><PixConfig admin={admin} /></div>
       <div className="mt-5"><Modelos admin={admin} /></div>
     </AppShell>
   );
