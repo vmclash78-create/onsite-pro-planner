@@ -50,8 +50,8 @@ export type OSParaPdf = {
   endereco?: string;
   equipamento?: string;
   itens: { nome: string; quantidade: string }[];
-  fotosAntes: string[];
-  fotosDepois: string[];
+  fotosAntes: (string | undefined)[];
+  fotosDepois: (string | undefined)[];
   logoUrl: string;
   marcaUrl: string;
 };
