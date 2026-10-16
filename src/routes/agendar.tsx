@@ -7,7 +7,7 @@ import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine } from "@/components/Vitrine";
-import { Layers, Snowflake, Zap } from "lucide-react";
+import { House, Layers, Snowflake, Zap } from "lucide-react";
 import "@/styles/agendar.css";
 
 export const Route = createFileRoute("/agendar")({
