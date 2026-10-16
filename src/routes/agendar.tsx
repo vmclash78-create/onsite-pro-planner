@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
+import { Vitrine } from "@/components/Vitrine";
 import { Snowflake } from "lucide-react";
 import "@/styles/agendar.css";
 
@@ -144,6 +145,10 @@ function Agendar() {
       <main className="mn">
         {step === 1 && (
           <>
+            <section className="mb-8">
+              <Vitrine onAgendar={() => document.getElementById("form-agendar")?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+            </section>
+            <div id="form-agendar" className="scroll-mt-4" />
             {head("O que você precisa?")}
             <p className="sub">Escolha a área e o tipo de serviço.</p>
             <div className="list">
