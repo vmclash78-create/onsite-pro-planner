@@ -185,7 +185,7 @@ function Agendar() {
               {dias.map((d) => {
                 const todasHoras = [...HORAS["Manhã"]!, ...HORAS["Tarde"]!];
                 const lotado = todasHoras.every((h) => OCUPADOS.includes(`${iso(d)} ${h}`));
-                const off = d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
+                const off = visita || d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
                 return (
                   <Button variant="ghost" key={iso(d)} className={`day ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                     title={lotado ? "Dia sem horários livres" : undefined}
@@ -202,7 +202,7 @@ function Agendar() {
                 <div className="horas">
                   {HORAS[p]!.map((h) => {
                     const ocupado = !!data && OCUPADOS.includes(`${data} ${h}`);
-                    const off = !data || ocupado, on = hora === h && !visita;
+                    const off = visita || !data || ocupado, on = hora === h && !visita;
                     return (
                       <Button variant="ghost" key={h} className={`hr ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                         onClick={() => { setHora(h); setVisita(false); }}>{ocupado ? <span className="ocp">{h}<small>ocupado</small></span> : h}</Button>
