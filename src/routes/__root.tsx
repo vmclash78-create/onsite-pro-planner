@@ -81,12 +81,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "VM Climatização & Acabamentos — Gestão de Serviços" },
       { name: "description", content: "Gestão de refrigeração, gesso e elétrica" },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "VM Climatização & Acabamentos" },
+      { property: "og:site_name", content: "VM Climatização & Acabamentos" },
       { property: "og:title", content: "VM Climatização & Acabamentos — Gestão de Serviços" },
       { property: "og:description", content: "Gestão de refrigeração, gesso e elétrica" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
