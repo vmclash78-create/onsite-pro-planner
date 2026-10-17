@@ -14,7 +14,9 @@ export const prepararFotos = createServerFn({ method: "POST" })
     const pasta = crypto.randomUUID();
     const slots: { path: string; token: string }[] = [];
     for (let i = 0; i < data.tipos.length; i++) {
-      const path = `site/${pasta}/${i}.${EXT[data.tipos[i]!]}`;
+      const mime = data.tipos[i];
+      if (!mime) continue;
+      const path = `site/${pasta}/${i}.${EXT[mime]}`;
       const { data: s, error } = await supabaseAdmin.storage.from("pedidos").createSignedUploadUrl(path);
       if (error || !s) throw new Error("Não foi possível preparar o envio das fotos.");
       slots.push({ path, token: s.token });
@@ -42,7 +44,8 @@ export const criarPedido = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!data.visita && data.data && data.hora) {
-      const { data: livre } = await supabaseAdmin.rpc("horarios_ocupados", { _inicio: data.data, _fim: data.data });
+      const { data: livre, error: disponibilidade } = await supabaseAdmin.rpc("horarios_ocupados", { _inicio: data.data, _fim: data.data });
+      if (disponibilidade) throw new Error("Não foi possível verificar o horário. Tente novamente.");
       const longo = (data.categoria === "Refrigeração" && data.tipo === "Instalação") || (data.categoria === "Elétrica" && data.tipo === "Quadro");
       const manha = data.hora < "12:00";
       const precisa = longo ? (manha ? ["08:00", "09:00", "10:00"] : ["14:00", "15:00", "16:00"]) : [data.hora];
@@ -68,7 +71,8 @@ export const criarPedido = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) {
-      console.error("criarPedido", error);
+      if (error.code === "23505" && error.message.includes("HORARIO_OCUPADO")) throw new Error("HORARIO_OCUPADO");
+      console.error("criarPedido", error.code);
       throw new Error("Não foi possível registrar o pedido.");
     }
     return { protocolo: row.id.slice(0, 8).toUpperCase() };

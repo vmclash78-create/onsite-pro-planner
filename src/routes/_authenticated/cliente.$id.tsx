@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, FileText, MessageCircle, Pencil, Phone, Plus, Snowflake, Wrench } from "lucide-react";
-import { CATEGORIAS } from "@/lib/staff";
+import { CATEGORIAS, useMe } from "@/lib/staff";
 import { AppShell } from "@/components/AppShell";
 import { Field, FormPanel, Panel, StateRow, Status, inputCls } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ const vazioAp = { location_id: "", descricao: "", marca: "", btus: "", gas: "R41
 function Ficha() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const me = useMe();
   const [novoAp, setNovoAp] = useState(false);
   const [ap, setAp] = useState(vazioAp);
   const q = useQuery({
@@ -95,10 +96,10 @@ function Ficha() {
       </div>}>
       {q.isLoading || q.error || !c ? <Panel><StateRow loading={q.isLoading} error={q.error} empty={!c} emptyText="Cliente não encontrado." /></Panel> : (
         <div className="space-y-5">
-          <div className="flex flex-wrap gap-2">
+          {me.data?.isAdmin && <div className="flex flex-wrap gap-2">
             <Button onClick={() => setNovaOs(true)}><Wrench className="h-4 w-4" /> Nova OS</Button>
             <Button variant="outline" disabled={novoOrc.isPending} onClick={() => novoOrc.mutate()}><FileText className="h-4 w-4" /> Novo orçamento</Button>
-          </div>
+          </div>}
           {novoOrc.error && <div className="text-sm text-destructive">{novoOrc.error.message}</div>}
           {editando && (
             <FormPanel title="Editar cliente" onClose={() => setEditando(false)} onSubmit={() => salvarCli.mutate()} saving={salvarCli.isPending} error={salvarCli.error?.message}>
@@ -115,7 +116,7 @@ function Ficha() {
               <Field label="Valor (R$)"><input className={inputCls} inputMode="decimal" value={os.valor} onChange={(e) => setOs({ ...os, valor: e.target.value })} placeholder="0,00" /></Field>
             </FormPanel>
           )}
-          {saldo > 0 && (
+          {me.data?.isAdmin && saldo > 0 && (
             <div role="alert" className={`flex items-start gap-3 rounded-lg border bg-card px-4 py-3 text-sm ${atrasado ? "border-destructive/50" : "border-warning/50"}`}>
               <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${atrasado ? "text-destructive" : "text-warning"}`} />
               <div className="min-w-0 flex-1"><span className="font-medium">{atrasado ? "Pagamento em atraso" : "Pagamento em aberto"}: {brl(saldo)}</span> <span className="text-muted-foreground">— confira antes de agendar um novo serviço.</span></div>
@@ -152,7 +153,7 @@ function Ficha() {
             </FormPanel>
           )}
 
-          <Panel title="Locais e aparelhos" action={c.locations.length > 0 && <Button size="sm" variant="outline" onClick={() => setNovoAp(true)}><Plus className="h-4 w-4" /> Aparelho</Button>}>
+          <Panel title="Locais e aparelhos" action={me.data?.isAdmin && c.locations.length > 0 && <Button size="sm" variant="outline" onClick={() => setNovoAp(true)}><Plus className="h-4 w-4" /> Aparelho</Button>}>
             {c.locations.length === 0 && <div className="px-4 py-6 text-sm text-muted-foreground">Nenhum endereço. Cadastre em Locais.</div>}
             <ul className="divide-y">
               {c.locations.map((l) => (
@@ -205,7 +206,7 @@ function Ficha() {
             </ul>
           </Panel>
 
-          <Panel title={`Orçamentos (${orcs.length})`}>
+          {me.data?.isAdmin && <Panel title={`Orçamentos (${orcs.length})`}>
             <StateRow empty={orcs.length === 0} emptyText="Nenhum orçamento ainda." />
             <ul className="divide-y">
               {orcs.map((o) => (
@@ -217,7 +218,7 @@ function Ficha() {
                 </li>
               ))}
             </ul>
-          </Panel>
+          </Panel>}
         </div>
       )}
     </AppShell>

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { addDias, brl, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
+import { useMe } from "@/lib/staff";
 
 export const Route = createFileRoute("/_authenticated/ordem/$id")({
   head: pageHead("Ordem de serviço", "Peças usadas, fotos de antes e depois e aparelho atendido."),
@@ -20,6 +21,7 @@ const STATUS = ["Aberta", "Em andamento", "Concluída", "Cancelada"];
 function Ordem() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const me = useMe();
   const [peca, setPeca] = useState({ stock_item_id: "", quantidade: "1" });
   const [enviando, setEnviando] = useState<string | null>(null);
 
@@ -117,7 +119,7 @@ function Ordem() {
                 </select>
               </Field>
               <Field label="Garantia (dias)">
-                <select className={inputCls} value={String(o.garantia_dias)} onChange={(e) => upd.mutate({ garantia_dias: Number(e.target.value) })}>
+                <select className={inputCls} disabled={!me.data?.isAdmin} value={String(o.garantia_dias)} onChange={(e) => upd.mutate({ garantia_dias: Number(e.target.value) })}>
                   {["0", "30", "90", "180", "365"].map((d) => <option key={d} value={d}>{d === "0" ? "Sem garantia" : `${d} dias`}</option>)}
                 </select>
               </Field>

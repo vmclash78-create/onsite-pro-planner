@@ -202,14 +202,14 @@ function Dashboard() {
 
   return (
     <AppShell title="Início" actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
-      <AvisoPedidos enabled={!!me.data?.isStaff} />
-      <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {me.data?.isAdmin && <AvisoPedidos enabled />}
+      {me.data?.isAdmin && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {([["/clientes", "Novo cliente", UserPlus], ["/ordens", "Nova OS", Wrench], ["/orcamentos", "Novo orçamento", FileText], ["/agenda", "Agendamento", CalendarPlus]] as const).map(([to, l, I]) => (
           <Link key={to} to={to} className="flex items-center gap-2 rounded-lg border bg-card px-3 py-3 text-sm font-medium hover:bg-muted/50">
             <I className="h-4 w-4 shrink-0 text-primary" /> <span className="truncate">{l}</span>
           </Link>
         ))}
-      </div>
+      </div>}
       <div className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card lg:grid-cols-4">
         {kpis.map((k, i) => (
           <div key={k.r} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 3 ? "lg:border-r-0" : ""}`}>
@@ -220,8 +220,8 @@ function Dashboard() {
         ))}
       </div>
 
-      <ReceberResumo enabled={!!me.data?.isStaff} />
-      <FinanceiroResumo enabled={!!me.data?.isStaff} />
+      {me.data?.isAdmin && <ReceberResumo enabled />}
+      {me.data?.isAdmin && <FinanceiroResumo enabled />}
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <Panel title={<>Agenda de hoje <span className="ml-1 font-normal tabular-nums text-muted-foreground">{dataBR(new Date())}</span></>}
@@ -246,7 +246,7 @@ function Dashboard() {
         </Panel>
 
         <div className="flex flex-col gap-5">
-          <Panel title="Orçamentos aguardando" action={<Link to="/orcamentos" className="text-xs text-primary hover:underline">Ver todos</Link>}>
+          {me.data?.isAdmin && <Panel title="Orçamentos aguardando" action={<Link to="/orcamentos" className="text-xs text-primary hover:underline">Ver todos</Link>}>
             <StateRow loading={q.isLoading} error={q.error} empty={d?.orcamentos.length === 0} emptyText="Nenhum orçamento aguardando." />
             <ul className="divide-y">
               {d?.orcamentos.slice(0, 5).map((o) => (
@@ -260,7 +260,7 @@ function Dashboard() {
                 </li>
               ))}
             </ul>
-          </Panel>
+          </Panel>}
 
           <Panel title="Serviços no mês" action={<span className="text-xs tabular-nums text-muted-foreground">{d?.concluidasMes.length ?? 0} concluídos</span>}>
             <div className="space-y-3 p-4">
