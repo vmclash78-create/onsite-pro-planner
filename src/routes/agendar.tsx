@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { criarPedido, prepararFotos } from "@/lib/pedidos.functions";
 import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
-import { Vitrine } from "@/components/Vitrine";
+import { Vitrine, type ItemEscolhido } from "@/components/Vitrine";
+import { brl } from "@/lib/format";
 import { House, Layers, Snowflake, Zap } from "lucide-react";
 import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
@@ -71,6 +72,13 @@ function Agendar() {
   const [lgpd, setLgpd] = useState(false);
   const [aba, setAba] = useState<"agendar" | "vitrine">("agendar");
   const [ok, setOk] = useState(false);
+  const [servico, setServico] = useState<ItemEscolhido | null>(null);
+  const escolher = (it: ItemEscolhido) => {
+    const a = AREAS[it.categoria] ? it.categoria : "Refrigeração";
+    setArea(a); setTipo(tipoDoItem(a, it.titulo)); setServico(it);
+    setData(null); setHora(null); setVisita(false); setAba("agendar"); go(2);
+  };
+  const trocar = () => { setServico(null); go(1); };
 
   const ocup = useQuery({
     queryKey: ["ocupados", iso(dias[0]!)],
@@ -129,7 +137,7 @@ function Agendar() {
       `Olá, VM Climatização & Acabamentos! Registrei ${txt.pedido} pelo site.`,
       ``,
       `*Protocolo:* ${protocolo}`,
-      `*Serviço:* ${tipo} de ${area.toLowerCase()}`,
+      `*Serviço:* ${servico ? servico.titulo : `${tipo} de ${area.toLowerCase()}`}`,
       `*Quando:* ${resumo}`,
       `*Nome:* ${nome}`,
       `*CEP:* ${cep}`,
@@ -143,7 +151,7 @@ function Agendar() {
         <main className="mn">
           <h1 style={{ marginTop: 56 }}>Solicitação registrada com sucesso</h1>
           <p className="sub">Protocolo de atendimento: {protocolo}. Sua solicitação foi registrada e nossa equipe entrará em contato pelo WhatsApp para confirmar o atendimento.</p>
-          <div className="card"><div><b>{tipo} · {area}</b><span>{resumo}</span></div></div>
+          <div className="card"><div><b>{servico ? servico.titulo : `${tipo} · ${area}`}</b><span>{resumo}</span></div></div>
         </main>
         <footer className="ft">
           <a className="b go" href={`${company.whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">Confirmar solicitação via WhatsApp</a>
@@ -161,9 +169,15 @@ function Agendar() {
         <button role="tab" aria-selected={aba === "vitrine"} className={aba === "vitrine" ? "on" : ""} onClick={() => setAba("vitrine")}>Serviços e portfólio</button>
       </div>
       {aba === "vitrine" ? (
-        <main className="mn pb-10 pt-6"><Vitrine onAgendar={() => { setAba("agendar"); go(1); }} /></main>
+        <main className="mn pb-10 pt-6"><Vitrine onAgendar={escolher} /></main>
       ) : (<>
       <main className="mn">
+        {servico && step > 1 && (
+          <div className="card" style={{ marginTop: 16 }}>
+            <div><span>Serviço selecionado</span><b>{servico.titulo}</b>{servico.preco != null && <span>{servico.a_partir ? "a partir de " : ""}{brl(servico.preco)}</span>}</div>
+            <Button variant="link" className="lnk" onClick={trocar}>Trocar serviço</Button>
+          </div>
+        )}
         {step === 1 && (
           <>
             {head("Selecione a especialidade")}
@@ -251,8 +265,8 @@ function Agendar() {
           <>
             {head("Dados do solicitante")}
             <div className="card">
-              <div><b>{tipo} · {area}</b><span>{resumo}</span></div>
-              <Button variant="link" className="lnk" onClick={() => go(1)}>Alterar</Button>
+              <div><b>{servico ? servico.titulo : `${tipo} · ${area}`}</b><span>{resumo}</span></div>
+              <Button variant="link" className="lnk" onClick={() => go(2)}>Alterar data</Button>
             </div>
             <label className="f" htmlFor="nome">Nome completo</label>
             <input className="t" id="nome" autoComplete="name" placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
@@ -306,4 +320,11 @@ function textoArea(area: string) {
   if (area === "Elétrica") return { pedido: "uma solicitação de serviço elétrico", rotulo: "Detalhes da instalação / serviço", dica: "Ex: quantidade de pontos, luminárias, troca de disjuntores ou revisão geral" };
   if (area === "Refrigeração") return { pedido: "um agendamento de ar-condicionado", rotulo: "Aparelho / o que está acontecendo", dica: "Ex: marca, BTUs (se souber) e o que está acontecendo (não gela, pinga água...)" };
   return { pedido: "uma solicitação de atendimento", rotulo: "Detalhes do serviço", dica: "Informe detalhes do serviço desejado" };
+}
+
+function tipoDoItem(area: string, titulo: string) {
+  const t = titulo.toLowerCase();
+  if (area === "Gesso") return t.includes("forro") ? "Forro" : t.includes("parede") || t.includes("drywall") ? "Parede" : t.includes("sanca") || t.includes("moldura") ? "Sanca" : "Reparo";
+  if (area === "Elétrica") return t.includes("quadro") ? "Quadro" : t.includes("tomada") || t.includes("ponto") ? "Ponto novo" : t.includes("instala") ? "Instalação" : "Reparo";
+  return t.includes("instala") ? "Instalação" : t.includes("higien") || t.includes("limp") ? "Limpeza" : t.includes("gás") || t.includes("gas") || t.includes("manut") ? "Manutenção" : "Conserto";
 }
