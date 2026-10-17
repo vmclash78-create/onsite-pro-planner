@@ -19,6 +19,8 @@ export type Database = {
           categoria: string
           cep: string | null
           client_id: string | null
+          consentimento_lgpd_em: string | null
+          consentimento_lgpd_versao: string | null
           created_at: string
           data: string | null
           descricao: string | null
@@ -44,6 +46,8 @@ export type Database = {
           categoria: string
           cep?: string | null
           client_id?: string | null
+          consentimento_lgpd_em?: string | null
+          consentimento_lgpd_versao?: string | null
           created_at?: string
           data?: string | null
           descricao?: string | null
@@ -69,6 +73,8 @@ export type Database = {
           categoria?: string
           cep?: string | null
           client_id?: string | null
+          consentimento_lgpd_em?: string | null
+          consentimento_lgpd_versao?: string | null
           created_at?: string
           data?: string | null
           descricao?: string | null
@@ -113,6 +119,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      booking_upload_authorizations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          paths: string[]
+          proof_hash: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          paths: string[]
+          proof_hash: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          paths?: string[]
+          proof_hash?: string
+        }
+        Relationships: []
       }
       catalogo_itens: {
         Row: {

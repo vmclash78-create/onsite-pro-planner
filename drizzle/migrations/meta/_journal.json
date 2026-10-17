@@ -71,6 +71,13 @@
       "when": 1792268279265,
       "tag": "0009_validate_appointment_photo_links",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792268944247,
+      "tag": "0010_booking_upload_authorizations",
+      "breakpoints": true
     }
   ]
 }
