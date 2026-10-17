@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BellRing } from "lucide-react";
+import { BellRing, CalendarPlus, FileText, MessageCircle, UserPlus, Wrench } from "lucide-react";
+import { normalizarTelefone } from "@/lib/cobranca";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Panel, StateRow, Status } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +27,7 @@ function useDashboard(enabled: boolean) {
     queryFn: async () => {
       const hoje = isoLocal();
       const [ag, orc, ord, eq] = await Promise.all([
-        supabase.from("appointments").select("id, hora, nome_contato, categoria, tipo, endereco, status, profiles:tecnico_id(nome)").eq("data", hoje).order("hora"),
+        supabase.from("appointments").select("id, hora, nome_contato, whatsapp, categoria, tipo, endereco, status, profiles:tecnico_id(nome)").eq("data", hoje).order("hora"),
         supabase.from("quotes").select("id, numero, descricao, valor, enviado_em, clients(nome)").eq("status", "Aguardando").order("enviado_em"),
         supabase.from("service_orders").select("id, status, categoria, inicio, concluida_em").or(`status.eq.Em andamento,concluida_em.gte.${inicioMes(-1)}`),
         supabase.from("equipment").select("id, descricao, ultima_manutencao, intervalo_meses, locations(bairro, cidade, clients(nome))"),
@@ -202,6 +203,13 @@ function Dashboard() {
   return (
     <AppShell title="Início" actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
       <AvisoPedidos enabled={!!me.data?.isStaff} />
+      <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {([["/clientes", "Novo cliente", UserPlus], ["/ordens", "Nova OS", Wrench], ["/orcamentos", "Novo orçamento", FileText], ["/agenda", "Agendamento", CalendarPlus]] as const).map(([to, l, I]) => (
+          <Link key={to} to={to} className="flex items-center gap-2 rounded-lg border bg-card px-3 py-3 text-sm font-medium hover:bg-muted/50">
+            <I className="h-4 w-4 shrink-0 text-primary" /> <span className="truncate">{l}</span>
+          </Link>
+        ))}
+      </div>
       <div className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card lg:grid-cols-4">
         {kpis.map((k, i) => (
           <div key={k.r} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 3 ? "lg:border-r-0" : ""}`}>
@@ -228,7 +236,10 @@ function Dashboard() {
                   <div className="truncate text-xs text-muted-foreground">{a.categoria} · {a.tipo}</div>
                   <div className="truncate text-xs text-muted-foreground">{a.endereco}{a.profiles?.nome ? ` · ${a.profiles.nome}` : ""}</div>
                 </div>
-                <div className="col-start-2 sm:col-start-auto"><Status value={a.status} /></div>
+                <div className="col-start-2 flex items-center gap-2 sm:col-start-auto">
+                  <Status value={a.status} />
+                  {normalizarTelefone(a.whatsapp) && <a href={`https://wa.me/${normalizarTelefone(a.whatsapp)}?text=${encodeURIComponent(`Olá, ${a.nome_contato}! Sou da VM Climatização & Acabamentos e estou a caminho para realizar seu atendimento.`)}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-success hover:bg-muted"><MessageCircle className="h-3.5 w-3.5" /> A caminho</a>}
+                </div>
               </li>
             ))}
           </ul>

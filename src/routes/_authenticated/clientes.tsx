@@ -5,6 +5,8 @@ import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Field, FormPanel, Panel, StateRow, inputCls } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
+import { MessageCircle } from "lucide-react";
+import { normalizarTelefone } from "@/lib/cobranca";
 
 export const Route = createFileRoute("/_authenticated/clientes")({
   head: pageHead("Clientes", "Cadastro de clientes com contato e endereços."),
@@ -57,9 +59,12 @@ function Clientes() {
         <StateRow loading={q.isLoading} error={q.error} empty={lista.length === 0} emptyText="Nenhum cliente encontrado." />
         <ul className="divide-y">
           {lista.map((c) => (
-            <li key={c.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_10rem_minmax(0,1fr)] sm:gap-4">
+            <li key={c.id} className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_12rem_minmax(0,1fr)] sm:gap-4">
               <Link to="/cliente/$id" params={{ id: c.id }} className="truncate text-sm font-medium text-primary hover:underline">{c.nome}</Link>
-              <div className="text-sm tabular-nums text-muted-foreground">{c.whatsapp ?? "—"}</div>
+              <div className="flex items-center gap-2 text-sm tabular-nums text-muted-foreground">
+                <span>{c.whatsapp ?? "—"}</span>
+                {normalizarTelefone(c.whatsapp) && <a href={`https://wa.me/${normalizarTelefone(c.whatsapp)}`} target="_blank" rel="noreferrer" aria-label={`WhatsApp de ${c.nome}`} className="rounded-md p-1 text-success hover:bg-muted"><MessageCircle className="h-4 w-4" /></a>}
+              </div>
               <div className="truncate text-xs text-muted-foreground sm:text-sm">{c.locations[0] ? `${c.locations[0].endereco} — ${c.locations[0].bairro ?? ""}, ${c.locations[0].cidade}` : "Sem endereço"}{c.locations.length > 1 ? ` (+${c.locations.length - 1})` : ""}</div>
             </li>
           ))}

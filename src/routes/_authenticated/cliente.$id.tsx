@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, MessageCircle, Phone, Plus, Snowflake } from "lucide-react";
+import { AlertTriangle, FileText, MessageCircle, Pencil, Phone, Plus, Snowflake, Wrench } from "lucide-react";
+import { CATEGORIAS } from "@/lib/staff";
 import { AppShell } from "@/components/AppShell";
 import { Field, FormPanel, Panel, StateRow, Status, inputCls } from "@/components/kit";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,37 @@ function Ficha() {
     },
     onSuccess: () => { setAp(vazioAp); setNovoAp(false); qc.invalidateQueries({ queryKey: ["cliente", id] }); qc.invalidateQueries({ queryKey: ["equipment"] }); },
   });
+  const nav = useNavigate();
+  const [editando, setEditando] = useState(false);
+  const [ed, setEd] = useState({ nome: "", whatsapp: "", email: "", observacoes: "" });
+  const [novaOs, setNovaOs] = useState(false);
+  const [os, setOs] = useState({ categoria: "Refrigeração", descricao: "", valor: "" });
+  const salvarCli = useMutation({
+    mutationFn: async () => {
+      if (!ed.nome.trim()) throw new Error("Informe o nome.");
+      const { error } = await supabase.from("clients").update({ nome: ed.nome.trim(), whatsapp: ed.whatsapp || null, email: ed.email || null, observacoes: ed.observacoes || null }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { setEditando(false); qc.invalidateQueries({ queryKey: ["cliente", id] }); qc.invalidateQueries({ queryKey: ["clients"] }); },
+  });
+  const criarOs = useMutation({
+    mutationFn: async () => {
+      if (!os.descricao.trim()) throw new Error("Descreva o serviço.");
+      const valor = os.valor ? Number(os.valor.replace(/\./g, "").replace(",", ".")) : null;
+      const { data, error } = await supabase.from("service_orders").insert({ client_id: id, categoria: os.categoria, descricao: os.descricao.trim(), valor }).select("id").single();
+      if (error) throw error;
+      return data.id;
+    },
+    onSuccess: (oid) => { qc.invalidateQueries({ queryKey: ["orders"] }); nav({ to: "/ordem/$id", params: { id: oid } }); },
+  });
+  const novoOrc = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.from("quotes").insert({ client_id: id, descricao: "Novo orçamento", valor: 0, status: "Rascunho" }).select("id").single();
+      if (error) throw error;
+      return data.id;
+    },
+    onSuccess: (qid) => { qc.invalidateQueries({ queryKey: ["quotes"] }); nav({ to: "/orcamento/$id", params: { id: qid } }); },
+  });
 
   const c = q.data;
   const hoje = isoLocal();
@@ -56,12 +88,33 @@ function Ficha() {
 
   return (
     <AppShell title={c?.nome ?? "Cliente"} breadcrumb={["Painel", "Clientes", c?.nome ?? "Ficha"]}
-      actions={c && <div className="flex gap-2">
+      actions={c && <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => { setEd({ nome: c.nome, whatsapp: c.whatsapp ?? "", email: c.email ?? "", observacoes: c.observacoes ?? "" }); setEditando(true); }}><Pencil className="h-4 w-4" /><span className="hidden sm:inline">Editar</span></Button>
         {tel && <Button asChild variant="outline"><a href={`https://wa.me/${tel}`} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /><span className="hidden sm:inline">WhatsApp</span></a></Button>}
         {tel && <Button asChild variant="outline"><a href={`tel:+${tel}`}><Phone className="h-4 w-4" /><span className="hidden sm:inline">Ligar</span></a></Button>}
       </div>}>
       {q.isLoading || q.error || !c ? <Panel><StateRow loading={q.isLoading} error={q.error} empty={!c} emptyText="Cliente não encontrado." /></Panel> : (
         <div className="space-y-5">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setNovaOs(true)}><Wrench className="h-4 w-4" /> Nova OS</Button>
+            <Button variant="outline" disabled={novoOrc.isPending} onClick={() => novoOrc.mutate()}><FileText className="h-4 w-4" /> Novo orçamento</Button>
+          </div>
+          {novoOrc.error && <div className="text-sm text-destructive">{novoOrc.error.message}</div>}
+          {editando && (
+            <FormPanel title="Editar cliente" onClose={() => setEditando(false)} onSubmit={() => salvarCli.mutate()} saving={salvarCli.isPending} error={salvarCli.error?.message}>
+              <Field label="Nome"><input className={inputCls} value={ed.nome} onChange={(e) => setEd({ ...ed, nome: e.target.value })} required /></Field>
+              <Field label="WhatsApp"><input className={inputCls} inputMode="tel" value={ed.whatsapp} onChange={(e) => setEd({ ...ed, whatsapp: e.target.value })} /></Field>
+              <Field label="E-mail"><input type="email" className={inputCls} value={ed.email} onChange={(e) => setEd({ ...ed, email: e.target.value })} /></Field>
+              <Field label="Observações"><input className={inputCls} value={ed.observacoes} onChange={(e) => setEd({ ...ed, observacoes: e.target.value })} /></Field>
+            </FormPanel>
+          )}
+          {novaOs && (
+            <FormPanel title="Nova ordem de serviço" onClose={() => setNovaOs(false)} onSubmit={() => criarOs.mutate()} saving={criarOs.isPending} error={criarOs.error?.message}>
+              <Field label="Área"><select className={inputCls} value={os.categoria} onChange={(e) => setOs({ ...os, categoria: e.target.value })}>{CATEGORIAS.map((g) => <option key={g}>{g}</option>)}</select></Field>
+              <Field label="O que será feito"><input className={inputCls} value={os.descricao} onChange={(e) => setOs({ ...os, descricao: e.target.value })} required /></Field>
+              <Field label="Valor (R$)"><input className={inputCls} inputMode="decimal" value={os.valor} onChange={(e) => setOs({ ...os, valor: e.target.value })} placeholder="0,00" /></Field>
+            </FormPanel>
+          )}
           {saldo > 0 && (
             <div role="alert" className={`flex items-start gap-3 rounded-lg border bg-card px-4 py-3 text-sm ${atrasado ? "border-destructive/50" : "border-warning/50"}`}>
               <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${atrasado ? "text-destructive" : "text-warning"}`} />
