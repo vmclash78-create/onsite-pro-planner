@@ -8,7 +8,9 @@ import { brl } from "@/lib/format";
 
 const FILTROS = ["Todos", "Refrigeração", "Gesso", "Elétrica"];
 
-export function Vitrine({ onAgendar }: { onAgendar?: () => void }) {
+export type ItemEscolhido = { titulo: string; categoria: string; preco: number | null; a_partir: boolean | null };
+
+export function Vitrine({ onAgendar }: { onAgendar?: (item: ItemEscolhido) => void }) {
   const [cat, setCat] = useState("Todos");
   const q = useQuery({
     queryKey: ["catalogo-publico"],
@@ -46,7 +48,7 @@ export function Vitrine({ onAgendar }: { onAgendar?: () => void }) {
                 {i.preco != null && <div className="text-lg font-semibold tabular-nums">{i.a_partir && <span className="text-xs font-normal text-muted-foreground">a partir de </span>}{brl(Number(i.preco))}</div>}
                 <div className="mt-3 flex gap-2">
                   {onAgendar
-                    ? <button type="button" className="vt-go flex-1" onClick={onAgendar}>Solicitar orçamento</button>
+                    ? <button type="button" className="vt-go flex-1" onClick={() => onAgendar({ titulo: i.titulo, categoria: i.categoria, preco: i.preco == null ? null : Number(i.preco), a_partir: i.a_partir })}>Solicitar orçamento</button>
                     : <Button asChild size="sm" className="flex-1"><a href="/agendar">Solicitar orçamento</a></Button>}
                   <Button asChild size="sm" variant="outline" aria-label="Perguntar no WhatsApp"><a href={zap(i.titulo)} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /></a></Button>
                 </div>
