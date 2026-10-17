@@ -92,7 +92,7 @@ function Agendar() {
   });
   const OCUPADOS = ocup.data ?? [];
   const diaSel = dias.find((d) => iso(d) === data);
-  const md = modo(area, tipo);
+  const md = modo(servico && AREAS[servico.categoria] ? servico.categoria : area, tipo);
   const turnoSel = TURNOS.find((t) => t.h === hora);
   const quando = md === "turno" && turnoSel ? `turno da ${turnoSel.p.toLowerCase()} (${turnoSel.faixa})` : `às ${hora ?? ""}`;
   const resumo = visita ? "Visita técnica para orçamento" : diaSel ? `${md === "medicao" ? "Vistoria e medição: " : ""}${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} ${quando}` : "";
