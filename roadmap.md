@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Corrigir e aplicar o arquivo de segurança enviado (permissões, fotos, reservas e proteção do administrador)
-- [ ] Ajustar os controles da equipe e testar as permissões reais
+- [x] Corrigir e aplicar o arquivo de segurança enviado (permissões, fotos, reservas e proteção do administrador)
+- [x] Ajustar os controles da equipe e testar as permissões reais
 
 - [x] Tema branco em todo o sistema e botão azul no agendamento
 - [x] Ajustes e verificação das telas em celular, tablet e computador
@@ -14,5 +14,6 @@
 - [x] Admin: descrição + fotos de um pedido e análise por IA (tipo, urgência, próximos passos)
 - [x] Fase 1: contas a receber, cobrança por Pix e avisos pelo WhatsApp
 - [x] Ficha do cliente, peças e fotos na OS, garantia, calculadora de gesso, vitrine pública
-- [ ] Próximas: PDF da OS, comissão de técnicos
+- [x] PDF da OS
+- Comissão de técnicos: ideia futura, fora do escopo atual
 - [x] Unir vitrine + agendamento em uma página pública única (/agendar), /catalogo redireciona
