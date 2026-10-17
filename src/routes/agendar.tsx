@@ -120,7 +120,8 @@ function Agendar() {
         if (error) throw new Error("FOTO_ERRO");
         paths.push(slot.path);
       }
-      const r = await criar({ data: { ...validacao.data, fotos: paths } });
+      const autorizacao = slots[0];
+      const r = await criar({ data: { ...validacao.data, fotos: paths, ...(autorizacao ? { uploadId: autorizacao.uploadId, uploadProof: autorizacao.uploadProof } : {}) } });
       setProtocolo(r.protocolo); setOk(true); window.scrollTo(0, 0);
     } catch (e) {
       if (e instanceof Error && e.message.includes("HORARIO_OCUPADO")) {

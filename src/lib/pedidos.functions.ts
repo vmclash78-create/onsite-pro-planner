@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { pedidoSchema, prepararFotosSchema } from "@/lib/pedido-validation";
+import { pedidoSchema, prepararFotosSchema, validarFotos } from "@/lib/pedido-validation";
+import { authorizedUpload, hashUploadProof } from "@/lib/upload-authorization";
 
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic" };
 
@@ -11,6 +12,7 @@ export const prepararFotos = createServerFn({ method: "POST" })
   .inputValidator((d) => prepararFotosSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!data.tipos.length) return [];
     const pasta = crypto.randomUUID();
     const slots: { path: string; token: string }[] = [];
     for (let i = 0; i < data.tipos.length; i++) {
@@ -21,7 +23,10 @@ export const prepararFotos = createServerFn({ method: "POST" })
       if (error || !s) throw new Error("Não foi possível preparar o envio das fotos.");
       slots.push({ path, token: s.token });
     }
-    return slots;
+    const proof = crypto.randomUUID();
+    const { data: ticket, error: ticketError } = await supabaseAdmin.from("booking_upload_authorizations").insert({ proof_hash: await hashUploadProof(proof), paths: slots.map((s) => s.path) }).select("id").single();
+    if (ticketError || !ticket) throw new Error("Não foi possível autorizar o envio das fotos.");
+    return slots.map((slot) => ({ ...slot, uploadId: ticket.id, uploadProof: proof }));
   });
 
 /** Public: creates a pending appointment from the booking page. Returns only the protocol id. */
@@ -36,6 +41,19 @@ export const criarPedido = createServerFn({ method: "POST" })
       const manha = data.hora < "12:00";
       const precisa = longo ? (manha ? ["08:00", "09:00", "10:00"] : ["14:00", "15:00", "16:00"]) : [data.hora];
       if (livre?.some((o) => precisa.includes(o.hora))) throw new Error("HORARIO_OCUPADO");
+    }
+    if (data.fotos.length) {
+      if (!data.uploadId || !data.uploadProof) throw new Error("Prepare novamente o envio das fotos.");
+      const hash = await hashUploadProof(data.uploadProof);
+      const { data: ticket, error: ticketError } = await supabaseAdmin.from("booking_upload_authorizations").select("proof_hash,paths,expires_at").eq("id", data.uploadId).single();
+      if (ticketError || !ticket || !authorizedUpload(ticket, hash, data.fotos)) throw new Error("Envio de fotos inválido ou expirado.");
+      for (const path of data.fotos) {
+        const { data: info, error: infoError } = await supabaseAdmin.storage.from("pedidos").info(path);
+        if (infoError || !info || validarFotos([{ type: info.contentType, size: info.size }])) throw new Error("Envie novamente as fotos em um formato válido.");
+      }
+      // Atomic consumption makes the authorization single-use even under concurrent requests.
+      const { data: consumed, error: consumeError } = await supabaseAdmin.from("booking_upload_authorizations").delete().eq("id", data.uploadId).eq("proof_hash", hash).gt("expires_at", new Date().toISOString()).select("id").maybeSingle();
+      if (consumeError || !consumed) throw new Error("O envio das fotos já foi utilizado. Envie novamente.");
     }
     const { data: row, error } = await supabaseAdmin
       .from("appointments")
@@ -53,6 +71,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         fotos: data.fotos,
         status: "Pendente",
         origem: "site",
+        consentimento_lgpd_em: new Date().toISOString(),
+        consentimento_lgpd_versao: "privacidade-v1",
       })
       .select("id")
       .single();

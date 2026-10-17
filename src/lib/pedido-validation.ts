@@ -25,12 +25,15 @@ export function criarPedidoSchema(agora: () => Date = () => new Date()) {
     cep: z.string().regex(/^\d{5}-\d{3}$/),
     descricao: z.string().trim().max(2000),
     fotos: z.array(z.string().regex(fotoPath)).max(3),
+    uploadId: z.string().uuid().optional(),
+    uploadProof: z.string().uuid().optional(),
     lgpd: z.literal(true),
     website: antiRobo,
   }).superRefine((d, ctx) => {
     const invalid = (path: string, message: string) => ctx.addIssue({ code: "custom", path: [path], message });
     if (!(modalidades[d.categoria] as readonly string[]).includes(d.tipo)) invalid("tipo", "Selecione uma modalidade válida.");
     if (new Set(d.fotos).size !== d.fotos.length) invalid("fotos", "As fotos não podem se repetir.");
+    if (d.fotos.length && (!d.uploadId || !d.uploadProof)) invalid("fotos", "Prepare novamente o envio das fotos.");
     const pastas = d.fotos.map((p) => p.split("/")[1]);
     if (new Set(pastas).size > 1) invalid("fotos", "Envie as fotos juntas na mesma solicitação.");
     if (d.visita) {
