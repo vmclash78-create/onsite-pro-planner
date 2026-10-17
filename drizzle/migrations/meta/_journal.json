@@ -64,6 +64,13 @@
       "when": 1792268200301,
       "tag": "0008_role_security_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792268279265,
+      "tag": "0009_validate_appointment_photo_links",
+      "breakpoints": true
     }
   ]
 }
