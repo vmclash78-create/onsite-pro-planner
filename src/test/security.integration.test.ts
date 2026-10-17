@@ -48,6 +48,21 @@ afterAll(async () => {
 },30000);
 
 describe("Permissões reais pela API", () => {
+  it("autorização de fotos é privada e consumida apenas uma vez", async () => {
+    const ticket = await service.from("booking_upload_authorizations").insert({ proof_hash: "security-test", paths: ["site/test/0.jpg"] }).select("id").single();
+    if (ticket.error || !ticket.data) throw new Error("Could not prepare upload authorization test");
+    const id = ticket.data.id;
+    try {
+      const hidden = await technician.from("booking_upload_authorizations").select("id").eq("id", id);
+      expect(hidden.error?.code).toBe("42501");
+      const consume = () => service.from("booking_upload_authorizations").delete().eq("id", id).eq("proof_hash", "security-test").select("id");
+      const results = await Promise.all([consume(), consume()]);
+      expect(results.every((r) => !r.error)).toBe(true);
+      expect(results.flatMap((r) => r.data ?? [])).toHaveLength(1);
+    } finally {
+      await service.from("booking_upload_authorizations").delete().eq("id", id);
+    }
+  });
   it("técnico lê apenas cliente da própria OS", async () => {
     const r=await technician.from("clients").select("id").in("id",[ownClient,otherClient]); expect(r.error).toBeNull(); expect(r.data?.map(x=>x.id)).toEqual([ownClient]);
   });
