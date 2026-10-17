@@ -4,6 +4,8 @@ import { LinkCliente } from "@/components/LinkCliente";
 import { AppShell, moreGroups, useSignOut } from "@/components/AppShell";
 import { company } from "@/lib/company";
 import { pageHead } from "@/lib/seo";
+import { useMe } from "@/lib/staff";
+import { canSeeNav } from "@/lib/access";
 
 export const Route = createFileRoute("/_authenticated/mais")({
   head: pageHead("Mais", "Acesso às demais áreas do painel."),
@@ -14,11 +16,12 @@ const row = "flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-muted";
 
 function Mais() {
   const sair = useSignOut();
-  const grupos = moreGroups;
+  const me = useMe();
+  const grupos = moreGroups.map((g) => ({ ...g, itens: g.itens.filter((i) => canSeeNav(i.to, !!me.data?.isAdmin)) })).filter((g) => g.itens.length);
   return (
     <AppShell title="Mais">
       <div className="space-y-5">
-        <LinkCliente />
+        {me.data?.isAdmin && <LinkCliente />}
         {grupos.map((g) => (
           <section key={g.titulo}>
             <h2 className="mb-1.5 px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</h2>

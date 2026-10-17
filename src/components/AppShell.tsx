@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import simbolo from "@/assets/logo-simbolo.png.asset.json";
 import { useEffect, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { company } from "@/lib/company";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
 import { Button } from "@/components/ui/button";
+import { canOpenPanel, canSeeNav } from "@/lib/access";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
@@ -73,6 +74,9 @@ export function useSignOut() {
 export function AppShell({ title, breadcrumb, actions, children }: { title: string; breadcrumb?: string[]; actions?: ReactNode; children: ReactNode }) {
   const crumbs = breadcrumb ?? ["Painel", title];
   const me = useMe();
+  const path = useLocation({ select: (location) => location.pathname });
+  const allowed = canOpenPanel(path, !!me.data?.isAdmin);
+  const groups = navGroups.map((g) => ({ ...g, itens: g.itens.filter((i) => canSeeNav(i.to, !!me.data?.isAdmin)) })).filter((g) => g.itens.length);
   const sair = useSignOut();
   const qc = useQueryClient();
   useEffect(() => {
@@ -94,12 +98,14 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
       </div>
     );
 
+  if (me.data?.isStaff && !allowed) body = <div className="text-sm text-muted-foreground">Esta área é exclusiva do administrador.</div>;
+
   return (
     <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-sidebar-border bg-sidebar py-4 text-sidebar-foreground lg:flex">
         <Brand />
         <nav className="mt-5 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
-          {navGroups.map((g) => (
+          {groups.map((g) => (
             <div key={g.titulo}>
               <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{g.titulo}</div>
               <div className="flex flex-col gap-0.5">
@@ -139,7 +145,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
               </div>
               <h1 className="mt-1 text-xl font-semibold">{title}</h1>
             </div>
-            {me.data?.isStaff && actions}
+            {me.data?.isAdmin && allowed && actions}
           </div>
         </header>
         <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">{body}</main>
@@ -149,7 +155,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
         {[
           { to: "/inicio", label: "Início", icon: LayoutDashboard },
           { to: "/agenda", label: "Agenda", icon: CalendarDays },
-          { to: "/pedidos", label: "Pedidos", icon: Inbox },
+          me.data?.isAdmin ? { to: "/pedidos", label: "Pedidos", icon: Inbox } : { to: "/ordens", label: "Ordens", icon: Wrench },
           { to: "/mais", label: "Mais", icon: MoreHorizontal },
         ].map(({ to, label, icon: Icon }) => (
           <Link key={to} to={to} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground" activeProps={{ className: "!text-primary font-medium" }}>
