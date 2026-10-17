@@ -12,7 +12,7 @@ export function LinkCliente() {
   useEffect(() => {
     const o = window.location.origin;
     // Link da prévia só abre para quem está logado no editor: manda sempre o publicado.
-    setUrl(/id-preview|localhost|lovableproject/.test(o) ? "https://onsite-pro-planner.lovable.app/agendar" : `${o}/agendar`);
+    setUrl(/id-preview|localhost|lovableproject|onsite-pro-planner/.test(o) ? "https://vmclimatizacao.lovable.app/agendar" : `${o}/agendar`);
   }, []);
   const copiar = async () => {
     try {
