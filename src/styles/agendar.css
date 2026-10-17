@@ -174,8 +174,3 @@
 .vm-ag .go,.vm-ag a.go{box-shadow:0 10px 24px -12px var(--ac)}
 .vm-ag .go:disabled{opacity:.4;box-shadow:none}
 .vm-ag .card{border-radius:14px}
-/* Ajustes: menos espaço vazio e botão sempre visível */
-.vm-ag .ou{margin:16px 0 10px}
-.vm-ag .w{min-height:auto}
-.vm-ag .mn{padding-bottom:8px}
-.vm-ag .ft{position:sticky;bottom:0;z-index:20;margin-top:auto}
