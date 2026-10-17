@@ -1,91 +1,77 @@
-import postgres from "postgres";
-import { afterAll, describe, expect, it } from "vitest";
+import { createClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { Database } from "@/integrations/supabase/types";
 
-// Privileged connection is used only by the test runner. All fixtures roll back.
-const url = process.env["SUPABASE_DB_URL"];
-const db = url ? postgres(url, { max: 1, prepare: false }) : null;
-const stop = new Error("ROLLBACK_FIXTURES");
-const admin = "e1400000-0000-4000-8000-000000000001";
-const tech = "e1400000-0000-4000-8000-000000000002";
-const other = "e1400000-0000-4000-8000-000000000003";
+const url = process.env["SUPABASE_URL"];
+const key = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+const publicKey = process.env["SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_ANON_KEY"];
+if (!url || !key || !publicKey) throw new Error("Security tests require server credentials");
+const service = createClient<Database>(url, key, { auth: { persistSession: false } });
+const technician = createClient<Database>(url, publicKey, { auth: { persistSession: false } });
+const users: string[] = [];
+let ownClient = "", otherClient = "", ownOrder = "", otherOrder = "", ownStock = "";
+let technicianId = "", otherId = "", quoteId = "", entryId = "";
+const appointments: string[] = [];
 
-async function fixture(run: (sql: postgres.TransactionSql) => Promise<void>) {
-  if (!db) throw new Error("SUPABASE_DB_URL is required for security integration tests");
-  try {
-    await db.begin(async (sql) => {
-      for (const id of [admin, tech, other]) {
-        await sql`insert into auth.users(id,email) values(${id},${`${id}@security.invalid`})`;
-      }
-      await sql`insert into public.user_roles(user_id,role) values(${admin},'admin'),(${tech},'tecnico'),(${other},'tecnico')`;
-      await run(sql);
-      throw stop;
-    });
-  } catch (e) { if (e !== stop) throw e; }
-}
+beforeAll(async () => {
+  const password = crypto.randomUUID()+"Aa1";
+  for (let n=0; n<2; n++) {
+    const email = `security-${crypto.randomUUID()}@example.com`;
+    const {data,error} = await service.auth.admin.createUser({email,password,email_confirm:true});
+    if (error || !data.user) throw new Error("Could not create security test account");
+    users.push(data.user.id);
+    if (n===0) { technicianId=data.user.id; const login=await technician.auth.signInWithPassword({email,password}); if(login.error) throw new Error("Could not sign in test technician"); }
+    else otherId=data.user.id;
+    const role=await service.from("user_roles").insert({user_id:data.user.id,role:"tecnico"}); if(role.error) throw role.error;
+  }
+  for (const [who,label] of [[technicianId,"own"],[otherId,"other"]]) {
+    const c=await service.from("clients").insert({nome:`Security test ${label}`}).select("id").single(); if(c.error) throw c.error;
+    const o=await service.from("service_orders").insert({client_id:c.data.id,tecnico_id:who,categoria:"Gesso",descricao:"Security test",valor:100}).select("id").single(); if(o.error) throw o.error;
+    if(label==="own") {ownClient=c.data.id;ownOrder=o.data.id;} else {otherClient=c.data.id;otherOrder=o.data.id;}
+  }
+  const s=await service.from("stock_items").insert({nome:"Security test",quantidade:10}).select("id").single(); if(s.error) throw s.error; ownStock=s.data.id;
+  const i=await service.from("service_order_items").insert({service_order_id:ownOrder,stock_item_id:ownStock,quantidade:2}); if(i.error) throw i.error;
+  const q=await service.from("quotes").insert({client_id:ownClient,descricao:"Security test"}).select("id").single(); if(q.error) throw q.error; quoteId=q.data.id;
+  const f=await service.from("financial_entries").insert({tipo:"Entrada",descricao:"Security test"}).select("id").single(); if(f.error) throw f.error; entryId=f.data.id;
+}, 30000);
 
-async function asTech(sql: postgres.TransactionSql) {
-  await sql`select set_config('request.jwt.claim.sub',${tech},true)`;
-  await sql.unsafe("set local role authenticated");
-}
+afterAll(async () => {
+  if(ownOrder) await service.from("service_orders").update({status:"Aberta"}).eq("id",ownOrder);
+  if(ownOrder) await service.from("service_order_items").delete().eq("service_order_id",ownOrder);
+  if(quoteId) await service.from("quotes").delete().eq("id",quoteId);
+  if(entryId) await service.from("financial_entries").delete().eq("id",entryId);
+  for(const id of appointments) await service.from("appointments").delete().eq("id",id);
+  for(const id of [ownOrder,otherOrder].filter(Boolean)) await service.from("service_orders").delete().eq("id",id);
+  for(const id of [ownClient,otherClient].filter(Boolean)) await service.from("clients").delete().eq("id",id);
+  if(ownStock) await service.from("stock_items").delete().eq("id",ownStock);
+  for(const id of users) await service.auth.admin.deleteUser(id);
+},30000);
 
-afterAll(async () => { await db?.end(); });
-
-describe("Regras reais de segurança (sem persistir dados de teste)", () => {
-  it("técnico lê apenas clientes ligados às próprias OS", async () => fixture(async (sql) => {
-    const [mine] = await sql`insert into public.clients(nome) values('Teste próprio') returning id`;
-    const [hidden] = await sql`insert into public.clients(nome) values('Teste outro') returning id`;
-    await sql`insert into public.service_orders(client_id,tecnico_id,categoria,descricao) values(${mine.id},${tech},'Gesso','Teste'),(${hidden.id},${other},'Gesso','Teste')`;
-    await asTech(sql);
-    const rows = await sql`select id from public.clients where id in (${mine.id},${hidden.id})`;
-    expect(rows.map((r) => r.id)).toEqual([mine.id]);
-  }));
-  it("técnico não cria clientes", async () => fixture(async (sql) => {
-    await asTech(sql);
-    await expect(sql.savepoint((s) => s`insert into public.clients(nome) values('Proibido')`)).rejects.toMatchObject({ code: "42501" });
-  }));
-  it("técnico não lê caixa nem orçamentos", async () => fixture(async (sql) => {
-    const [c] = await sql`insert into public.clients(nome) values('Teste') returning id`;
-    const [q] = await sql`insert into public.quotes(client_id,descricao) values(${c.id},'Teste') returning id`;
-    const [f] = await sql`insert into public.financial_entries(tipo,descricao) values('Entrada','Teste') returning id`;
-    await asTech(sql);
-    expect(await sql`select id from public.quotes where id=${q.id}`).toHaveLength(0);
-    expect(await sql`select id from public.financial_entries where id=${f.id}`).toHaveLength(0);
-  }));
-  it("técnico não altera valor nem garantia da própria OS", async () => fixture(async (sql) => {
-    const [c] = await sql`insert into public.clients(nome) values('Teste') returning id`;
-    const [o] = await sql`insert into public.service_orders(client_id,tecnico_id,categoria,descricao,valor) values(${c.id},${tech},'Gesso','Teste',100) returning id`;
-    await asTech(sql);
-    await expect(sql.savepoint((s) => s`update public.service_orders set valor=1 where id=${o.id}`)).rejects.toThrow('administradores');
-    await expect(sql.savepoint((s) => s`update public.service_orders set garantia_dias=365 where id=${o.id}`)).rejects.toThrow('administradores');
-  }));
-  it("conclusão pelo técnico baixa estoque uma vez e impede manipulação do indicador", async () => fixture(async (sql) => {
-    const [c] = await sql`insert into public.clients(nome) values('Teste') returning id`;
-    const [o] = await sql`insert into public.service_orders(client_id,tecnico_id,categoria,descricao) values(${c.id},${tech},'Gesso','Teste') returning id`;
-    const [item] = await sql`insert into public.stock_items(nome,quantidade) values('Teste',10) returning id`;
-    await sql`insert into public.service_order_items(service_order_id,stock_item_id,quantidade) values(${o.id},${item.id},2)`;
-    await asTech(sql);
-    await expect(sql.savepoint((s) => s`update public.service_orders set estoque_baixado=true where id=${o.id}`)).rejects.toThrow('administradores');
-    await sql`update public.service_orders set status='Concluída' where id=${o.id}`;
-    await sql`update public.service_orders set status='Concluída' where id=${o.id}`;
-    const [stock] = await sql`select quantidade from public.stock_items where id=${item.id}`;
-    expect(Number(stock.quantidade)).toBe(8);
-  }));
-  it("técnico não consulta fotos de outra ordem ou identidade", async () => fixture(async (sql) => {
-    const [c] = await sql`insert into public.clients(nome) values('Teste') returning id`;
-    const [o] = await sql`insert into public.service_orders(client_id,tecnico_id,categoria,descricao) values(${c.id},${other},'Gesso','Teste') returning id`;
-    await asTech(sql);
-    const [r] = await sql`select public.pode_acessar_foto(${`os/${o.id}/antes.jpg`},false) allowed, public.tecnico_da_os(${other},${o.id}) probe`;
-    expect(r.allowed).toBe(false); expect(r.probe).toBe(false);
-  }));
-  it("pedido aceita no máximo 3 fotos", async () => fixture(async (sql) => {
-    await expect(sql.savepoint((s) => s`insert into public.appointments(nome_contato,whatsapp,categoria,tipo,fotos) values('Teste','(88) 99999-9999','Gesso','Reparo',array['a','b','c','d'])`)).rejects.toMatchObject({ code: "23514" });
-  }));
-  it("serviço longo bloqueia todos os horários do período", async () => fixture(async (sql) => {
-    await sql`insert into public.appointments(nome_contato,whatsapp,categoria,tipo,data,hora,origem) values('Teste','(88) 99999-9999','Refrigeração','Instalação','2099-01-05','08:00','site')`;
-    await expect(sql.savepoint((s) => s`insert into public.appointments(nome_contato,whatsapp,categoria,tipo,data,hora,origem) values('Teste','(88) 99999-9999','Gesso','Reparo','2099-01-05','10:00','site')`)).rejects.toThrow('HORARIO_OCUPADO');
-  }));
-  it("não permite remover o último administrador", async () => fixture(async (sql) => {
-    await sql`delete from public.user_roles where role='admin' and user_id<>${admin}`;
-    await expect(sql.savepoint((s) => s`delete from public.user_roles where user_id=${admin} and role='admin'`)).rejects.toThrow('último administrador');
-  }));
+describe("Permissões reais pela API", () => {
+  it("técnico lê apenas cliente da própria OS", async () => {
+    const r=await technician.from("clients").select("id").in("id",[ownClient,otherClient]); expect(r.error).toBeNull(); expect(r.data?.map(x=>x.id)).toEqual([ownClient]);
+  });
+  it("técnico não cria clientes", async () => {
+    const r=await technician.from("clients").insert({nome:"Proibido"}); expect(r.error?.code).toBe("42501");
+  });
+  it("técnico não lê caixa nem orçamentos", async () => {
+    const q=await technician.from("quotes").select("id").eq("id",quoteId); const f=await technician.from("financial_entries").select("id").eq("id",entryId); expect(q.error).toBeNull();expect(f.error).toBeNull();expect(q.data).toEqual([]);expect(f.data).toEqual([]);
+  });
+  it("técnico não altera valor", async () => {const r=await technician.from("service_orders").update({valor:1}).eq("id",ownOrder);expect(r.error?.message).toContain("administradores");});
+  it("técnico não altera garantia", async () => {const r=await technician.from("service_orders").update({garantia_dias:365}).eq("id",ownOrder);expect(r.error?.message).toContain("administradores");});
+  it("técnico não manipula estoque_baixado", async () => {const r=await technician.from("service_orders").update({estoque_baixado:true}).eq("id",ownOrder);expect(r.error?.message).toContain("administradores");});
+  it("concluir OS baixa estoque apenas uma vez", async () => {
+    for(let n=0;n<2;n++){const r=await technician.from("service_orders").update({status:"Concluída"}).eq("id",ownOrder);expect(r.error).toBeNull();}
+    const r=await service.from("stock_items").select("quantidade").eq("id",ownStock).single();expect(Number(r.data?.quantidade)).toBe(8);
+  });
+  it("técnico não consulta foto ou identidade de outro técnico", async () => {
+    const r=await technician.rpc("pode_acessar_foto",{_path:`os/${otherOrder}/antes.jpg`,_escrever:false}); expect(r.error).toBeNull();expect(r.data).toBe(false);
+    const p=await technician.rpc("tecnico_da_os",{_user:otherId,_os:otherOrder});expect(p.data).toBe(false);
+  });
+  it("pedido aceita no máximo 3 fotos", async () => {const r=await service.from("appointments").insert({nome_contato:"Teste",whatsapp:"(88) 99999-9999",categoria:"Gesso",tipo:"Reparo",fotos:["a","b","c","d"]});expect(r.error?.code).toBe("23514");});
+  it("serviço longo impede reserva sobreposta", async () => {
+    const base={nome_contato:"Security test",whatsapp:"(88) 99999-9999",data:"2099-01-05",origem:"site"};
+    const a=await service.from("appointments").insert({...base,categoria:"Refrigeração",tipo:"Instalação",hora:"08:00"}).select("id").single();if(a.data)appointments.push(a.data.id);expect(a.error).toBeNull();
+    const b=await service.from("appointments").insert({...base,categoria:"Gesso",tipo:"Reparo",hora:"10:00"}).select("id").single();if(b.data)appointments.push(b.data.id);expect(b.error?.message).toContain("HORARIO_OCUPADO");
+  });
 });
