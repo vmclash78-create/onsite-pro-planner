@@ -8,6 +8,7 @@ import { company } from "@/lib/company";
 import { Button } from "@/components/ui/button";
 import { Vitrine, type ItemEscolhido } from "@/components/Vitrine";
 import { brl } from "@/lib/format";
+import { pedidoSchema, tiposFoto, validarFotos } from "@/lib/pedido-validation";
 import { House, Layers, Snowflake, Zap } from "lucide-react";
 import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
@@ -70,6 +71,7 @@ function Agendar() {
   const criar = useServerFn(criarPedido);
   const preparar = useServerFn(prepararFotos);
   const [lgpd, setLgpd] = useState(false);
+  const [isca, setIsca] = useState("");
   const [aba, setAba] = useState<"agendar" | "vitrine">("agendar");
   const [ok, setOk] = useState(false);
   const [servico, setServico] = useState<ItemEscolhido | null>(null);
@@ -81,9 +83,11 @@ function Agendar() {
   const trocar = () => { setServico(null); go(1); };
 
   const ocup = useQuery({
-    queryKey: ["ocupados", iso(dias[0]!)],
+    queryKey: ["ocupados", dias[0] ? iso(dias[0]) : ""],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("horarios_ocupados", { _inicio: iso(dias[0]!), _fim: iso(dias[dias.length - 1]!) });
+      const primeiro = dias[0], ultimo = dias[dias.length - 1];
+      if (!primeiro || !ultimo) throw new Error("Não foi possível consultar os dias.");
+      const { data, error } = await supabase.rpc("horarios_ocupados", { _inicio: iso(primeiro), _fim: iso(ultimo) });
       if (error) throw error;
       return data.map((o) => `${o.data} ${o.hora}`);
     },
@@ -96,21 +100,28 @@ function Agendar() {
   const turnoSel = TURNOS.find((t) => t.h === hora);
   const quando = md === "turno" && turnoSel ? `turno da ${turnoSel.p.toLowerCase()} (${turnoSel.faixa})` : `às ${hora ?? ""}`;
   const resumo = visita ? "Visita técnica para orçamento" : diaSel ? `${md === "medicao" ? "Vistoria e medição: " : ""}${fmt(diaSel, { weekday: "long", day: "numeric", month: "long" })} ${quando}` : "";
-  const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora) : nome.trim().length > 2 && whats.length >= 14 && cep.length === 9 && lgpd;
+  const pode = step === 1 ? !!tipo : step === 2 ? visita || (!!data && !!hora && !ocup.isPending && !ocup.isError) : nome.trim().length > 2 && nome.trim().length <= 120 && whats.length >= 14 && cep.length === 9 && desc.length <= 2000 && lgpd;
 
   const go = (n: number) => { setStep(n); window.scrollTo(0, 0); };
-  const TIPOS_OK = ["image/jpeg", "image/png", "image/webp", "image/heic"] as const;
   const enviar = async () => {
     setEnviando(true); setErroEnvio(null);
     try {
-      const validas = fotos.filter((f) => (TIPOS_OK as readonly string[]).includes(f.type));
-      const slots = validas.length ? await preparar({ data: { tipos: validas.map((f) => f.type as (typeof TIPOS_OK)[number]) } }) : [];
+      const entrada = { categoria: area, tipo, visita, data, hora, nome, whatsapp: whats, cep, descricao: desc, fotos: [], lgpd, website: isca };
+      const validacao = pedidoSchema.safeParse(entrada);
+      if (!validacao.success) { setErroEnvio(validacao.error.issues[0]?.message ?? "Confira os dados da solicitação."); return; }
+      const erroFotos = validarFotos(fotos);
+      if (erroFotos) { setErroEnvio(erroFotos); return; }
+      const slots = fotos.length ? await preparar({ data: { tipos: fotos.map((f) => f.type as (typeof tiposFoto)[number]), website: isca } }) : [];
       const paths: string[] = [];
       for (let i = 0; i < slots.length; i++) {
-        const { error } = await supabase.storage.from("pedidos").uploadToSignedUrl(slots[i]!.path, slots[i]!.token, validas[i]!, { contentType: validas[i]!.type });
-        if (!error) paths.push(slots[i]!.path);
+        const slot = slots[i], foto = fotos[i];
+        if (!slot || !foto) throw new Error("Não foi possível preparar todas as fotos.");
+        const { error } = await supabase.storage.from("pedidos").uploadToSignedUrl(slot.path, slot.token, foto, { contentType: foto.type });
+        if (error) throw new Error("FOTO_ERRO");
+        paths.push(slot.path);
       }
-      const r = await criar({ data: { categoria: area as "Refrigeração" | "Gesso" | "Elétrica", tipo, visita, data, hora, nome, whatsapp: whats, cep, descricao: desc, fotos: paths, lgpd: true } });
+      const autorizacao = slots[0];
+      const r = await criar({ data: { ...validacao.data, fotos: paths, ...(autorizacao ? { uploadId: autorizacao.uploadId, uploadProof: autorizacao.uploadProof } : {}) } });
       setProtocolo(r.protocolo); setOk(true); window.scrollTo(0, 0);
     } catch (e) {
       if (e instanceof Error && e.message.includes("HORARIO_OCUPADO")) {
@@ -118,7 +129,7 @@ function Agendar() {
         setErroEnvio("Esse horário acabou de ser ocupado. Escolha outro.");
         return;
       }
-      setErroEnvio("Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.");
+      setErroEnvio(e instanceof Error && e.message.includes("FOTO_ERRO") ? "Não foi possível enviar as fotos. Tente novamente; a solicitação não foi registrada." : "Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.");
     } finally { setEnviando(false); }
   };
   const next = () => { if (!pode || enviando) return; if (step < 3) go(step + 1); else void enviar(); };
@@ -184,7 +195,7 @@ function Agendar() {
             <p className="sub">Indique a área de atuação e a modalidade de atendimento.</p>
             <div className="areas">
               {Object.keys(AREAS).map((a) => {
-                const Ic = ICONES[a]!;
+                const Ic = ICONES[a] ?? Snowflake;
                 return (
                   <button key={a} className={`area ${area === a ? "on" : ""}`} aria-pressed={area === a} onClick={() => { setArea(a); setTipo(""); setHora(null); }}>
                     <Ic size={22} strokeWidth={1.75} aria-hidden />
@@ -193,10 +204,10 @@ function Agendar() {
                 );
               })}
             </div>
-            <p className="sub mt-3">{AREAS[area]![0]}</p>
+            <p className="sub mt-3">{AREAS[area]?.[0]}</p>
             <div className="lb">Modalidade de atendimento</div>
             <div className="chips">
-              {AREAS[area]![1].map((t) => (
+              {AREAS[area]?.[1].map((t) => (
                 <Button variant="ghost" key={t} className={`chip ${tipo === t ? "on" : ""}`} aria-pressed={tipo === t} onClick={() => { setTipo(t); setHora(null); }}>{t}</Button>
               ))}
             </div>
@@ -208,12 +219,13 @@ function Agendar() {
             {head(md === "medicao" ? "Vistoria e medição técnica" : md === "turno" ? "Data e turno de atendimento" : "Data e horário de preferência")}
             {md === "medicao" && <p className="sub aviso">Serviços de gesso iniciam com vistoria no local para medição e orçamento. A execução da obra é agendada após a aprovação.</p>}
             {md === "turno" && <p className="sub aviso">Este serviço requer de 2h30 a 4h e ocupa um turno completo.</p>}
-            <p className="sub" style={{ textTransform: "capitalize" }}>{fmt(dias[0]!, { month: "long", year: "numeric" })}</p>
+            {ocup.isError && <p className="alt envio-erro" role="alert">Não foi possível consultar os horários. Tente novamente ou solicite uma visita sem horário definido.</p>}
+            <p className="sub" style={{ textTransform: "capitalize" }}>{dias[0] ? fmt(dias[0], { month: "long", year: "numeric" }) : ""}</p>
             <div className="days">
               {dias.map((d) => {
-                const todasHoras = [...HORAS["Manhã"]!, ...HORAS["Tarde"]!];
+                const todasHoras = [...(HORAS["Manhã"] ?? []), ...(HORAS["Tarde"] ?? [])];
                 const lotado = todasHoras.every((h) => OCUPADOS.includes(`${iso(d)} ${h}`));
-                const off = visita || d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
+                const off = visita || ocup.isPending || ocup.isError || d.getDay() === 0 || lotado, on = data === iso(d) && !visita;
                 return (
                   <Button variant="ghost" key={iso(d)} className={`day ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                     title={lotado ? "Dia sem horários livres" : undefined}
@@ -227,8 +239,8 @@ function Agendar() {
             {md === "turno" ? (
               <div className="turnos">
                 {TURNOS.map((t) => {
-                  const ocupado = !!data && HORAS[t.p]!.some((h) => OCUPADOS.includes(`${data} ${h}`));
-                  const off = visita || !data || ocupado, on = hora === t.h && !visita;
+                  const ocupado = !!data && (HORAS[t.p] ?? []).some((h) => OCUPADOS.includes(`${data} ${h}`));
+                  const off = visita || !data || ocupado || ocup.isPending || ocup.isError, on = hora === t.h && !visita;
                   return (
                     <button type="button" key={t.p} className={`turno ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                       onClick={() => { setHora(t.h); setVisita(false); }}>
@@ -241,9 +253,9 @@ function Agendar() {
               <div key={p}>
                 <div className="lb">{p}</div>
                 <div className="horas">
-                  {HORAS[p]!.map((h) => {
+                  {HORAS[p]?.map((h) => {
                     const ocupado = !!data && OCUPADOS.includes(`${data} ${h}`);
-                    const off = visita || !data || ocupado, on = hora === h && !visita;
+                    const off = visita || !data || ocupado || ocup.isPending || ocup.isError, on = hora === h && !visita;
                     return (
                       <Button variant="ghost" key={h} className={`hr ${off ? "off" : on ? "on" : ""}`} disabled={off} aria-pressed={on}
                         onClick={() => { setHora(h); setVisita(false); }}>{ocupado ? <span className="ocp">{h}<small>ocupado</small></span> : h}</Button>
@@ -269,22 +281,23 @@ function Agendar() {
               <Button variant="link" className="lnk" onClick={() => go(2)}>Alterar data</Button>
             </div>
             <label className="f" htmlFor="nome">Nome completo</label>
-            <input className="t" id="nome" autoComplete="name" placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
+            <input className="t" id="nome" autoComplete="name" maxLength={120} placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
             <label className="f" htmlFor="whats">Telefone (WhatsApp)</label>
             <input className="t" id="whats" inputMode="tel" autoComplete="tel" placeholder="(88) 90000-0000" value={whats} onChange={(e) => setWhats(maskWhats(e.target.value))} />
             <label className="f" htmlFor="cep">CEP</label>
             <input className="t" id="cep" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCep(e.target.value))} />
             <label className="f" htmlFor="desc">Descrição da necessidade</label>
-            <textarea id="desc" placeholder={textoArea(area).dica} value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <textarea id="desc" maxLength={2000} placeholder={textoArea(area).dica} value={desc} onChange={(e) => setDesc(e.target.value)} />
             <label className="ph" style={{ position: "relative" }}>
               {fotos.length ? `${fotos.length} de 3 fotos` : "Anexar fotos do local ou equipamento (até 3)"}
-              <input type="file" accept="image/*" multiple onChange={(e) => { setFotos([...fotos, ...(e.target.files ?? [])].slice(0, 3)); e.target.value = ""; }} />
+              <input type="file" accept={tiposFoto.join(",")} multiple onChange={(e) => { const novas = [...fotos, ...(e.target.files ?? [])]; const erro = validarFotos(novas); setErroEnvio(erro); if (!erro) setFotos(novas); e.target.value = ""; }} />
             </label>
             <ul className="fl">
               {fotos.map((n, i) => (
                 <li key={i}><span>{n.name}</span><Button variant="link" className="lnk" onClick={() => setFotos(fotos.filter((_, j) => j !== i))}>Remover</Button></li>
               ))}
             </ul>
+            <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute h-px w-px overflow-hidden opacity-0 pointer-events-none" value={isca} onChange={(e) => setIsca(e.target.value)} />
             <div className="lg">
               <input type="checkbox" id="lgpd" checked={lgpd} onChange={(e) => setLgpd(e.target.checked)} />
               <label htmlFor="lgpd">Autorizo o tratamento dos meus dados para contato e atendimento técnico, conforme a <Link to="/privacidade">política de privacidade</Link>.</label>

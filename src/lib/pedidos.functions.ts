@@ -2,15 +2,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { pedidoSchema, prepararFotosSchema, validarFotos } from "@/lib/pedido-validation";
+import { authorizedUpload, hashUploadProof } from "@/lib/upload-authorization";
 
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic" };
-const FOTO_SITE = /^site\/[0-9a-f-]{36}\/[0-2]\.(jpg|png|webp|heic)$/;
 
 /** Public: reserves up to 3 one-time upload slots for booking photos (no read access is granted). */
 export const prepararFotos = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({ tipos: z.array(z.enum(["image/jpeg", "image/png", "image/webp", "image/heic"])).max(3) }).parse(d))
+  .inputValidator((d) => prepararFotosSchema.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!data.tipos.length) return [];
     const pasta = crypto.randomUUID();
     const slots: { path: string; token: string }[] = [];
     for (let i = 0; i < data.tipos.length; i++) {
@@ -21,22 +23,11 @@ export const prepararFotos = createServerFn({ method: "POST" })
       if (error || !s) throw new Error("Não foi possível preparar o envio das fotos.");
       slots.push({ path, token: s.token });
     }
-    return slots;
+    const proof = crypto.randomUUID();
+    const { data: ticket, error: ticketError } = await supabaseAdmin.from("booking_upload_authorizations").insert({ proof_hash: await hashUploadProof(proof), paths: slots.map((s) => s.path) }).select("id").single();
+    if (ticketError || !ticket) throw new Error("Não foi possível autorizar o envio das fotos.");
+    return slots.map((slot) => ({ ...slot, uploadId: ticket.id, uploadProof: proof }));
   });
-
-const pedidoSchema = z.object({
-  categoria: z.enum(["Refrigeração", "Gesso", "Elétrica"]),
-  tipo: z.string().trim().min(2).max(60),
-  visita: z.boolean(),
-  data: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
-  hora: z.string().regex(/^\d{2}:\d{2}$/).nullable(),
-  nome: z.string().trim().min(3).max(120),
-  whatsapp: z.string().trim().regex(/^\(\d{2}\) \d{4,5}-\d{4}$/),
-  cep: z.string().regex(/^\d{5}-\d{3}$/),
-  descricao: z.string().trim().max(2000),
-  fotos: z.array(z.string().regex(FOTO_SITE)).max(3),
-  lgpd: z.literal(true),
-});
 
 /** Public: creates a pending appointment from the booking page. Returns only the protocol id. */
 export const criarPedido = createServerFn({ method: "POST" })
@@ -50,6 +41,19 @@ export const criarPedido = createServerFn({ method: "POST" })
       const manha = data.hora < "12:00";
       const precisa = longo ? (manha ? ["08:00", "09:00", "10:00"] : ["14:00", "15:00", "16:00"]) : [data.hora];
       if (livre?.some((o) => precisa.includes(o.hora))) throw new Error("HORARIO_OCUPADO");
+    }
+    if (data.fotos.length) {
+      if (!data.uploadId || !data.uploadProof) throw new Error("Prepare novamente o envio das fotos.");
+      const hash = await hashUploadProof(data.uploadProof);
+      const { data: ticket, error: ticketError } = await supabaseAdmin.from("booking_upload_authorizations").select("proof_hash,paths,expires_at").eq("id", data.uploadId).single();
+      if (ticketError || !ticket || !authorizedUpload(ticket, hash, data.fotos)) throw new Error("Envio de fotos inválido ou expirado.");
+      for (const path of data.fotos) {
+        const { data: info, error: infoError } = await supabaseAdmin.storage.from("pedidos").info(path);
+        if (infoError || !info || typeof info.contentType !== "string" || typeof info.size !== "number" || validarFotos([{ type: info.contentType, size: info.size }])) throw new Error("Envie novamente as fotos em um formato válido.");
+      }
+      // Atomic consumption makes the authorization single-use even under concurrent requests.
+      const { data: consumed, error: consumeError } = await supabaseAdmin.from("booking_upload_authorizations").delete().eq("id", data.uploadId).eq("proof_hash", hash).gt("expires_at", new Date().toISOString()).select("id").maybeSingle();
+      if (consumeError || !consumed) throw new Error("O envio das fotos já foi utilizado. Envie novamente.");
     }
     const { data: row, error } = await supabaseAdmin
       .from("appointments")
@@ -67,6 +71,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         fotos: data.fotos,
         status: "Pendente",
         origem: "site",
+        consentimento_lgpd_em: new Date().toISOString(),
+        consentimento_lgpd_versao: "privacidade-v1",
       })
       .select("id")
       .single();
@@ -105,7 +111,7 @@ export const analisarPedido = createServerFn({ method: "POST" })
       r = await classificarPedido({ request: getRequest(), apiKey, descricao: p.descricao ?? "", categoriaInformada: p.categoria, tipoInformado: p.tipo, fotos: urls });
     } catch (e) {
       const status = (e as { statusCode?: number }).statusCode;
-      console.error("analisarPedido", e);
+      console.error("analisarPedido", status ?? "AI_ERROR");
       if (status === 429) throw new Error("Muitas análises seguidas. Aguarde um minuto e tente de novo.");
       if (status === 402 || status === 403) throw new Error("Os créditos de IA acabaram ou estão bloqueados. Verifique em Configurações → Planos e créditos.");
       throw new Error("A análise falhou. Tente novamente em instantes.");
