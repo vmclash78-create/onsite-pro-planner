@@ -24,7 +24,7 @@ beforeAll(async () => {
     else otherId=data.user.id;
     const role=await service.from("user_roles").insert({user_id:data.user.id,role:"tecnico"}); if(role.error) throw role.error;
   }
-  for (const [who,label] of [[technicianId,"own"],[otherId,"other"]]) {
+  for (const [who,label] of [[technicianId,"own"],[otherId,"other"]] as const) {
     const c=await service.from("clients").insert({nome:`Security test ${label}`}).select("id").single(); if(c.error) throw c.error;
     const o=await service.from("service_orders").insert({client_id:c.data.id,tecnico_id:who,categoria:"Gesso",descricao:"Security test",valor:100}).select("id").single(); if(o.error) throw o.error;
     if(label==="own") {ownClient=c.data.id;ownOrder=o.data.id;} else {otherClient=c.data.id;otherOrder=o.data.id;}
