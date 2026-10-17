@@ -1,7 +1,8 @@
 # Roadmap
 
-- [ ] Reforçar validação do agendamento e das fotos, proteção anti-robô simples, cabeçalhos e entrada da IA
-- [ ] Executar testes e revisar os achados de segurança restantes
+- [x] Reforçar validação do agendamento e das fotos, proteção anti-robô simples, cabeçalhos e entrada da IA
+- [x] Executar testes e revisar os achados de segurança restantes
+- [ ] Limitação de pedidos em massa: aguarda aprovação de solução provisória, pois não há proteção padrão disponível
 
 - [x] Corrigir e aplicar o arquivo de segurança enviado (permissões, fotos, reservas e proteção do administrador)
 - [x] Ajustar os controles da equipe e testar as permissões reais
