@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Corrigir e aplicar o arquivo de segurança enviado (permissões, fotos, reservas e proteção do administrador)
+- [ ] Ajustar os controles da equipe e testar as permissões reais
+
 - [x] Tema branco em todo o sistema e botão azul no agendamento
 - [x] Ajustes e verificação das telas em celular, tablet e computador
 
