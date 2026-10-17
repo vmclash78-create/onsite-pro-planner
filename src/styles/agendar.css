@@ -179,3 +179,15 @@
 .vm-ag .w{min-height:auto}
 .vm-ag .mn{padding-bottom:8px}
 .vm-ag .ft{position:sticky;bottom:0;z-index:20;margin-top:auto}
+/* Topo leve com respiro (sem caixa) */
+.vm-ag .w{padding-top:max(28px,env(safe-area-inset-top))}
+.vm-ag .brand{grid-template-columns:44px minmax(0,1fr);padding:0 0 16px;border:0;border-bottom:2px solid var(--ac);border-radius:0;background:transparent;box-shadow:none}
+.vm-ag .brand img{width:44px!important;height:44px!important;padding:0;background:transparent}
+.vm-ag .tabs{margin-top:22px}
+.vm-ag .step{margin-top:26px}
+.vm-ag h1{margin:14px 0 6px}
+.vm-ag .areas{margin-top:22px}
+.vm-ag .lb{margin:24px 0 10px}
+.vm-ag .go:disabled{opacity:.7}
+.vm-ag .ft{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+@media(max-width:767px){.vm-ag .w{padding-top:max(24px,env(safe-area-inset-top))}.vm-ag .brand{padding-bottom:14px}.vm-ag .tabs{margin-top:18px}.vm-ag .step{margin-top:20px}.vm-ag h1{margin:10px 0 4px}}
