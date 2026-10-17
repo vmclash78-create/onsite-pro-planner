@@ -18,6 +18,8 @@
 - Private photos are authorized by their order/appointment paths; booking conflicts and role changes serialize in database triggers — direct API writes and concurrent requests follow the same rules as the UI.
 - Access is role-based via `user_roles` (admin/tecnico); the first account becomes admin, later accounts wait for an admin in Equipe — prevents open sign-up from exposing data.
 - Public booking writes only through server functions in src/lib/pedidos.functions.ts (signed upload URLs + validated insert); anon has no table access — keeps customer data private.
+- Public booking shares its input schema between browser and server in src/lib/pedido-validation.ts; browser checks improve feedback but server validation is authoritative — prevents malformed requests bypassing the form.
+- Response security defaults are centralized in src/lib/security-headers.ts and preserve iframe previews/OAuth popups — applies browser protections without breaking app delivery.
 - AI triage runs server-side in src/lib/triagem.server.ts (Lovable AI Gateway, Responses API, structured output) and is admin-only — keeps the key and prompts off the client.
 - Completed service orders create a `recebimentos` row (trigger os_financeiro); revenue reaches financial_entries only via the admin-only `registrar_pagamento` RPC — cash basis, no double counting.
 - Pix BR Code, phone normalization and WhatsApp templates live in src/lib/cobranca.ts; WhatsApp sends are wa.me links logged in `mensagens_enviadas` — no paid API.
