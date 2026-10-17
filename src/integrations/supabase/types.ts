@@ -822,9 +822,22 @@ export type Database = {
         }[]
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      pode_acessar_foto: {
+        Args: { _escrever?: boolean; _path: string }
+        Returns: boolean
+      }
       registrar_pagamento: {
         Args: { _data: string; _forma: string; _rec: string; _valor: number }
         Returns: undefined
+      }
+      tecnico_da_os: { Args: { _os: string; _user: string }; Returns: boolean }
+      tecnico_ve_cliente: {
+        Args: { _client: string; _user: string }
+        Returns: boolean
+      }
+      tecnico_ve_local: {
+        Args: { _location: string; _user: string }
+        Returns: boolean
       }
     }
     Enums: {

@@ -1,0 +1,94 @@
+CREATE OR REPLACE FUNCTION public.tecnico_da_os(_user uuid,_os uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT _user=auth.uid() AND public.is_staff(_user) AND EXISTS(SELECT 1 FROM public.service_orders WHERE id=_os AND tecnico_id=_user) $$;
+CREATE OR REPLACE FUNCTION public.tecnico_ve_cliente(_user uuid,_client uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT _user=auth.uid() AND public.is_staff(_user) AND (EXISTS(SELECT 1 FROM public.service_orders WHERE client_id=_client AND tecnico_id=_user) OR EXISTS(SELECT 1 FROM public.appointments WHERE client_id=_client AND tecnico_id=_user)) $$;
+CREATE OR REPLACE FUNCTION public.tecnico_ve_local(_user uuid,_location uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT _user=auth.uid() AND public.is_staff(_user) AND (EXISTS(SELECT 1 FROM public.locations WHERE id=_location AND public.tecnico_ve_cliente(_user,client_id)) OR EXISTS(SELECT 1 FROM public.service_orders WHERE location_id=_location AND tecnico_id=_user) OR EXISTS(SELECT 1 FROM public.appointments WHERE location_id=_location AND tecnico_id=_user)) $$;
+REVOKE ALL ON FUNCTION public.tecnico_da_os(uuid,uuid),public.tecnico_ve_cliente(uuid,uuid),public.tecnico_ve_local(uuid,uuid) FROM public,anon;
+GRANT EXECUTE ON FUNCTION public.tecnico_da_os(uuid,uuid),public.tecnico_ve_cliente(uuid,uuid),public.tecnico_ve_local(uuid,uuid) TO authenticated,service_role;
+DROP POLICY IF EXISTS "public read ativos" ON public.catalogo_itens;
+CREATE POLICY "anon read ativos" ON public.catalogo_itens FOR SELECT TO anon USING(ativo);
+CREATE POLICY "staff read catalogo" ON public.catalogo_itens FOR SELECT TO authenticated USING(ativo OR public.is_staff(auth.uid()));
+REVOKE ALL ON FUNCTION public.has_role(uuid,public.app_role),public.is_staff(uuid) FROM public,anon;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid,public.app_role),public.is_staff(uuid) TO authenticated,service_role;
+REVOKE ALL ON FUNCTION public.handle_new_user(),public.os_financeiro(),public.os_conclusao() FROM public,anon,authenticated;
+DROP POLICY IF EXISTS "staff all" ON public.clients;
+CREATE POLICY "clients select" ON public.clients FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin') OR public.tecnico_ve_cliente(auth.uid(),id));
+CREATE POLICY "clients admin write" ON public.clients FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.locations;
+CREATE POLICY "locations select" ON public.locations FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin') OR public.tecnico_ve_local(auth.uid(),id));
+CREATE POLICY "locations admin write" ON public.locations FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.equipment;
+CREATE POLICY "equipment select" ON public.equipment FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin') OR public.tecnico_ve_local(auth.uid(),location_id));
+CREATE POLICY "equipment admin write" ON public.equipment FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.appointments;
+CREATE POLICY "appointments select" ON public.appointments FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid()));
+CREATE POLICY "appointments admin insert" ON public.appointments FOR INSERT TO authenticated WITH CHECK(public.has_role(auth.uid(),'admin'));
+CREATE POLICY "appointments update" ON public.appointments FOR UPDATE TO authenticated USING(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid())) WITH CHECK(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid()));
+CREATE POLICY "appointments admin delete" ON public.appointments FOR DELETE TO authenticated USING(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.service_orders;
+CREATE POLICY "service_orders select" ON public.service_orders FOR SELECT TO authenticated USING(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid()));
+CREATE POLICY "service_orders admin insert" ON public.service_orders FOR INSERT TO authenticated WITH CHECK(public.has_role(auth.uid(),'admin'));
+CREATE POLICY "service_orders update" ON public.service_orders FOR UPDATE TO authenticated USING(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid())) WITH CHECK(public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND tecnico_id=auth.uid()));
+CREATE POLICY "service_orders admin delete" ON public.service_orders FOR DELETE TO authenticated USING(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all os items" ON public.service_order_items;
+CREATE POLICY "os items por papel" ON public.service_order_items FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin') OR public.tecnico_da_os(auth.uid(),service_order_id)) WITH CHECK(public.has_role(auth.uid(),'admin') OR public.tecnico_da_os(auth.uid(),service_order_id));
+DROP POLICY IF EXISTS "staff all os fotos" ON public.os_fotos;
+CREATE POLICY "os fotos por papel" ON public.os_fotos FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin') OR public.tecnico_da_os(auth.uid(),service_order_id)) WITH CHECK(public.has_role(auth.uid(),'admin') OR public.tecnico_da_os(auth.uid(),service_order_id));
+DROP POLICY IF EXISTS "staff all" ON public.quotes;
+CREATE POLICY "quotes admin" ON public.quotes FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all quote_items" ON public.quote_items;
+CREATE POLICY "quote_items admin" ON public.quote_items FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.financial_entries;
+CREATE POLICY "financial admin" ON public.financial_entries FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+DROP POLICY IF EXISTS "staff all" ON public.stock_items;
+CREATE POLICY "stock staff read" ON public.stock_items FOR SELECT TO authenticated USING(public.is_staff(auth.uid()));
+CREATE POLICY "stock admin write" ON public.stock_items FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+CREATE OR REPLACE FUNCTION public.proteger_colunas_os() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN
+IF auth.uid() IS NOT NULL AND NOT public.has_role(auth.uid(),'admin') THEN
+ IF (to_jsonb(new)-ARRAY['status','descricao','concluida_em','equipment_id']) IS DISTINCT FROM (to_jsonb(old)-ARRAY['status','descricao','concluida_em','equipment_id']) THEN RAISE EXCEPTION 'Apenas administradores podem alterar os dados comerciais ou reatribuir a OS'; END IF;
+ IF new.equipment_id IS DISTINCT FROM old.equipment_id AND new.equipment_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM public.equipment e JOIN public.locations l ON l.id=e.location_id WHERE e.id=new.equipment_id AND l.client_id=new.client_id) THEN RAISE EXCEPTION 'Aparelho não pertence ao cliente da OS'; END IF;
+END IF; RETURN new; END $$;
+CREATE TRIGGER a_proteger_colunas_os BEFORE UPDATE ON public.service_orders FOR EACH ROW EXECUTE FUNCTION public.proteger_colunas_os();
+CREATE OR REPLACE FUNCTION public.proteger_colunas_agendamento() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN
+IF auth.uid() IS NOT NULL AND NOT public.has_role(auth.uid(),'admin') AND (to_jsonb(new)-ARRAY['status','descricao','fotos']) IS DISTINCT FROM (to_jsonb(old)-ARRAY['status','descricao','fotos']) THEN RAISE EXCEPTION 'Apenas administradores podem reatribuir ou alterar os dados do agendamento'; END IF; RETURN new; END $$;
+CREATE TRIGGER proteger_colunas_agendamento BEFORE UPDATE ON public.appointments FOR EACH ROW EXECUTE FUNCTION public.proteger_colunas_agendamento();
+CREATE OR REPLACE FUNCTION public.guard_last_admin() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN
+PERFORM pg_advisory_xact_lock(724301);
+IF tg_op='INSERT' THEN RETURN new; END IF;
+IF old.role='admin' AND (tg_op='DELETE' OR new.role IS DISTINCT FROM old.role OR new.user_id IS DISTINCT FROM old.user_id) AND NOT EXISTS(SELECT 1 FROM public.user_roles WHERE role='admin' AND id<>old.id) THEN RAISE EXCEPTION 'Não é possível remover o último administrador'; END IF;
+IF tg_op='DELETE' THEN RETURN old; END IF; RETURN new; END $$;
+CREATE TRIGGER guard_last_admin BEFORE INSERT OR UPDATE OR DELETE ON public.user_roles FOR EACH ROW EXECUTE FUNCTION public.guard_last_admin();
+CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN
+PERFORM pg_advisory_xact_lock(724301);
+INSERT INTO public.profiles(id,nome,email) VALUES(new.id,left(coalesce(new.raw_user_meta_data->>'full_name',new.raw_user_meta_data->>'name',split_part(new.email,'@',1)),120),new.email);
+IF NOT EXISTS(SELECT 1 FROM public.user_roles WHERE role='admin') THEN INSERT INTO public.user_roles(user_id,role) VALUES(new.id,'admin'); END IF; RETURN new; END $$;
+ALTER TABLE public.appointments ADD CONSTRAINT appointments_limites CHECK(char_length(nome_contato)<=120 AND char_length(coalesce(descricao,''))<=2000 AND cardinality(fotos)<=3) NOT VALID;
+CREATE OR REPLACE FUNCTION public.validar_reserva() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ DECLARE slots text[]; conflicting boolean; BEGIN
+IF new.status='Cancelada' OR new.data IS NULL OR new.hora IS NULL THEN RETURN new; END IF;
+IF tg_op='UPDATE' AND (new.data,new.hora,new.tipo,new.categoria,new.tecnico_id,new.origem) IS NOT DISTINCT FROM (old.data,old.hora,old.tipo,old.categoria,old.tecnico_id,old.origem) AND old.status<>'Cancelada' THEN RETURN new; END IF;
+PERFORM pg_advisory_xact_lock(724302);
+IF (new.categoria,new.tipo) IN (('Refrigeração','Instalação'),('Elétrica','Quadro')) THEN slots:=CASE WHEN new.hora<'12:00' THEN ARRAY['08:00','09:00','10:00'] ELSE ARRAY['14:00','15:00','16:00'] END; ELSE slots:=ARRAY[new.hora]; END IF;
+SELECT EXISTS(SELECT 1 FROM public.appointments a WHERE a.id<>new.id AND a.data=new.data AND a.hora IS NOT NULL AND a.status<>'Cancelada' AND (new.origem='site' OR a.origem='site' OR (new.tecnico_id IS NOT NULL AND a.tecnico_id=new.tecnico_id)) AND slots && CASE WHEN (a.categoria,a.tipo) IN (('Refrigeração','Instalação'),('Elétrica','Quadro')) THEN CASE WHEN a.hora<'12:00' THEN ARRAY['08:00','09:00','10:00'] ELSE ARRAY['14:00','15:00','16:00'] END ELSE ARRAY[a.hora] END) INTO conflicting;
+IF conflicting THEN RAISE EXCEPTION USING errcode='23505',message='HORARIO_OCUPADO'; END IF; RETURN new; END $$;
+CREATE TRIGGER validar_reserva BEFORE INSERT OR UPDATE ON public.appointments FOR EACH ROW EXECUTE FUNCTION public.validar_reserva();
+CREATE OR REPLACE FUNCTION public.proteger_pecas_os() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ DECLARE oid uuid; locked boolean; BEGIN
+IF tg_op='UPDATE' AND new.service_order_id IS DISTINCT FROM old.service_order_id THEN RAISE EXCEPTION 'Não é permitido transferir peças entre ordens'; END IF;
+IF tg_op='DELETE' THEN oid:=old.service_order_id; ELSE oid:=new.service_order_id; END IF;
+SELECT estoque_baixado INTO locked FROM public.service_orders WHERE id=oid FOR UPDATE;
+IF locked THEN RAISE EXCEPTION 'Reabra a ordem antes de alterar as peças'; END IF;
+IF tg_op<>'DELETE' AND new.quantidade<=0 THEN RAISE EXCEPTION 'Quantidade deve ser maior que zero'; END IF;
+IF tg_op='DELETE' THEN RETURN old; END IF; RETURN new; END $$;
+CREATE TRIGGER proteger_pecas_os BEFORE INSERT OR UPDATE OR DELETE ON public.service_order_items FOR EACH ROW EXECUTE FUNCTION public.proteger_pecas_os();
+CREATE OR REPLACE FUNCTION public.pode_acessar_foto(_path text,_escrever boolean DEFAULT false) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$
+SELECT public.has_role(auth.uid(),'admin') OR (public.is_staff(auth.uid()) AND ((split_part(_path,'/',1)='os' AND EXISTS(SELECT 1 FROM public.service_orders o WHERE o.id::text=split_part(_path,'/',2) AND o.tecnico_id=auth.uid())) OR (split_part(_path,'/',1)='painel' AND EXISTS(SELECT 1 FROM public.appointments a WHERE a.id::text=split_part(_path,'/',2) AND a.tecnico_id=auth.uid())) OR (NOT _escrever AND EXISTS(SELECT 1 FROM public.appointments a WHERE a.tecnico_id=auth.uid() AND _path=ANY(a.fotos))))); $$;
+REVOKE ALL ON FUNCTION public.pode_acessar_foto(text,boolean) FROM public,anon;
+GRANT EXECUTE ON FUNCTION public.pode_acessar_foto(text,boolean) TO authenticated,service_role;
+DROP POLICY IF EXISTS "staff read pedidos" ON storage.objects;
+DROP POLICY IF EXISTS "staff write pedidos" ON storage.objects;
+DROP POLICY IF EXISTS "staff delete pedidos" ON storage.objects;
+CREATE POLICY "assigned read pedidos" ON storage.objects FOR SELECT TO authenticated USING(bucket_id='pedidos' AND public.pode_acessar_foto(name,false));
+CREATE POLICY "assigned write pedidos" ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='pedidos' AND public.pode_acessar_foto(name,true) AND lower(storage.extension(name)) IN ('jpg','jpeg','png','webp','heic'));
+CREATE POLICY "assigned delete pedidos" ON storage.objects FOR DELETE TO authenticated USING(bucket_id='pedidos' AND public.pode_acessar_foto(name,true));
+DROP POLICY IF EXISTS "admin write catalogo files" ON storage.objects;
+CREATE POLICY "admin write catalogo files" ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='catalogo' AND public.has_role(auth.uid(),'admin') AND lower(storage.extension(name)) IN ('jpg','jpeg','png','webp'));
+CREATE OR REPLACE FUNCTION public.validar_path_os() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN IF split_part(new.path,'/',1)<>'os' OR split_part(new.path,'/',2)<>new.service_order_id::text THEN RAISE EXCEPTION 'Foto deve pertencer à pasta da própria OS'; END IF; RETURN new; END $$;
+CREATE TRIGGER validar_path_os BEFORE INSERT OR UPDATE ON public.os_fotos FOR EACH ROW EXECUTE FUNCTION public.validar_path_os();
+REVOKE ALL ON FUNCTION public.proteger_colunas_os(),public.proteger_colunas_agendamento(),public.guard_last_admin(),public.validar_reserva(),public.proteger_pecas_os(),public.validar_path_os() FROM public,anon,authenticated;
