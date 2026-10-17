@@ -49,7 +49,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       if (ticketError || !ticket || !authorizedUpload(ticket, hash, data.fotos)) throw new Error("Envio de fotos inválido ou expirado.");
       for (const path of data.fotos) {
         const { data: info, error: infoError } = await supabaseAdmin.storage.from("pedidos").info(path);
-        if (infoError || !info || validarFotos([{ type: info.contentType, size: info.size }])) throw new Error("Envie novamente as fotos em um formato válido.");
+        if (infoError || !info || typeof info.contentType !== "string" || typeof info.size !== "number" || validarFotos([{ type: info.contentType, size: info.size }])) throw new Error("Envie novamente as fotos em um formato válido.");
       }
       // Atomic consumption makes the authorization single-use even under concurrent requests.
       const { data: consumed, error: consumeError } = await supabaseAdmin.from("booking_upload_authorizations").delete().eq("id", data.uploadId).eq("proof_hash", hash).gt("expires_at", new Date().toISOString()).select("id").maybeSingle();
