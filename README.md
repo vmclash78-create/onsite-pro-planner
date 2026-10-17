@@ -40,7 +40,7 @@ Comece criando a estrutura de navegação, a dashboard com dados de exemplo e o 
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://onsite-pro-planner.lovable.app
+**Live app**: https://vmclimatizacao.lovable.app
 
 ## Build with Lovable
 
