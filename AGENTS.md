@@ -17,6 +17,7 @@
 - Panel screens read/write through the browser Supabase client with role/assignment-scoped RLS and protected-column triggers; presentation access is centralized in src/lib/access.ts — database policies, not hidden controls, enforce permissions.
 - Private photos are authorized by their order/appointment paths; booking conflicts and role changes serialize in database triggers — direct API writes and concurrent requests follow the same rules as the UI.
 - Access is role-based via `user_roles` (admin/tecnico); the first account becomes admin, later accounts wait for an admin in Equipe — prevents open sign-up from exposing data.
+- The last-admin guard permits role cascades only after Auth Admin has removed the underlying account with no user session; direct last-role deletion stays blocked — enables authorized full account resets without leaving orphan roles.
 - Public booking writes only through server functions in src/lib/pedidos.functions.ts (signed upload URLs + validated insert); anon has no table access — keeps customer data private.
 - Public booking shares its input schema between browser and server in src/lib/pedido-validation.ts; browser checks improve feedback but server validation is authoritative — prevents malformed requests bypassing the form.
 - Public booking photos require a hashed, expiring, single-use upload authorization and server-side object checks; consent timestamps are saved with new bookings — prevents cross-booking photo links and preserves consent evidence.
