@@ -117,6 +117,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="VM Climatização" />
         <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
+        <script dangerouslySetInnerHTML={{ __html: RECARREGAR_JS }} />
       </head>
       <body style={{ background: "#ffffff" }}>
         <div id="vm-splash" aria-hidden="true">
@@ -131,6 +132,12 @@ function RootShell({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
+// After an update, cached pages may request old code files; reload once to fetch the new version.
+const RECARREGAR_JS = `(function(){var k="vm-recarga";function r(m){m=String(m||"");if(!/module script|dynamically imported|Failed to fetch|preload/i.test(m))return;var t=+sessionStorage.getItem(k)||0;if(Date.now()-t<15000)return;sessionStorage.setItem(k,Date.now());location.reload();}
+window.addEventListener("vite:preloadError",function(e){e.preventDefault();r("preload")});
+window.addEventListener("error",function(e){r(e.message)});
+window.addEventListener("unhandledrejection",function(e){r(e.reason&&(e.reason.message||e.reason))});})();`;
 
 const SPLASH_CSS = `
 #vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
