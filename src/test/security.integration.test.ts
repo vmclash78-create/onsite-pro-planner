@@ -11,10 +11,16 @@ const technician = createClient<Database>(url, publicKey, { auth: { persistSessi
 const users: string[] = [];
 let ownClient = "", otherClient = "", ownOrder = "", otherOrder = "", ownStock = "";
 let technicianId = "", otherId = "", quoteId = "", entryId = "";
+let bootstrapAdminId = "";
 const appointments: string[] = [];
 
 beforeAll(async () => {
   const password = crypto.randomUUID()+"Aa1";
+  const bootstrap = await service.auth.admin.createUser({email:`reset-admin-${crypto.randomUUID()}@example.com`,password,email_confirm:true});
+  if (bootstrap.error || !bootstrap.data.user) throw new Error("Could not create test admin");
+  bootstrapAdminId = bootstrap.data.user.id;
+  const bootstrapRole = await service.from("user_roles").upsert({user_id:bootstrapAdminId,role:"admin"},{onConflict:"user_id,role"});
+  if (bootstrapRole.error) throw bootstrapRole.error;
   for (let n=0; n<2; n++) {
     const email = `security-${crypto.randomUUID()}@example.com`;
     const {data,error} = await service.auth.admin.createUser({email,password,email_confirm:true});
@@ -45,9 +51,19 @@ afterAll(async () => {
   for(const id of [ownClient,otherClient].filter(Boolean)) await service.from("clients").delete().eq("id",id);
   if(ownStock) await service.from("stock_items").delete().eq("id",ownStock);
   for(const id of users) await service.auth.admin.deleteUser(id);
+  if (bootstrapAdminId) {
+    const removed = await service.auth.admin.deleteUser(bootstrapAdminId);
+    expect(removed.error).toBeNull();
+    const remaining = await service.from("user_roles").select("id").eq("user_id",bootstrapAdminId);
+    expect(remaining.data).toEqual([]);
+  }
 },30000);
 
 describe("Permissões reais pela API", () => {
+  it("não permite apagar diretamente o papel do último administrador", async () => {
+    const result = await service.from("user_roles").delete().eq("user_id",bootstrapAdminId).eq("role","admin");
+    expect(result.error?.message).toContain("último administrador");
+  });
   it("autorização de fotos é privada e consumida apenas uma vez", async () => {
     const ticket = await service.from("booking_upload_authorizations").insert({ proof_hash: "security-test", paths: ["site/test/0.jpg"] }).select("id").single();
     if (ticket.error || !ticket.data) throw new Error("Could not prepare upload authorization test");

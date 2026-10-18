@@ -14,4 +14,16 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("does not require login to open the empty panel", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const panel = router.matchRoutes("/inicio").find((match) => match.routeId === "/_authenticated");
+    expect(panel).toBeDefined();
+    expect(router.routesById["/_authenticated"].options.beforeLoad).toBeUndefined();
+  });
+
+  it("redirects the removed login screen to inicio", async () => {
+    const { Route } = await import("@/routes/auth");
+    expect(() => Route.options.beforeLoad?.({} as never)).toThrow(expect.objectContaining({ options: expect.objectContaining({ to: "/inicio" }) }));
+  });
 });
