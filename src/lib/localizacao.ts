@@ -18,7 +18,7 @@ export async function enderecoAtual(): Promise<EnderecoGps> {
   const { latitude, longitude } = pos.coords;
   const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&accept-language=pt-BR&lat=${latitude}&lon=${longitude}`);
   if (!r.ok) throw new Error("Não foi possível descobrir o endereço. Digite manualmente.");
-  const j = (await r.json()) as { address?: Record<string, string> };
+  const j = (await r.json()) as { address?: Partial<Record<"road" | "pedestrian" | "house_number" | "suburb" | "neighbourhood" | "quarter" | "city" | "town" | "village" | "municipality" | "state" | "postcode" | "ISO3166-2-lvl4", string>> };
   const a = j.address ?? {};
   const cepNum = (a.postcode ?? "").replace(/\D/g, "").slice(0, 8);
   return {
