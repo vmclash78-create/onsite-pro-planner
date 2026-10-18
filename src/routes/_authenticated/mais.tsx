@@ -36,9 +36,9 @@ function Mais() {
             </div>
           </section>
         ))}
-        <button onClick={sair} className="flex w-full items-center gap-3 rounded-lg border bg-card px-4 py-3.5 text-left text-sm text-destructive hover:bg-muted">
+        {me.data && <button onClick={sair} className="flex w-full items-center gap-3 rounded-lg border bg-card px-4 py-3.5 text-left text-sm text-destructive hover:bg-muted">
           <LogOut className="h-4 w-4" strokeWidth={1.75} /> Sair
-        </button>
+        </button>}
       </div>
       <div className="mt-5 text-xs leading-relaxed text-muted-foreground">
         <a href={company.whatsappUrl} className="tabular-nums text-foreground">{company.phoneDisplay}</a>

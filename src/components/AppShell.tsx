@@ -90,7 +90,8 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
 
   let body: ReactNode = children;
   if (me.isLoading) body = <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>;
-  else if (!me.data || !me.data.isStaff)
+  else if (!me.data) body = <div className="py-12 text-center text-sm text-muted-foreground">Nenhum registro disponível.</div>;
+  else if (!me.data.isStaff)
     body = (
       <div className="max-w-md rounded-lg border bg-card p-5 text-sm">
         <p className="font-medium">Aguardando liberação</p>
@@ -125,8 +126,8 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
         </nav>
         <div className="mt-3 border-t border-sidebar-border px-5 pt-4 text-xs leading-relaxed text-muted-foreground">
           <div className="truncate text-sm font-medium text-sidebar-accent-foreground">{me.data?.nome ?? ""}</div>
-          <div>{me.data?.isAdmin ? "Administrador" : me.data?.isStaff ? "Técnico" : "Sem acesso"}</div>
-          <button onClick={sair} className="mt-2 inline-flex items-center gap-1.5 text-sidebar-foreground hover:text-foreground"><LogOut className="h-3.5 w-3.5" /> Sair</button>
+          <div>{me.data?.isAdmin ? "Administrador" : me.data?.isStaff ? "Técnico" : "VM Climatização & Acabamentos"}</div>
+          {me.data && <Button variant="ghost" onClick={sair} className="mt-2 inline-flex items-center gap-1.5 text-sidebar-foreground hover:text-foreground"><LogOut className="h-3.5 w-3.5" /> Sair</Button>}
           <a href={company.whatsappUrl} target="_blank" rel="noreferrer" className="mt-3 block tabular-nums text-sidebar-foreground hover:underline">{company.phoneDisplay}</a>
         </div>
       </aside>
