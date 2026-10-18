@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Vitrine, type ItemEscolhido } from "@/components/Vitrine";
 import { brl } from "@/lib/format";
 import { pedidoSchema, tiposFoto, validarFotos } from "@/lib/pedido-validation";
-import { House, Layers, Snowflake, Zap } from "lucide-react";
+import { House, Layers, LocateFixed, Snowflake, Zap } from "lucide-react";
+import { toast } from "sonner";
 import logoSimbolo from "@/assets/logo-simbolo.png.asset.json";
 import "@/styles/agendar.css";
 
