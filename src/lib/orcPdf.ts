@@ -1,7 +1,7 @@
 // Gera o Orçamento como PDF A4 de verdade (mesmo padrão visual da OS).
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { company } from "@/lib/company";
+import { empresaDe, type Empresa } from "@/lib/company";
 import { brl, dataBR } from "@/lib/format";
 
 const AZUL: [number, number, number] = [37, 99, 235];
@@ -42,7 +42,8 @@ export type OrcParaPdf = {
   marcaUrl: string;
 };
 
-export async function gerarPdfOrcamento(o: OrcParaPdf) {
+export async function gerarPdfOrcamento(o: OrcParaPdf & { empresa?: Empresa }) {
+  const company = o.empresa ?? empresaDe(null);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, H = 297, M = 14, CW = W - M * 2;
   const [logo, marca] = await Promise.all([carregar(o.logoUrl, 900), carregar(o.marcaUrl, 700)]);
@@ -71,7 +72,7 @@ export async function gerarPdfOrcamento(o: OrcParaPdf) {
   }
   doc.setDrawColor(...AZUL).setLineWidth(0.6).line(M, y + 21, M, y + 29);
   doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...CINZA);
-  doc.text(company.addressDisplay, M + 3, y + 24);
+  doc.text(company.cnpj ? `${company.addressDisplay} · CNPJ ${company.cnpj}` : company.addressDisplay, M + 3, y + 24);
   doc.text(`WhatsApp ${company.phoneDisplay} · ${company.instagram}`, M + 3, y + 28);
 
   const bw = 62, bx = W - M - bw, cx = bx + bw / 2;
