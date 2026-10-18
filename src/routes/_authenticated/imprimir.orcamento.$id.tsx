@@ -6,7 +6,7 @@ import logoH from "@/assets/logo-horizontal.png.asset.json";
 import marca from "@/assets/marca-dagua.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { linkWhatsApp, normalizarTelefone, useConfigEmpresa } from "@/lib/cobranca";
-import { company } from "@/lib/company";
+import { empresaDe } from "@/lib/company";
 import { addDias, brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { useOrcamento } from "@/lib/orcamento";
@@ -20,6 +20,7 @@ function PdfOrcamento() {
   const { id } = Route.useParams();
   const q = useOrcamento(id);
   const cfg = useConfigEmpresa();
+  const company = empresaDe(cfg.data);
   const d = q.data;
   const pronto = !!d && !cfg.isLoading;
 
@@ -41,7 +42,7 @@ function PdfOrcamento() {
         codigo, emissao, validade, descricao: d!.descricao, observacoes: d!.observacoes,
         cliente: d!.clients, endereco: loc ? `${loc.endereco}${loc.bairro ? `, ${loc.bairro}` : ""} — ${loc.cidade}` : "",
         itens, total, pix: c?.pix_chave ? { chave: c.pix_chave, nome: c.pix_nome ?? company.name } : null,
-        logoUrl: logoH.url, marcaUrl: marca.url,
+        logoUrl: logoH.url, marcaUrl: marca.url, empresa: empresaDe(c),
       });
       const file = new File([blob], `${codigo}.pdf`, { type: "application/pdf" });
       return { file, paginas: await paginasDoPdf(blob) };
