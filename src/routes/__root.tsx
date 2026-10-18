@@ -109,11 +109,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" style={{ colorScheme: "light", background: "#ffffff" }}>
       <head>
         <HeadContent />
+        <meta name="color-scheme" content="light" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="VM Climatização" />
+        <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
       </head>
-      <body>
+      <body style={{ background: "#ffffff" }}>
+        <div id="vm-splash" aria-hidden="true">
+          <img src="/icon-192.png" alt="" width={84} height={84} />
+          <strong>VM Climatização &amp; Acabamentos</strong>
+          <span>Climatização · Gesso · Elétrica</span>
+          <i><b /></i>
+        </div>
         {children}
         <Scripts />
       </body>
@@ -121,8 +132,25 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const SPLASH_CSS = `
+#vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
+#vm-splash img{border-radius:22px;box-shadow:0 10px 30px rgba(37,99,235,.18);animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
+#vm-splash strong{font-size:16px;font-weight:700;color:#1e293b}
+#vm-splash span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#64748b}
+#vm-splash i{display:block;width:140px;height:3px;border-radius:3px;background:#e2e8f0;overflow:hidden;margin-top:22px}
+#vm-splash b{display:block;width:40%;height:100%;border-radius:3px;background:#2563eb;animation:vmBar 1.1s ease-in-out infinite}
+html.vm-pronto #vm-splash{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes vmPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
+@keyframes vmBar{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+`;
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const t = setTimeout(() => document.documentElement.classList.add("vm-pronto"), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
