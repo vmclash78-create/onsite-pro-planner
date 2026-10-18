@@ -13,9 +13,14 @@ beforeEach(() => { rpc.mockReset(); remove.mockReset(); vi.spyOn(console, "error
 const orfas = (n: number) => Array.from({ length: n }, (_, i) => `site/00000000-0000-0000-0000-000000000000/${i}.jpg`);
 
 describe("limpeza.server", () => {
+  it.each([null, {}, ["os/abc/antes-1.jpg"]])("não apaga nada se a resposta de fotos for inválida: %s", async (data) => {
+    rpc.mockImplementation(async (fn: string) => fn === "limpar_registros_publicos" ? { data: {}, error: null } : { data, error: null });
+    expect((await limparPublico()).ok).toBe(false);
+    expect(remove).not.toHaveBeenCalled();
+  });
   it("remove só caminhos site/ devolvidos pelo banco, em lotes de 100, e reporta ok", async () => {
     rpc.mockImplementation(async (fn: string) =>
-      fn === "limpar_registros_publicos" ? { data: { autorizacoes_removidas: 2 }, error: null } : { data: [...orfas(150), "os/abc/antes-1.jpg"], error: null });
+      fn === "limpar_registros_publicos" ? { data: { autorizacoes_removidas: 2 }, error: null } : { data: orfas(150), error: null });
     remove.mockImplementation(async (p: string[]) => ({ data: p.map((name) => ({ name })), error: null }));
     const r = await limparPublico();
     expect(remove).toHaveBeenCalledTimes(2);

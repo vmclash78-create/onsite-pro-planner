@@ -16,8 +16,8 @@ export async function hashChave(valor: string): Promise<string> {
 }
 
 /**
- * IP do cliente, SOMENTE de `cf-connecting-ip`: o Cloudflare sobrescreve esse cabeçalho, então o cliente
- * não consegue forjá-lo. `x-forwarded-for` e `x-real-ip` NÃO são usados porque qualquer cliente pode
+ * IP do cliente, SOMENTE de `cf-connecting-ip`: a confiança depende de a hospedagem
+ * sobrescrever esse cabeçalho; deve ser verificada depois de publicar. `x-forwarded-for` e `x-real-ip` NÃO são usados porque qualquer cliente pode
  * enviá-los com valores inventados e contornar o limite. Sem cabeçalho confiável, devolve null.
  */
 export function ipDoCliente(req?: Request): string | null {
@@ -75,4 +75,14 @@ export async function observar(escopo: string, alertaEm: number, janelaSeg: numb
   } catch (e) {
     if (e instanceof Error && e.message === MUITAS) console.warn(`VOLUME_ANORMAL: ${escopo} passou de ${alertaEm} em ${janelaSeg}s`);
   }
+}
+
+export async function limitarPedido(whatsapp: string): Promise<void> {
+  await limitarPorIp("pedido-ip", 5, 600);
+  await limitar("pedido-zap", whatsapp.replace(/\D/g, ""), 3, 3600);
+  await observar("pedido-global", 60, 3600);
+}
+
+export async function limitarFotos(): Promise<void> {
+  await limitarPorIp("fotos-ip", 10, 600);
 }

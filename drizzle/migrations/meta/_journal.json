@@ -85,6 +85,13 @@
       "when": 1792287042567,
       "tag": "0011_public_request_limits_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792287118339,
+      "tag": "0012_preserve_order_photo_references_cleanup",
+      "breakpoints": true
     }
   ]
 }
