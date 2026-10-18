@@ -70,7 +70,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         nome_contato: data.nome,
         whatsapp: data.whatsapp,
         cep: data.cep,
-        endereco: `CEP ${data.cep}`,
+        endereco: data.endereco ? `${data.endereco} — CEP ${data.cep}` : `CEP ${data.cep}`,
         descricao: data.descricao || null,
         fotos: data.fotos,
         status: "Pendente",

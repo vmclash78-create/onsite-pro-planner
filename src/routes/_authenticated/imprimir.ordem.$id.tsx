@@ -4,11 +4,11 @@ import marca from "@/assets/marca-dagua.png.asset.json";
 import { useQuery } from "@tanstack/react-query";
 
 import { ArrowLeft, Download, Loader2, MessageCircle, ShieldCheck } from "lucide-react";
-import { linkWhatsApp, normalizarTelefone } from "@/lib/cobranca";
+import { linkWhatsApp, normalizarTelefone, useConfigEmpresa } from "@/lib/cobranca";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { company } from "@/lib/company";
+import { empresaDe, type Empresa } from "@/lib/company";
 import { addDias, brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 
@@ -48,12 +48,13 @@ type OSDados = NonNullable<Awaited<ReturnType<typeof carregarOS>>>;
 function ImprimirOS() {
   const { id } = Route.useParams();
   const q = useQuery({ queryKey: ["ordem-print", id], queryFn: () => carregarOS(id) });
-  if (q.isLoading) return <p className="p-8 text-sm text-muted-foreground">Carregando...</p>;
+  const cfg = useConfigEmpresa();
+  if (q.isLoading || cfg.isLoading) return <p className="p-8 text-sm text-muted-foreground">Carregando...</p>;
   if (q.error || !q.data) return <p className="p-8 text-sm text-destructive">Não foi possível carregar a ordem de serviço.</p>;
-  return <FolhaOS id={id} o={q.data} />;
+  return <FolhaOS id={id} o={q.data} company={empresaDe(cfg.data)} />;
 }
 
-function FolhaOS({ id, o }: { id: string; o: OSDados }) {
+function FolhaOS({ id, o, company }: { id: string; o: OSDados; company: Empresa }) {
   const loc = o.clients?.locations?.[0];
   const ap = o.clients?.locations.flatMap((l) => l.equipment).find((e) => e.id === o.equipment_id);
   const codigo = `OS-${String(o.numero).padStart(4, "0")}`;
@@ -65,7 +66,7 @@ function FolhaOS({ id, o }: { id: string; o: OSDados }) {
   // O PDF é montado assim que a tela abre: a pré-visualização mostra o arquivo
   // real e o botão de baixar entrega na hora (o iPhone exige isso no toque).
   const pdf = useQuery({
-    queryKey: ["ordem-pdf", id, o],
+    queryKey: ["ordem-pdf", id, o, company],
     staleTime: Infinity,
     queryFn: async () => {
       const [{ gerarPdfOS }, { paginasDoPdf }] = await Promise.all([import("@/lib/osPdf"), import("@/lib/pdfPreview")]);
@@ -75,7 +76,7 @@ function FolhaOS({ id, o }: { id: string; o: OSDados }) {
         cliente: o.clients, endereco, equipamento,
         itens: o.service_order_items.map((i) => ({ nome: i.stock_items?.nome ?? "", quantidade: `${String(i.quantidade).replace(".", ",")} ${i.stock_items?.unidade ?? ""}`.trim() })),
         fotosAntes: fotos("antes").map((f) => o.urls[f.path]), fotosDepois: fotos("depois").map((f) => o.urls[f.path]),
-        logoUrl: logoH.url, marcaUrl: marca.url,
+        logoUrl: logoH.url, marcaUrl: marca.url, empresa: company,
       });
       const file = new File([blob], `${codigo}.pdf`, { type: "application/pdf" });
       const paginas = await paginasDoPdf(blob);
@@ -130,7 +131,7 @@ function FolhaOS({ id, o }: { id: string; o: OSDados }) {
             <div className="min-w-0 space-y-3">
               <img src={logoH.url} alt={company.name} className="h-16 w-auto max-w-full object-contain sm:h-[72px]" />
               <div className="space-y-0.5 border-l-2 border-primary pl-3 text-[10px] text-muted-foreground">
-                <div>{company.addressDisplay}</div>
+                <div>{company.addressDisplay}{company.cnpj ? ` · CNPJ ${company.cnpj}` : ""}</div>
                 <div>WhatsApp {company.phoneDisplay} · {company.instagram}</div>
               </div>
             </div>

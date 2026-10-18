@@ -2,7 +2,7 @@
 // sem depender da impressão do navegador.
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { company } from "@/lib/company";
+import { empresaDe, type Empresa } from "@/lib/company";
 import { addDias, brl, dataBR } from "@/lib/format";
 
 // Cores da folha impressa (mesmo azul de destaque do sistema).
@@ -55,7 +55,8 @@ export type OSParaPdf = {
   marcaUrl: string;
 };
 
-export async function gerarPdfOS(o: OSParaPdf) {
+export async function gerarPdfOS(o: OSParaPdf & { empresa?: Empresa }) {
+  const company = o.empresa ?? empresaDe(null);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const W = 210, H = 297, M = 14, CW = W - M * 2;
   const [logo, marca, ...fotos] = await Promise.all([
@@ -95,7 +96,7 @@ export async function gerarPdfOS(o: OSParaPdf) {
   }
   doc.setDrawColor(...AZUL).setLineWidth(0.6).line(M, y + 21, M, y + 29);
   doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...CINZA);
-  doc.text(company.addressDisplay, M + 3, y + 24);
+  doc.text(company.cnpj ? `${company.addressDisplay} · CNPJ ${company.cnpj}` : company.addressDisplay, M + 3, y + 24);
   doc.text(`WhatsApp ${company.phoneDisplay} · ${company.instagram}`, M + 3, y + 28);
 
   // Cartão da OS: conteúdo centralizado, sem lado vazio.

@@ -23,6 +23,7 @@ export function criarPedidoSchema(agora: () => Date = () => new Date()) {
     nome: z.string().trim().min(3).max(120),
     whatsapp: z.string().trim().regex(/^\([1-9]\d\) \d{4,5}-\d{4}$/),
     cep: z.string().regex(/^\d{5}-\d{3}$/),
+    endereco: z.string().trim().max(200).optional(),
     descricao: z.string().trim().max(2000),
     fotos: z.array(z.string().regex(fotoPath)).max(3),
     uploadId: z.string().uuid().optional(),
