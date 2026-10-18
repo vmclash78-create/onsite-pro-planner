@@ -598,6 +598,24 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          chave: string
+          janela: string
+          n: number
+        }
+        Insert: {
+          chave: string
+          janela: string
+          n?: number
+        }
+        Update: {
+          chave?: string
+          janela?: string
+          n?: number
+        }
+        Relationships: []
+      }
       recebimentos: {
         Row: {
           cliente_id: string
@@ -837,6 +855,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      fotos_site_orfas: { Args: { _limite?: number }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -852,8 +871,13 @@ export type Database = {
         }[]
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      limpar_registros_publicos: { Args: never; Returns: Json }
       pode_acessar_foto: {
         Args: { _escrever?: boolean; _path: string }
+        Returns: boolean
+      }
+      rate_limit_hit: {
+        Args: { _chave: string; _janela_seg: number; _max: number }
         Returns: boolean
       }
       registrar_pagamento: {
