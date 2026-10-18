@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/public/cron/agenda-dia")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { enviarPush } = await import("@/lib/push.server");
           const hoje = new Date(Date.now() - 3 * 3600_000).toISOString().slice(0, 10);
-          const { data: ags } = await supabaseAdmin.from("appointments").select("tecnico_id, status").eq("data", hoje).neq("status", "Cancelado");
+          const { data: ags } = await supabaseAdmin.from("appointments").select("tecnico_id, status").eq("data", hoje).neq("status", "Cancelada");
           const { count: pend } = await supabaseAdmin.from("appointments").select("id", { count: "exact", head: true }).eq("status", "Pendente");
           const lista = ags ?? [];
           const plural = (n: number) => `${n} atendimento${n === 1 ? "" : "s"}`;
