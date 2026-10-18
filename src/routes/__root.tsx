@@ -133,7 +133,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const SPLASH_CSS = `
-#vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
+#vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .2s ease,visibility .2s;}
 #vm-splash img{border-radius:22px;box-shadow:0 10px 30px rgba(37,99,235,.18);animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
 #vm-splash strong{font-size:16px;font-weight:700;color:#1e293b}
 #vm-splash span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#64748b}
@@ -148,8 +148,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    const t = setTimeout(() => document.documentElement.classList.add("vm-pronto"), 350);
-    return () => clearTimeout(t);
+    document.documentElement.classList.add("vm-pronto");
   }, []);
 
   return (
