@@ -36,6 +36,7 @@ import { Route as AuthenticatedPedidosIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedPedidosIdRouteImport } from './routes/_authenticated/pedidos.$id'
 import { Route as AuthenticatedImprimirOrcamentoIdRouteImport } from './routes/_authenticated/imprimir.orcamento.$id'
 import { Route as AuthenticatedImprimirOrdemIdRouteImport } from './routes/_authenticated/imprimir.ordem.$id'
+import { Route as ApiPublicCronAgendaDiaRouteImport } from './routes/api/public/cron/agenda-dia'
 import { Route as ApiPublicCronLimpezaRouteImport } from './routes/api/public/cron/limpeza'
 
 const IndexRoute = IndexRouteImport.update({
@@ -177,6 +178,11 @@ const AuthenticatedImprimirOrdemIdRoute =
     path: '/imprimir/ordem/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCronAgendaDiaRoute = ApiPublicCronAgendaDiaRouteImport.update({
+  id: '/api/public/cron/agenda-dia',
+  path: '/api/public/cron/agenda-dia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronLimpezaRoute = ApiPublicCronLimpezaRouteImport.update({
   id: '/api/public/cron/limpeza',
   path: '/api/public/cron/limpeza',
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
   '/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
+  '/api/public/cron/agenda-dia': typeof ApiPublicCronAgendaDiaRoute
   '/api/public/cron/limpeza': typeof ApiPublicCronLimpezaRoute
 }
 export interface FileRoutesByTo {
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/pedidos': typeof AuthenticatedPedidosIndexRoute
   '/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
   '/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
+  '/api/public/cron/agenda-dia': typeof ApiPublicCronAgendaDiaRoute
   '/api/public/cron/limpeza': typeof ApiPublicCronLimpezaRoute
 }
 export interface FileRoutesById {
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/_authenticated/pedidos/': typeof AuthenticatedPedidosIndexRoute
   '/_authenticated/imprimir/orcamento/$id': typeof AuthenticatedImprimirOrcamentoIdRoute
   '/_authenticated/imprimir/ordem/$id': typeof AuthenticatedImprimirOrdemIdRoute
+  '/api/public/cron/agenda-dia': typeof ApiPublicCronAgendaDiaRoute
   '/api/public/cron/limpeza': typeof ApiPublicCronLimpezaRoute
 }
 export interface FileRouteTypes {
@@ -301,6 +310,7 @@ export interface FileRouteTypes {
     | '/pedidos/'
     | '/imprimir/orcamento/$id'
     | '/imprimir/ordem/$id'
+    | '/api/public/cron/agenda-dia'
     | '/api/public/cron/limpeza'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/pedidos'
     | '/imprimir/orcamento/$id'
     | '/imprimir/ordem/$id'
+    | '/api/public/cron/agenda-dia'
     | '/api/public/cron/limpeza'
   id:
     | '__root__'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pedidos/'
     | '/_authenticated/imprimir/orcamento/$id'
     | '/_authenticated/imprimir/ordem/$id'
+    | '/api/public/cron/agenda-dia'
     | '/api/public/cron/limpeza'
   fileRoutesById: FileRoutesById
 }
@@ -370,6 +382,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CatalogoRoute: typeof CatalogoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  ApiPublicCronAgendaDiaRoute: typeof ApiPublicCronAgendaDiaRoute
   ApiPublicCronLimpezaRoute: typeof ApiPublicCronLimpezaRoute
 }
 
@@ -564,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImprimirOrdemIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cron/agenda-dia': {
+      id: '/api/public/cron/agenda-dia'
+      path: '/api/public/cron/agenda-dia'
+      fullPath: '/api/public/cron/agenda-dia'
+      preLoaderRoute: typeof ApiPublicCronAgendaDiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/limpeza': {
       id: '/api/public/cron/limpeza'
       path: '/api/public/cron/limpeza'
@@ -632,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CatalogoRoute: CatalogoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  ApiPublicCronAgendaDiaRoute: ApiPublicCronAgendaDiaRoute,
   ApiPublicCronLimpezaRoute: ApiPublicCronLimpezaRoute,
 }
 export const routeTree = rootRouteImport
