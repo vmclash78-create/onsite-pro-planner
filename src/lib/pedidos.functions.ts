@@ -13,8 +13,8 @@ export const prepararFotos = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!data.tipos.length) return [];
-    const { limitarPorIp } = await import("@/lib/rate-limit.server");
-    await limitarPorIp("fotos-ip", 10, 600);
+    const { limitarFotos } = await import("@/lib/rate-limit.server");
+    await limitarFotos();
     const pasta = crypto.randomUUID();
     const slots: { path: string; token: string }[] = [];
     for (let i = 0; i < data.tipos.length; i++) {
@@ -35,10 +35,8 @@ export const prepararFotos = createServerFn({ method: "POST" })
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((d) => pedidoSchema.parse(d))
   .handler(async ({ data }) => {
-    const { limitar, limitarPorIp, observar } = await import("@/lib/rate-limit.server");
-    await limitarPorIp("pedido-ip", 5, 600);
-    await limitar("pedido-zap", data.whatsapp.replace(/\D/g, ""), 3, 3600);
-    await observar("pedido-global", 60, 3600);
+    const { limitarPedido } = await import("@/lib/rate-limit.server");
+    await limitarPedido(data.whatsapp);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!data.visita && data.data && data.hora) {
       const { data: livre, error: disponibilidade } = await supabaseAdmin.rpc("horarios_ocupados", { _inicio: data.data, _fim: data.data });
