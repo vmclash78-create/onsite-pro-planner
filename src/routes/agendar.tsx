@@ -129,6 +129,10 @@ function Agendar() {
         setErroEnvio("Esse horário acabou de ser ocupado. Escolha outro.");
         return;
       }
+      if (e instanceof Error && e.message.includes("MUITAS_TENTATIVAS")) {
+        setErroEnvio("Recebemos muitos pedidos deste aparelho ou WhatsApp em pouco tempo. Tente mais tarde ou fale conosco pelo WhatsApp.");
+        return;
+      }
       setErroEnvio(e instanceof Error && e.message.includes("FOTO_ERRO") ? "Não foi possível enviar as fotos. Tente novamente; a solicitação não foi registrada." : "Não foi possível enviar agora. Tente de novo ou fale pelo WhatsApp.");
     } finally { setEnviando(false); }
   };

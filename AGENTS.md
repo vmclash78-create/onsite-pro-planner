@@ -27,3 +27,6 @@
 - Public catalog (/catalogo) reads catalogo_itens via anon RLS (ativo only); images in public bucket catalogo — only showcase data is public.
 - Completing a service order deducts its service_order_items from stock and refreshes the linked equipment's last maintenance (trigger os_conclusao) — stock and preventive dates stay consistent.
 - Service order PDFs are generated client-side with jsPDF (src/lib/osPdf.ts) on page open, previewed as page images via pdfjs-dist v4 (src/lib/pdfPreview.ts; v5 needs browser APIs older phones lack) and delivered synchronously on tap (share sheet on touch, download otherwise) — browser print and window.open fail inside the preview frame and on iOS.
+
+- Public abuse counters use atomic service-only RPCs in rate-limit.server.ts, with keyed hashes, fixed windows, fail-open logs and no global blocking; only cf-connecting-ip is considered and hosting trust must be verified — reduces common abuse without a global denial-of-service switch.
+- Public cleanup runs through an authenticated managed HTTP schedule and removes only aged unreferenced site uploads via Storage API; active upload tickets are excluded — preserves customer photos and records failures.
