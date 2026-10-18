@@ -2,9 +2,10 @@
 
 - [x] Reforçar validação do agendamento e das fotos, proteção anti-robô simples, cabeçalhos e entrada da IA
 - [x] Executar testes e revisar os achados de segurança restantes
-- [ ] Aplicar proteção provisória autorizada e verificar limites, concorrência e permissões
-- [ ] Configurar e conferir fotos e limpeza diária protegida
-- [ ] Verificar IP e bloqueio no site publicado após publicação
+- [x] Aplicar proteção provisória autorizada e verificar limites, concorrência e permissões
+- [x] Configurar e conferir fotos e limpeza diária protegida
+- [ ] Verificar IP e bloqueio no site publicado: aguarda publicação; prévia não recebe cf-connecting-ip
+- [ ] Confirmar primeira execução do agendador: aguarda publicação da limpeza, atualmente ausente no site publicado; chamada autenticada na prévia retornou 200 e ok=true
 
 - [x] Corrigir e aplicar o arquivo de segurança enviado (permissões, fotos, reservas e proteção do administrador)
 - [x] Ajustar os controles da equipe e testar as permissões reais
