@@ -219,24 +219,48 @@ export type Database = {
       configuracoes_empresa: {
         Row: {
           atualizado_em: string
+          cidade: string | null
+          cnpj: string | null
+          endereco: string | null
           id: number
+          instagram: string | null
+          nome_fantasia: string | null
           pix_chave: string | null
           pix_cidade: string | null
           pix_nome: string | null
+          razao_social: string | null
+          telefone: string | null
+          uf: string | null
         }
         Insert: {
           atualizado_em?: string
+          cidade?: string | null
+          cnpj?: string | null
+          endereco?: string | null
           id?: number
+          instagram?: string | null
+          nome_fantasia?: string | null
           pix_chave?: string | null
           pix_cidade?: string | null
           pix_nome?: string | null
+          razao_social?: string | null
+          telefone?: string | null
+          uf?: string | null
         }
         Update: {
           atualizado_em?: string
+          cidade?: string | null
+          cnpj?: string | null
+          endereco?: string | null
           id?: number
+          instagram?: string | null
+          nome_fantasia?: string | null
           pix_chave?: string | null
           pix_cidade?: string | null
           pix_nome?: string | null
+          razao_social?: string | null
+          telefone?: string | null
+          uf?: string | null
         }
         Relationships: []
       }
