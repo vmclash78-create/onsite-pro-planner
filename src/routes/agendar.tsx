@@ -63,6 +63,20 @@ function Agendar() {
   const [nome, setNome] = useState("");
   const [whats, setWhats] = useState("");
   const [cep, setCep] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [gps, setGps] = useState(false);
+  const usarGps = async () => {
+    setGps(true);
+    try {
+      const { enderecoAtual } = await import("@/lib/localizacao");
+      const e = await enderecoAtual();
+      const txt = [[e.rua, e.numero].filter(Boolean).join(", "), e.bairro, e.cidade && `${e.cidade}${e.uf ? `/${e.uf}` : ""}`].filter(Boolean).join(" — ");
+      if (txt) setEndereco(txt.slice(0, 200));
+      if (e.cep) setCep(e.cep);
+      toast.success("Localização preenchida. Confira o número da casa.");
+    } catch (err) { toast.error(err instanceof Error ? err.message : "Não foi possível pegar a localização."); }
+    finally { setGps(false); }
+  };
   const [desc, setDesc] = useState("");
   const [fotos, setFotos] = useState<File[]>([]);
   const [enviando, setEnviando] = useState(false);
@@ -106,7 +120,7 @@ function Agendar() {
   const enviar = async () => {
     setEnviando(true); setErroEnvio(null);
     try {
-      const entrada = { categoria: area, tipo, visita, data, hora, nome, whatsapp: whats, cep, descricao: desc, fotos: [], lgpd, website: isca };
+      const entrada = { categoria: area, tipo, visita, data, hora, nome, whatsapp: whats, cep, endereco: endereco.trim() || undefined, descricao: desc, fotos: [], lgpd, website: isca };
       const validacao = pedidoSchema.safeParse(entrada);
       if (!validacao.success) { setErroEnvio(validacao.error.issues[0]?.message ?? "Confira os dados da solicitação."); return; }
       const erroFotos = validarFotos(fotos);
@@ -155,6 +169,7 @@ function Agendar() {
       `*Serviço:* ${servico ? servico.titulo : `${tipo} de ${area.toLowerCase()}`}`,
       `*Quando:* ${resumo}`,
       `*Nome:* ${nome}`,
+      ...(endereco.trim() ? [`*Endereço:* ${endereco.trim()}`] : []),
       `*CEP:* ${cep}`,
       desc.trim() ? `*${txt.rotulo}:* ${desc.trim()}` : "",
       ``,
@@ -288,6 +303,11 @@ function Agendar() {
             <input className="t" id="nome" autoComplete="name" maxLength={120} placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} />
             <label className="f" htmlFor="whats">Telefone (WhatsApp)</label>
             <input className="t" id="whats" inputMode="tel" autoComplete="tel" placeholder="(88) 90000-0000" value={whats} onChange={(e) => setWhats(maskWhats(e.target.value))} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+              <label className="f" htmlFor="endereco">Endereço do atendimento</label>
+              <Button type="button" variant="outline" size="sm" disabled={gps} onClick={usarGps}><LocateFixed className="mr-1 h-4 w-4" />{gps ? "Localizando..." : "Usar minha localização"}</Button>
+            </div>
+            <input className="t" id="endereco" autoComplete="street-address" maxLength={200} placeholder="Rua, número, bairro, cidade" value={endereco} onChange={(e) => setEndereco(e.target.value)} />
             <label className="f" htmlFor="cep">CEP</label>
             <input className="t" id="cep" inputMode="numeric" autoComplete="postal-code" placeholder="00000-000" value={cep} onChange={(e) => setCep(maskCep(e.target.value))} />
             <label className="f" htmlFor="desc">Descrição da necessidade</label>
