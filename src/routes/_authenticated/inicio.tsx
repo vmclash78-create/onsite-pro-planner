@@ -6,7 +6,6 @@ import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Panel, StateRow, Status } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
 import { brl, dataBR, isoLocal, addDias, diasEntre } from "@/lib/format";
-import { pageHead } from "@/lib/seo";
 import { CATEGORIAS, useMe } from "@/lib/staff";
 import { statusRecebimento } from "@/lib/cobranca";
 
