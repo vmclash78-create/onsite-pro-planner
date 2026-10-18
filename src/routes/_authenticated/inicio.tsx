@@ -6,12 +6,21 @@ import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Panel, StateRow, Status } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
 import { brl, dataBR, isoLocal, addDias, diasEntre } from "@/lib/format";
-import { pageHead } from "@/lib/seo";
 import { CATEGORIAS, useMe } from "@/lib/staff";
 import { statusRecebimento } from "@/lib/cobranca";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
-  head: pageHead("Início", "Agenda do dia, orçamentos pendentes e ordens de serviço."),
+  // Nome sem prefixo "Início —": é ele que aparece ao adicionar o painel à tela de início do celular.
+  head: () => ({
+    meta: [
+      { title: "VM Climatização & Acabamentos" },
+      { name: "description", content: "Agenda do dia, orçamentos pendentes e ordens de serviço." },
+      { property: "og:title", content: "VM Climatização & Acabamentos" },
+      { property: "og:description", content: "Agenda do dia, orçamentos pendentes e ordens de serviço." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Dashboard,
 });
 
