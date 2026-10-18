@@ -96,6 +96,11 @@ function Agendar() {
     setData(null); setHora(null); setVisita(false); setAba("agendar"); go(2);
   };
   const trocar = () => { setServico(null); go(1); };
+  const recomecar = (destino: "agendar" | "vitrine") => {
+    setOk(false); setProtocolo(""); setServico(null); setTipo(""); setData(null); setHora(null); setVisita(false);
+    setNome(""); setWhats(""); setCep(""); setEndereco(""); setDesc(""); setFotos([]); setLgpd(false); setErroEnvio(null);
+    setAba(destino); go(1);
+  };
 
   const ocup = useQuery({
     queryKey: ["ocupados", dias[0] ? iso(dias[0]) : ""],
@@ -186,6 +191,10 @@ function Agendar() {
         </main>
         <footer className="ft">
           <a className="b go" href={`${company.whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">Confirmar solicitação via WhatsApp</a>
+          <div className="bt" style={{ marginTop: 10 }}>
+            <Button variant="ghost" className="b bk" onClick={() => recomecar("agendar")}>Novo agendamento</Button>
+            <Button variant="ghost" className="b bk" onClick={() => recomecar("vitrine")}>Ver serviços</Button>
+          </div>
         </footer>
       </div></div>
     );
