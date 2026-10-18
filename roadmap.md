@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Apagar todos os registros de trabalho, configurações, vitrine e arquivos armazenados
+- [ ] Apagar as contas atuais com segurança
+- [ ] Retirar a tela de login sem liberar dados privados e verificar o painel vazio
+
 - [x] Reforçar validação do agendamento e das fotos, proteção anti-robô simples, cabeçalhos e entrada da IA
 - [x] Executar testes e revisar os achados de segurança restantes
 - [x] Aplicar proteção provisória autorizada e verificar limites, concorrência e permissões
