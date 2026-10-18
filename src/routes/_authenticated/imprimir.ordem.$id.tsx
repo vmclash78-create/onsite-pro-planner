@@ -66,7 +66,7 @@ function FolhaOS({ id, o, company }: { id: string; o: OSDados; company: Empresa 
   // O PDF é montado assim que a tela abre: a pré-visualização mostra o arquivo
   // real e o botão de baixar entrega na hora (o iPhone exige isso no toque).
   const pdf = useQuery({
-    queryKey: ["ordem-pdf", id, o],
+    queryKey: ["ordem-pdf", id, o, company],
     staleTime: Infinity,
     queryFn: async () => {
       const [{ gerarPdfOS }, { paginasDoPdf }] = await Promise.all([import("@/lib/osPdf"), import("@/lib/pdfPreview")]);
