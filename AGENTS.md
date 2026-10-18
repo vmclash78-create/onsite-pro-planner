@@ -13,7 +13,7 @@
 - Shared semantic tokens define the system theme; public booking aliases those tokens and shared layout primitives constrain content widths — keeps colors and device adaptation consistent across screens.
 - Internal panel pages use `AppShell` (src/components/AppShell.tsx) for sidebar/mobile nav; the public booking page (/agendar) renders without it — keeps public and staff UI separated.
 - Formatting of dates/currency goes through src/lib/format.ts (pt-BR) — single source for BR formats.
-- Panel routes remain under src/routes/_authenticated/ with SSR disabled; signed-out visitors see an empty shell, `/auth` redirects to `/inicio`, and anonymous database privileges are unchanged — removes the login screen without exposing private data or granting staff access.
+- Panel routes live under src/routes/_authenticated/ with SSR disabled and a client-side session gate redirecting to /auth; the first account becomes admin — keeps private data behind login.
 - Panel screens read/write through the browser Supabase client with role/assignment-scoped RLS and protected-column triggers; presentation access is centralized in src/lib/access.ts — database policies, not hidden controls, enforce permissions.
 - Private photos are authorized by their order/appointment paths; booking conflicts and role changes serialize in database triggers — direct API writes and concurrent requests follow the same rules as the UI.
 - Access is role-based via `user_roles` (admin/tecnico); the first account becomes admin, later accounts wait for an admin in Equipe — prevents open sign-up from exposing data.

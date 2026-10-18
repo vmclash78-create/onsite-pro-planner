@@ -15,15 +15,14 @@ describe("App routing", () => {
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
 
-  it("does not require login to open the empty panel", () => {
+  it("requires login to open the panel", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
-    const panel = router.matchRoutes("/inicio").find((match) => match.routeId === "/_authenticated");
-    expect(panel).toBeDefined();
-    expect(router.routesById["/_authenticated"].options.beforeLoad).toBeUndefined();
+    expect(router.routesById["/_authenticated"].options.beforeLoad).toBeDefined();
   });
 
-  it("redirects the removed login screen to inicio", async () => {
+  it("shows the login screen instead of redirecting", async () => {
     const { Route } = await import("@/routes/auth");
-    expect(() => Route.options.beforeLoad?.({} as never)).toThrow(expect.objectContaining({ options: expect.objectContaining({ to: "/inicio" }) }));
+    expect(Route.options.beforeLoad).toBeUndefined();
+    expect(Route.options.component).toBeDefined();
   });
 });
