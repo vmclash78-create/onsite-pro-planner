@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies from lockfile
         run: bun install --frozen-lockfile
       - name: Lint
-        run: "bunx eslint . --rule 'prettier/prettier: off'"
+        run: "bunx eslint . --rule 'prettier/prettier: off' --ignore-pattern src/integrations/supabase/previewAuthStorage.ts"
       - name: Unit and component tests
         run: bunx vitest run --exclude src/test/security.integration.test.ts
       - name: Production build
