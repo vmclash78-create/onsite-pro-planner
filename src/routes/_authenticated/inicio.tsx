@@ -197,7 +197,7 @@ function Saudacao({ nome }: { nome: string }) {
   const agora = new Date();
   const h = agora.getHours();
   const turno = h >= 5 && h < 12 ? "Bom dia" : h >= 12 && h < 18 ? "Boa tarde" : "Boa noite";
-  const primeiro = (nome.includes("@") ? nome.split("@")[0] : nome).trim().split(/\s+/)[0] ?? "";
+  const primeiro = ((nome.includes("@") ? nome.split("@")[0] : nome) ?? "").trim().split(/\s+/)[0] ?? "";
   const data = agora.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
   return (
     <p className="mb-4 text-sm text-muted-foreground">
