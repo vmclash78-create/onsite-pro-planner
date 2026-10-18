@@ -54,7 +54,7 @@ export function tocarAviso(id?: string) {
     ctx ??= new AudioContext();
     void ctx.resume();
     const c = ctx, t0 = c.currentTime + 0.02;
-    const toque = TOQUES[id ?? toqueAtual()] ?? TOQUES.nota!;
+    const toque = TOQUES[id ?? toqueAtual()] ?? TOQUES["nota"]!;
     toque.notas.forEach((n) => {
       const o = c.createOscillator(), g = c.createGain();
       o.frequency.value = n.f; o.type = n.tipo ?? "sine";
