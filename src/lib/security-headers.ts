@@ -5,7 +5,7 @@ export function comCabecalhosSeguranca(response: Response, request: Request): Re
   const defaults: Record<string, string> = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+    "Permissions-Policy": "camera=(self), microphone=(), geolocation=(self), payment=(), usb=()",
     "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     "Content-Security-Policy": "object-src 'none'; base-uri 'self'",
   };
