@@ -193,6 +193,19 @@ function AvisoPedidos({ enabled }: { enabled: boolean }) {
   );
 }
 
+function Saudacao({ nome }: { nome: string }) {
+  const agora = new Date();
+  const h = agora.getHours();
+  const turno = h >= 5 && h < 12 ? "Bom dia" : h >= 12 && h < 18 ? "Boa tarde" : "Boa noite";
+  const primeiro = ((nome.includes("@") ? nome.split("@")[0] : nome) ?? "").trim().split(/\s+/)[0] ?? "";
+  const data = agora.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+  return (
+    <p className="mb-4 text-sm text-muted-foreground">
+      <b className="font-semibold text-foreground">{turno}{primeiro ? `, ${primeiro}` : ""}!</b> · {data}
+    </p>
+  );
+}
+
 function Dashboard() {
   const me = useMe();
   const q = useDashboard(!!me.data?.isStaff);
@@ -211,6 +224,7 @@ function Dashboard() {
 
   return (
     <AppShell title="Início" actions={<PrimaryButton label="Novo agendamento" to="/agenda" />}>
+      {me.data && <Saudacao nome={me.data.nome} />}
       {me.data?.isAdmin && <AvisoPedidos enabled />}
       {me.data?.isAdmin && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {([["/clientes", "Novo cliente", UserPlus], ["/ordens", "Nova OS", Wrench], ["/orcamentos", "Novo orçamento", FileText], ["/agenda", "Agendamento", CalendarPlus]] as const).map(([to, l, I]) => (
