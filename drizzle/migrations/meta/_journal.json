@@ -92,6 +92,13 @@
       "when": 1792287118339,
       "tag": "0012_preserve_order_photo_references_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792291079069,
+      "tag": "0013_allow_auth_account_removal_without_orphan_roles",
+      "breakpoints": true
     }
   ]
 }
