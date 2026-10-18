@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { Bell, BellRing, Check, Loader2, Volume2 } from "lucide-react";
+import { Bell, BellRing, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Panel } from "@/components/kit";
 import { Button } from "@/components/ui/button";
-import { TOQUES, ativarPush, ehAppInstalado, escolherToque, pushAtivo, suportaPush, toqueAtual, tocarAviso } from "@/lib/notificacoes";
+import { ativarPush, avisoSistema, ehAppInstalado, pushAtivo, suportaPush } from "@/lib/notificacoes";
 import { testarPush } from "@/lib/push.functions";
 
 export function NotificacoesAparelho() {
   const [estado, setEstado] = useState<"carregando" | "ativo" | "inativo" | "sem-suporte">("carregando");
   const [ocupado, setOcupado] = useState(false);
   const [ios, setIos] = useState(false);
-  const [toque, setToque] = useState("nota");
 
   useEffect(() => {
-    setToque(toqueAtual());
     setIos(/iphone|ipad/i.test(navigator.userAgent) && !ehAppInstalado());
     if (!suportaPush()) { setEstado("sem-suporte"); return; }
     void pushAtivo().then((a) => setEstado(a ? "ativo" : "inativo"));
@@ -50,21 +48,7 @@ export function NotificacoesAparelho() {
             <Button onClick={ativar} disabled={ocupado}>{ocupado ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />} Ativar notificações</Button>
           ) : null}
         </div>
-        <div className="pt-2">
-          <p className="mb-2 font-medium">Toque de aviso com o painel aberto</p>
-          <ul className="divide-y rounded-md border">
-            {Object.entries(TOQUES).map(([id, t]) => (
-              <li key={id} className="flex items-center gap-2 px-3 py-2">
-                <button type="button" className="flex flex-1 items-center gap-2 text-left" aria-pressed={toque === id}
-                  onClick={() => { setToque(id); escolherToque(id); tocarAviso(id); }}>
-                  <Check className={`h-4 w-4 text-primary ${toque === id ? "" : "invisible"}`} />{t.nome}
-                </button>
-                <Button size="sm" variant="ghost" aria-label={`Ouvir ${t.nome}`} onClick={() => tocarAviso(id)}><Volume2 className="h-4 w-4" /></Button>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2 text-xs text-muted-foreground">Com o app fechado, o celular usa o próprio som de notificação escolhido nos Ajustes do aparelho.</p>
-        </div>
+        <p className="text-xs text-muted-foreground">O aviso usa o som de notificação do próprio celular, escolhido nos Ajustes do aparelho.</p>
       </div>
     </Panel>
   );

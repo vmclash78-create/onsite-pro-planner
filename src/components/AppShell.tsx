@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
 import { Button } from "@/components/ui/button";
 import { canOpenPanel, canSeeNav } from "@/lib/access";
-import { definirContador, tocarAviso } from "@/lib/notificacoes";
+import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
@@ -92,9 +92,9 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
     const ch = supabase.channel("appointments-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, (p) => {
         for (const k of ["pedidos", "agenda", "dashboard"]) qc.invalidateQueries({ queryKey: [k] });
-        const novo = p.new as { status?: string; nome_contato?: string } | null;
+        const novo = p.new as { id?: string; status?: string; nome_contato?: string } | null;
         if (p.eventType === "INSERT" && novo?.status === "Pendente") {
-          tocarAviso();
+          void avisoSistema("Novo agendamento recebido", novo.nome_contato ?? "Toque para ver os pedidos.", `pedido-${novo.id ?? ""}`);
           toast.success("Novo agendamento recebido", { description: novo.nome_contato ?? undefined, action: { label: "Ver", onClick: () => { window.location.href = "/pedidos"; } } });
         }
         void atualizarContador();
