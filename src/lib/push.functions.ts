@@ -19,7 +19,7 @@ export const salvarInscricaoPush = createServerFn({ method: "POST" })
   .inputValidator((d) => subSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("push_subscriptions").upsert({ ...data, user_id: context.userId }, { onConflict: "endpoint" });
+    const { error } = await supabaseAdmin.from("push_subscriptions").upsert({ endpoint: data.endpoint, p256dh: data.p256dh, auth: data.auth, aparelho: data.aparelho ?? null, user_id: context.userId }, { onConflict: "endpoint" });
     if (error) throw new Error("Não foi possível ativar as notificações.");
     return { ok: true };
   });

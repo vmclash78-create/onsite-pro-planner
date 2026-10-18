@@ -20,7 +20,7 @@ export async function ativarPush() {
   const { publicKey } = await chavePublicaPush();
   const sub = (await reg.pushManager.getSubscription()) ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toBytes(publicKey) }));
   const j = sub.toJSON();
-  await salvarInscricaoPush({ data: { endpoint: sub.endpoint, p256dh: j.keys?.p256dh ?? "", auth: j.keys?.auth ?? "", aparelho: navigator.userAgent.slice(0, 200) } });
+  await salvarInscricaoPush({ data: { endpoint: sub.endpoint, p256dh: j.keys?.["p256dh"] ?? "", auth: j.keys?.["auth"] ?? "", aparelho: navigator.userAgent.slice(0, 200) } });
 }
 
 export async function pushAtivo() {
