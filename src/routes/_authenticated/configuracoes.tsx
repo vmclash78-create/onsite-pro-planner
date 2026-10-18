@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LinkCliente } from "@/components/LinkCliente";
+import { NotificacoesAparelho } from "@/components/NotificacoesAparelho";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Field, Panel, StateRow, inputCls } from "@/components/kit";
@@ -25,6 +26,7 @@ function Configuracoes() {
     <AppShell title="Configurações">
       {!admin && me.data && <p className="mb-4 text-sm text-muted-foreground">Somente administradores podem alterar estas configurações.</p>}
       <LinkCliente />
+      <div className="mt-5"><NotificacoesAparelho /></div>
       <div className="mt-5"><DadosEmpresa admin={admin} /></div>
       <div className="mt-5"><PixConfig admin={admin} /></div>
       <div className="mt-5"><Modelos admin={admin} /></div>

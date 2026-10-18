@@ -85,6 +85,14 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("criarPedido", error.code);
       throw new Error("Não foi possível registrar o pedido.");
     }
+    try {
+      const { enviarPush } = await import("@/lib/push.server");
+      const { count } = await supabaseAdmin.from("appointments").select("id", { count: "exact", head: true }).eq("status", "Pendente");
+      const quando = data.visita ? "Visita para orçamento" : `${data.data?.split("-").reverse().join("/")} às ${data.hora}`;
+      await enviarPush({ title: "Novo agendamento recebido", body: `${data.nome} · ${data.categoria} – ${data.tipo} · ${quando}`, url: "/pedidos", tag: `pedido-${row.id}`, badge: count ?? 1 });
+    } catch (e) {
+      console.error("aviso pedido", e instanceof Error ? e.message : e);
+    }
     return { protocolo: row.id.slice(0, 8).toUpperCase() };
   });
 

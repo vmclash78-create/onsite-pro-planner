@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/staff";
 import { Button } from "@/components/ui/button";
 import { canOpenPanel, canSeeNav } from "@/lib/access";
+import { definirContador, tocarAviso } from "@/lib/notificacoes";
+import { toast } from "sonner";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
@@ -79,14 +81,27 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
   const groups = navGroups.map((g) => ({ ...g, itens: g.itens.filter((i) => canSeeNav(i.to, !!me.data?.isAdmin)) })).filter((g) => g.itens.length);
   const sair = useSignOut();
   const qc = useQueryClient();
+  const isStaff = !!me.data?.isStaff;
   useEffect(() => {
+    if (!isStaff) return;
+    const atualizarContador = async () => {
+      const { count } = await supabase.from("appointments").select("id", { count: "exact", head: true }).eq("status", "Pendente");
+      definirContador(count ?? 0);
+    };
+    void atualizarContador();
     const ch = supabase.channel("appointments-live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, (p) => {
         for (const k of ["pedidos", "agenda", "dashboard"]) qc.invalidateQueries({ queryKey: [k] });
+        const novo = p.new as { status?: string; nome_contato?: string } | null;
+        if (p.eventType === "INSERT" && novo?.status === "Pendente") {
+          tocarAviso();
+          toast.success("Novo agendamento recebido", { description: novo.nome_contato ?? undefined, action: { label: "Ver", onClick: () => { window.location.href = "/pedidos"; } } });
+        }
+        void atualizarContador();
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [qc]);
+  }, [qc, isStaff]);
 
   let body: ReactNode = children;
   if (me.isLoading) body = <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando...</div>;
