@@ -33,7 +33,7 @@ jobs:
       - name: Lint
         run: bun run lint
       - name: Unit and component tests
-        run: bun run vitest run --exclude src/test/security.integration.test.ts
+        run: bunx vitest run --exclude src/test/security.integration.test.ts
       - name: Production build
         run: bun run build
 
