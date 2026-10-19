@@ -4,7 +4,7 @@ import { enviadoEm, linkWhatsApp, normalizarTelefone, preencherModelo, useEnviad
 
 /** Opens wa.me with a filled template and logs the send to avoid duplicates. */
 export function WhatsButton({ label, chave, telefone, vars, clienteId, referenciaId, texto }: {
-  label: string; chave: string; telefone: string | null | undefined; vars: VarsMensagem; clienteId: string | null; referenciaId: string; texto?: string;
+  label: string; chave: string; telefone: string | null | undefined; vars: VarsMensagem; clienteId: string | null; referenciaId: string; texto?: string | undefined;
 }) {
   const modelos = useModelos();
   const enviadas = useEnviadas();
