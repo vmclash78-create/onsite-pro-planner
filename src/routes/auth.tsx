@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { maskTel, telefoneValido } from "@/lib/telefone";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -25,6 +26,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const [modo, setModo] = useState<"entrar" | "cadastrar">("entrar");
   const [nome, setNome] = useState("");
+  const [tel, setTel] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -45,9 +47,10 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
         if (error) throw error;
       } else {
+        if (!telefoneValido(tel)) { setErro("Digite o WhatsApp com DDD."); return; }
         const { data, error } = await supabase.auth.signUp({
           email, password: senha,
-          options: { emailRedirectTo: window.location.origin + "/inicio", data: { full_name: nome } },
+          options: { emailRedirectTo: window.location.origin + "/inicio", data: { full_name: nome.trim(), telefone: tel } },
         });
         if (error) throw error;
         if (!data.session) setAviso("Enviamos um link de confirmação para o seu e-mail.");
@@ -78,7 +81,10 @@ function AuthPage() {
           <h1 className="text-lg font-semibold">{modo === "entrar" ? "Entrar" : "Criar conta"}</h1>
           <form onSubmit={enviar} className="mt-4 space-y-3">
             {modo === "cadastrar" && (
-              <input className={input} placeholder="Nome de usuário (ex.: Livia Souza)" value={nome} onChange={(e) => setNome(e.target.value)} required minLength={2} maxLength={80} autoComplete="name" />
+              <>
+                <input className={input} placeholder="Nome de usuário (ex.: Livia Souza)" value={nome} onChange={(e) => setNome(e.target.value)} required minLength={2} maxLength={80} autoComplete="name" />
+                <input className={input} placeholder="WhatsApp (88) 99999-9999" value={tel} onChange={(e) => setTel(maskTel(e.target.value))} required inputMode="tel" autoComplete="tel" />
+              </>
             )}
             <input className={input} type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             <input className={input} type="password" placeholder="Senha (mínimo 6 caracteres)" minLength={6} value={senha} onChange={(e) => setSenha(e.target.value)} required autoComplete={modo === "entrar" ? "current-password" : "new-password"} />

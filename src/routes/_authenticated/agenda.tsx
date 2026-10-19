@@ -12,6 +12,8 @@ import { CATEGORIAS, STATUS_AG, TIPOS, useMe } from "@/lib/staff";
 import { excluirAgendamento, rotuloLembrete, textoLembrete, tipoLembrete } from "@/lib/agendamento";
 import { useClientes, useTecnicos } from "./-shared";
 import { WhatsButton } from "@/components/WhatsButton";
+import { useServerFn } from "@tanstack/react-start";
+import { notificarMembro } from "@/lib/push.functions";
 
 export const Route = createFileRoute("/_authenticated/agenda")({
   head: pageHead("Agenda", "Agenda semanal de serviços por dia e técnico."),
@@ -30,6 +32,7 @@ function Agenda() {
   const clientes = useClientes();
   const tecnicos = useTecnicos();
   const me = useMe();
+  const notificar = useServerFn(notificarMembro);
   const [inicio, setInicio] = useState(() => segunda(isoLocal()));
   const [aberto, setAberto] = useState(false);
   const vazio = { client_id: "", categoria: "Refrigeração", tipo: "Instalação", data: isoLocal(), hora: "08:00", tecnico_id: "", descricao: "" };
@@ -63,6 +66,9 @@ function Agenda() {
         categoria: f.categoria, tipo: f.tipo, data: f.data, hora: f.hora, descricao: f.descricao || null, status: "Agendada",
       });
       if (error) throw error;
+      if (f.tecnico_id && f.tecnico_id !== me.data?.id) {
+        void notificar({ data: { userId: f.tecnico_id, titulo: "Novo atendimento para você", texto: `${cli?.nome ?? "Cliente"} · ${f.categoria} – ${f.tipo} · ${dataBR(f.data)} às ${f.hora}`, url: "/agenda" } }).catch(() => undefined);
+      }
     },
     onSuccess: () => { setF(vazio); setAberto(false); inval(); },
   });

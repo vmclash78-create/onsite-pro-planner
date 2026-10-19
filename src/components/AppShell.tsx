@@ -13,6 +13,7 @@ import { canOpenPanel, canSeeNav } from "@/lib/access";
 import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
 import { DefinirNome } from "@/components/DefinirNome";
+import { AvisoNotificacao } from "@/components/AvisoNotificacao";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
@@ -166,7 +167,8 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
           </div>
         </header>
         <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">
-          {me.data?.precisaNome && <DefinirNome userId={me.data.id} />}
+          {me.data && (me.data.precisaNome || me.data.precisaTelefone) && <DefinirNome userId={me.data.id} pedirNome={me.data.precisaNome} pedirTelefone={me.data.precisaTelefone} />}
+          {me.data?.isStaff && <AvisoNotificacao />}
           {body}
         </main>
       </div>
