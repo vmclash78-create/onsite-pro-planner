@@ -17,7 +17,7 @@ export function normalizarTelefone(raw: string | null | undefined): string | nul
 
 export const linkWhatsApp = (tel: string, texto: string) => `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
 
-export type VarsMensagem = Partial<Record<"nome" | "servico" | "data" | "hora" | "tecnico" | "valor" | "modelo_aparelho", string>>;
+export type VarsMensagem = Partial<Record<"nome" | "servico" | "data" | "hora" | "tecnico" | "valor" | "modelo_aparelho" | "atendente", string>>;
 
 export const preencherModelo = (texto: string, vars: VarsMensagem) =>
   texto.replace(/\{(\w+)\}/g, (m, k: string) => (vars as Record<string, string | undefined>)[k] ?? m);

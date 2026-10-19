@@ -207,7 +207,7 @@ function NovoModelo() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["modelos"] }); toast.success("Modelo criado."); setTitulo(""); setTexto(""); setAberto(false); },
   });
   if (!aberto) return <div className="border-b px-4 py-3"><Button className="w-full sm:w-auto" onClick={() => setAberto(true)}><Plus className="mr-1 h-4 w-4" />Novo modelo</Button></div>;
-  const vars = ["{nome}", "{servico}", "{data}", "{hora}", "{tecnico}", "{valor}"];
+  const vars = ["{nome}", "{servico}", "{data}", "{hora}", "{tecnico}", "{valor}", "{atendente}"];
   return (
     <form className="space-y-2 border-b bg-muted/40 px-4 py-3" onSubmit={(e) => { e.preventDefault(); criar.mutate(); }}>
       <Field label="Nome do modelo"><input className={inputCls} value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Aviso de garantia" maxLength={80} /></Field>

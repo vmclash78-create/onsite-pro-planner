@@ -1,12 +1,14 @@
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { enviadoEm, linkWhatsApp, normalizarTelefone, preencherModelo, useEnviadas, useModelos, useRegistrarEnvio, type VarsMensagem } from "@/lib/cobranca";
+import { useMe } from "@/lib/staff";
 
 /** Opens wa.me with a filled template and logs the send to avoid duplicates. */
 export function WhatsButton({ label, chave, telefone, vars, clienteId, referenciaId, texto }: {
   label: string; chave: string; telefone: string | null | undefined; vars: VarsMensagem; clienteId: string | null; referenciaId: string; texto?: string | undefined;
 }) {
   const modelos = useModelos();
+  const me = useMe();
   const enviadas = useEnviadas();
   const registrar = useRegistrarEnvio();
   const ultimo = enviadas.data?.get(`${referenciaId}:${chave}`);
@@ -16,7 +18,8 @@ export function WhatsButton({ label, chave, telefone, vars, clienteId, referenci
     const m = modelos.data?.find((x) => x.chave === chave);
     if (!texto && !m) { toast.error("Modelo de mensagem não encontrado em Configurações."); return; }
     if (ultimo && !confirm(`Essa mensagem já foi ${enviadoEm(ultimo)}. Enviar de novo?`)) return;
-    window.open(linkWhatsApp(tel, texto ?? preencherModelo(m!.texto, vars)), "_blank", "noopener");
+    const atendente = (me.data?.nome ?? "").split(" ")[0] ?? "";
+    window.open(linkWhatsApp(tel, texto ?? preencherModelo(m!.texto, { atendente, ...vars })), "_blank", "noopener");
     registrar.mutate({ cliente_id: clienteId, tipo: chave, referencia_id: referenciaId });
   };
   return (
