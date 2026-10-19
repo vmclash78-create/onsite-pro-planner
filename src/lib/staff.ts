@@ -11,13 +11,15 @@ export function useMe() {
       if (!user) return null;
       const [{ data: roles }, { data: perfil }] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", user.id),
-        supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("nome, telefone").eq("id", user.id).maybeSingle(),
       ]);
       const r = (roles ?? []).map((x) => x.role as string);
       const bruto = (perfil?.nome ?? "").trim();
       const prefixo = (user.email ?? "").split("@")[0] ?? "";
       const precisaNome = !bruto || bruto.includes("@") || bruto.toLowerCase() === prefixo.toLowerCase();
-      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", precisaNome, roles: r, isDono: r.includes("dono"), isAdmin: r.includes("admin") || r.includes("dono"), isStaff: r.length > 0 };
+      const telefone = perfil?.telefone ?? "";
+      const precisaTelefone = telefone.replace(/\D/g, "").length < 10;
+      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", telefone, precisaNome, precisaTelefone, roles: r, isDono: r.includes("dono"), isAdmin: r.includes("admin") || r.includes("dono"), isStaff: r.length > 0 };
     },
     staleTime: 60_000,
   });
