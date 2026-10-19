@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ImagePlus, Loader2, MessageCircle, Sparkles, Trash2, X } from "lucide-react";
-import { excluirAgendamento } from "@/lib/agendamento";
+import { excluirAgendamento, rotuloLembrete, textoEmBreve, textoLembrete, tipoLembrete } from "@/lib/agendamento";
+import { WhatsButton } from "@/components/WhatsButton";
+import { isoLocal } from "@/lib/format";
 import { company } from "@/lib/company";
 import { AppShell } from "@/components/AppShell";
 import { Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
@@ -28,6 +30,8 @@ function Pedido() {
   const analisar = useServerFn(analisarPedido);
   const fileRef = useRef<HTMLInputElement>(null);
   const [descricao, setDescricao] = useState("");
+  const [editando, setEditando] = useState(false);
+  const [ed, setEd] = useState({ nome_contato: "", whatsapp: "", endereco: "", categoria: "", tipo: "", data: "", hora: "" });
 
   const q = useQuery({
     queryKey: ["pedido", id],
@@ -60,6 +64,23 @@ function Pedido() {
     },
     onSuccess: inval,
   });
+  const salvarEd = useMutation({
+    mutationFn: async () => {
+      if (!ed.nome_contato.trim() || !ed.whatsapp.trim()) throw new Error("Informe nome e WhatsApp.");
+      const { error } = await supabase.from("appointments").update({
+        nome_contato: ed.nome_contato.trim(), whatsapp: ed.whatsapp.trim(), endereco: ed.endereco.trim() || null,
+        categoria: ed.categoria.trim(), tipo: ed.tipo.trim(), data: ed.data || null, hora: ed.hora || null,
+        visita_orcamento: !ed.data,
+      }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { setEditando(false); inval(); },
+  });
+  const abrirEdicao = () => {
+    if (!p) return;
+    setEd({ nome_contato: p.nome_contato, whatsapp: p.whatsapp, endereco: p.endereco ?? "", categoria: p.categoria, tipo: p.tipo, data: p.data ?? "", hora: p.hora ?? "" });
+    setEditando(true);
+  };
   const excluir = useMutation({
     mutationFn: async () => { if (p) await excluirAgendamento(id, p.fotos); },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["pedidos"] }); qc.invalidateQueries({ queryKey: ["agenda"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); nav({ to: "/pedidos" }); },
@@ -127,6 +148,45 @@ function Pedido() {
                     ` Endereço: ${p.endereco ?? "a confirmar"}. Em caso de dúvidas, permanecemos à disposição.`
                   )}`}
                 ><MessageCircle className="h-4 w-4" /> Confirmar pelo WhatsApp</a>
+                {p.status !== "Cancelada" && p.status !== "Concluída" && (() => {
+                  const hoje = isoLocal();
+                  const servico = `${p.tipo} (${p.categoria})`;
+                  const vars = { nome: p.nome_contato, servico, data: p.data ? dataBR(p.data) : "", hora: p.hora ?? "", tecnico: "a definir" };
+                  const props = { telefone: p.whatsapp, clienteId: p.client_id, referenciaId: p.id, vars };
+                  const t = p.data ? tipoLembrete(p.data, hoje) : "passado";
+                  return (
+                    <div className="mt-3">
+                      <div className="mb-1.5 text-xs text-muted-foreground">Avisar o cliente</div>
+                      <div className="flex flex-wrap gap-2">
+                        {p.data && t !== "passado" && <WhatsButton label={rotuloLembrete(p.data, hoje)} chave="vespera" {...props}
+                          texto={textoLembrete({ nome: p.nome_contato, servico, data: p.data, hora: p.hora ?? "" }, hoje, company.name)} />}
+                        {t === "hoje" && <WhatsButton label="Próximo ao horário" chave="em_breve" {...props}
+                          texto={textoEmBreve({ nome: p.nome_contato, servico, hora: p.hora ?? "", tecnico: "" }, company.name)} />}
+                        <WhatsButton label="A caminho" chave="a_caminho" {...props} />
+                      </div>
+                    </div>
+                  );
+                })()}
+                {me.data?.isAdmin && !editando && (
+                  <button type="button" onClick={abrirEdicao} className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted sm:mr-2 sm:w-auto">Editar pedido</button>
+                )}
+                {editando && (
+                  <div className="mt-3 grid gap-2 rounded-md border p-3 sm:grid-cols-2">
+                    {([["nome_contato","Nome"],["whatsapp","WhatsApp"],["endereco","Endereço"],["categoria","Categoria"],["tipo","Serviço"]] as const).map(([k, l]) => (
+                      <label key={k} className="text-xs text-muted-foreground">{l}
+                        <input className={inputCls} value={ed[k]} onChange={(e) => setEd({ ...ed, [k]: e.target.value })} /></label>
+                    ))}
+                    <label className="text-xs text-muted-foreground">Data (vazio = visita)
+                      <input type="date" className={inputCls} value={ed.data} onChange={(e) => setEd({ ...ed, data: e.target.value })} /></label>
+                    <label className="text-xs text-muted-foreground">Hora
+                      <input type="time" className={inputCls} value={ed.hora} onChange={(e) => setEd({ ...ed, hora: e.target.value })} /></label>
+                    <div className="flex gap-2 sm:col-span-2">
+                      <button type="button" disabled={salvarEd.isPending} onClick={() => salvarEd.mutate()} className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">Salvar</button>
+                      <button type="button" onClick={() => setEditando(false)} className="h-9 rounded-md border px-4 text-sm">Cancelar</button>
+                    </div>
+                    {salvarEd.error && <p role="alert" className="text-xs text-destructive sm:col-span-2">{salvarEd.error.message}</p>}
+                  </div>
+                )}
                 {me.data?.isAdmin && (
                   <button type="button" disabled={excluir.isPending}
                     onClick={() => confirm("Excluir este pedido de vez? Fotos e dados serão apagados e não dá para desfazer. Para manter o histórico, mude a situação para \"Cancelada\".") && excluir.mutate()}

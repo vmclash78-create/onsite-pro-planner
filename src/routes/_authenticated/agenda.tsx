@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { addDias, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS, STATUS_AG, TIPOS, useMe } from "@/lib/staff";
-import { excluirAgendamento, rotuloLembrete, textoLembrete, tipoLembrete } from "@/lib/agendamento";
+import { excluirAgendamento, rotuloLembrete, textoEmBreve, textoLembrete, tipoLembrete } from "@/lib/agendamento";
 import { useClientes, useTecnicos } from "./-shared";
 import { WhatsButton } from "@/components/WhatsButton";
 import { useServerFn } from "@tanstack/react-start";
@@ -158,6 +158,8 @@ function Agenda() {
                                 <WhatsButton label="Confirmar" chave="confirmacao" {...p} />
                                 {t !== "passado" && <WhatsButton label={rotuloLembrete(dia, hoje)} chave="vespera" {...p}
                                   texto={t === "amanha" ? undefined : textoLembrete({ nome: a.nome_contato, servico, data: dia, hora: a.hora ?? "" }, hoje, "VM Climatização & Acabamentos")} />}
+                                {t === "hoje" && <WhatsButton label="Próximo ao horário" chave="em_breve" {...p}
+                                  texto={textoEmBreve({ nome: a.nome_contato, servico, hora: a.hora ?? "", tecnico: a.profiles?.nome ?? "" }, "VM Climatização & Acabamentos")} />}
                                 <WhatsButton label="A caminho" chave="a_caminho" {...p} />
                               </div>
                             );
