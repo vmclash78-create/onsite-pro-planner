@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import { enviadoEm, linkWhatsApp, normalizarTelefone, preencherModelo, useEnviadas, useModelos, useRegistrarEnvio, type VarsMensagem } from "@/lib/cobranca";
 
 /** Opens wa.me with a filled template and logs the send to avoid duplicates. */
-export function WhatsButton({ label, chave, telefone, vars, clienteId, referenciaId }: {
-  label: string; chave: string; telefone: string | null | undefined; vars: VarsMensagem; clienteId: string | null; referenciaId: string;
+export function WhatsButton({ label, chave, telefone, vars, clienteId, referenciaId, texto }: {
+  label: string; chave: string; telefone: string | null | undefined; vars: VarsMensagem; clienteId: string | null; referenciaId: string; texto?: string;
 }) {
   const modelos = useModelos();
   const enviadas = useEnviadas();
@@ -14,9 +14,9 @@ export function WhatsButton({ label, chave, telefone, vars, clienteId, referenci
     const tel = normalizarTelefone(telefone);
     if (!tel) { toast.error("Telefone inválido. Cadastre DDD + número."); return; }
     const m = modelos.data?.find((x) => x.chave === chave);
-    if (!m) { toast.error("Modelo de mensagem não encontrado em Configurações."); return; }
+    if (!texto && !m) { toast.error("Modelo de mensagem não encontrado em Configurações."); return; }
     if (ultimo && !confirm(`Essa mensagem já foi ${enviadoEm(ultimo)}. Enviar de novo?`)) return;
-    window.open(linkWhatsApp(tel, preencherModelo(m.texto, vars)), "_blank", "noopener");
+    window.open(linkWhatsApp(tel, texto ?? preencherModelo(m!.texto, vars)), "_blank", "noopener");
     registrar.mutate({ cliente_id: clienteId, tipo: chave, referencia_id: referenciaId });
   };
   return (
