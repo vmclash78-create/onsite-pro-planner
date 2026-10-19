@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { addDias, brl, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { useMe } from "@/lib/staff";
+import { CalculadoraServico } from "@/components/CalculadoraServico";
+
+const num = (s: string) => Number(s.replace(/\./g, "").replace(",", ".")) || 0;
 
 export const Route = createFileRoute("/_authenticated/ordem/$id")({
   head: pageHead("Ordem de serviço", "Peças usadas, fotos de antes e depois e aparelho atendido."),
@@ -52,7 +55,7 @@ function Ordem() {
   const inval = () => { for (const k of ["ordem", "orders", "stock", "estoque", "dashboard", "recebimentos", "equipment"]) qc.invalidateQueries({ queryKey: [k] }); };
 
   const upd = useMutation({
-    mutationFn: async (patch: { status?: string; equipment_id?: string | null; garantia_dias?: number }) => {
+    mutationFn: async (patch: { status?: string; equipment_id?: string | null; garantia_dias?: number; valor?: number; descricao?: string }) => {
       const p = patch.status ? { ...patch, concluida_em: patch.status === "Concluída" ? isoLocal() : null } : patch;
       const { error } = await supabase.from("service_orders").update(p).eq("id", id);
       if (error) throw error;
@@ -125,6 +128,15 @@ function Ordem() {
               </Field>
             </div>
           </Panel>
+
+          {me.data?.isAdmin && !bloqueado && (
+            <CalculadoraServico key={o.categoria} categoria={o.categoria} acao="Somar ao valor da OS" onAdd={(itens) => {
+              const extra = itens.reduce((a, i) => a + num(i.quantidade) * num(i.valor_unitario), 0);
+              const resumo = itens.map((i) => `${i.quantidade} × ${i.descricao}`).join("; ");
+              if (!confirm(`Somar ${brl(extra)} ao valor da OS e anotar os materiais na descrição?`)) return;
+              upd.mutate({ valor: Number(o.valor ?? 0) + extra, descricao: `${o.descricao}\nCálculo: ${resumo}` });
+            }} />
+          )}
 
           <Panel title="Peças e materiais usados" action={<span className="text-xs text-muted-foreground tabular-nums">Custo {brl(custoPecas)}</span>}>
             {bloqueado && <div className="border-b px-4 py-2 text-xs text-success">Já baixado do estoque. Volte a situação para alterar as peças.</div>}
