@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Loader2, MessageCircle, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, MessageCircle, Sparkles, Trash2, X } from "lucide-react";
+import { excluirAgendamento } from "@/lib/agendamento";
 import { company } from "@/lib/company";
 import { AppShell } from "@/components/AppShell";
 import { Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
@@ -22,6 +23,7 @@ const urgCor: Record<string, string> = { Alta: "text-destructive", Média: "text
 function Pedido() {
   const { id } = Route.useParams();
   const qc = useQueryClient();
+  const nav = useNavigate();
   const me = useMe();
   const analisar = useServerFn(analisarPedido);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -57,6 +59,10 @@ function Pedido() {
       if (error) throw error;
     },
     onSuccess: inval,
+  });
+  const excluir = useMutation({
+    mutationFn: async () => { if (p) await excluirAgendamento(id, p.fotos); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["pedidos"] }); qc.invalidateQueries({ queryKey: ["agenda"] }); qc.invalidateQueries({ queryKey: ["dashboard"] }); nav({ to: "/pedidos" }); },
   });
   const enviarFotos = useMutation({
     mutationFn: async (files: File[]) => {
@@ -121,6 +127,14 @@ function Pedido() {
                     ` Endereço: ${p.endereco ?? "a confirmar"}. Em caso de dúvidas, permanecemos à disposição.`
                   )}`}
                 ><MessageCircle className="h-4 w-4" /> Confirmar pelo WhatsApp</a>
+                {me.data?.isAdmin && (
+                  <button type="button" disabled={excluir.isPending}
+                    onClick={() => confirm("Excluir este pedido de vez? Fotos e dados serão apagados e não dá para desfazer. Para manter o histórico, mude a situação para \"Cancelada\".") && excluir.mutate()}
+                    className="mt-2 inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-destructive/40 px-4 text-sm font-medium text-destructive hover:bg-destructive/10 sm:ml-2 sm:mt-0 sm:w-auto">
+                    <Trash2 className="h-4 w-4" /> Excluir pedido
+                  </button>
+                )}
+                {excluir.error && <p role="alert" className="mt-2 text-xs text-destructive">{excluir.error.message}</p>}
               </div>
             </Panel>
 
