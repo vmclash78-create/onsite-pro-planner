@@ -14,7 +14,10 @@ export function useMe() {
         supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle(),
       ]);
       const r = (roles ?? []).map((x) => x.role as string);
-      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", roles: r, isDono: r.includes("dono"), isAdmin: r.includes("admin") || r.includes("dono"), isStaff: r.length > 0 };
+      const bruto = (perfil?.nome ?? "").trim();
+      const prefixo = (user.email ?? "").split("@")[0] ?? "";
+      const precisaNome = !bruto || bruto.includes("@") || bruto.toLowerCase() === prefixo.toLowerCase();
+      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", precisaNome, roles: r, isDono: r.includes("dono"), isAdmin: r.includes("admin") || r.includes("dono"), isStaff: r.length > 0 };
     },
     staleTime: 60_000,
   });
