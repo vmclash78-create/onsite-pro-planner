@@ -13,8 +13,8 @@ export function useMe() {
         supabase.from("user_roles").select("role").eq("user_id", user.id),
         supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle(),
       ]);
-      const r = (roles ?? []).map((x) => x.role);
-      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", roles: r, isAdmin: r.includes("admin"), isStaff: r.length > 0 };
+      const r = (roles ?? []).map((x) => x.role as string);
+      return { id: user.id, email: user.email ?? "", nome: perfil?.nome || user.email || "", roles: r, isDono: r.includes("dono"), isAdmin: r.includes("admin") || r.includes("dono"), isStaff: r.length > 0 };
     },
     staleTime: 60_000,
   });
