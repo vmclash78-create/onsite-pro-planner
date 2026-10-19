@@ -28,6 +28,6 @@
 - [x] PDF da OS
 - Comissão de técnicos: ideia futura, fora do escopo atual
 - [x] Unir vitrine + agendamento em uma página pública única (/agendar), /catalogo redireciona
-- [ ] Agenda: lembrete com a data certa (amanhã só na véspera)
-- [ ] Excluir pedido/agendamento (diferente de cancelar)
-- [ ] Calculadoras por área (Refrigeração, Elétrica, Gesso) no orçamento e na OS
+- [x] Agenda: lembrete com a data certa (amanhã só na véspera)
+- [x] Excluir pedido/agendamento (diferente de cancelar)
+- [x] Calculadoras por área (Refrigeração, Elétrica, Gesso) no orçamento e na OS
