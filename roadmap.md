@@ -31,3 +31,7 @@
 - [x] Agenda: lembrete com a data certa (amanhã só na véspera)
 - [x] Excluir pedido/agendamento (diferente de cancelar)
 - [x] Calculadoras por área (Refrigeração, Elétrica, Gesso) no orçamento e na OS
+
+- [ ] Vários serviços no mesmo agendamento/OS e listagem completa no PDF da OS (pendente)
+- [x] Dono edita nome/WhatsApp/especialidade/cargo da equipe; WhatsApp exigido no cadastro
+- [x] Aviso para ativar notificações; push ao técnico escalado e botão do dono para notificar
