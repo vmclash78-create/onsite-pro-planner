@@ -31,3 +31,8 @@ export async function excluirAgendamento(id: string, fotos: string[]) {
   if (error) throw error;
   if (fotos.length) await supabase.storage.from("pedidos").remove(fotos);
 }
+
+/** Same-day heads-up sent shortly before leaving for the appointment. */
+export function textoEmBreve(v: { nome: string; servico: string; hora: string; tecnico: string }, empresa: string) {
+  return `Olá ${v.nome}! Confirmando seu atendimento de ${v.servico} hoje${v.hora ? ` às ${v.hora}` : ""}. ${v.tecnico && v.tecnico !== "a definir" ? `${v.tecnico} já está` : "Nossa equipe já está"} se organizando para ir até você. Avisaremos quando estivermos a caminho. ${empresa}`;
+}
