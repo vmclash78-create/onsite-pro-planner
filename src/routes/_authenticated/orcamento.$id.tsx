@@ -11,7 +11,7 @@ import { brl, dataBR } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
 import { CATEGORIAS } from "@/lib/staff";
 import { useOrcamento } from "@/lib/orcamento";
-import { CalcGesso } from "@/components/CalcGesso";
+import { CalculadoraServico } from "@/components/CalculadoraServico";
 
 export const Route = createFileRoute("/_authenticated/orcamento/$id")({
   head: pageHead("Orçamento", "Itens, valores e impressão do orçamento."),
@@ -131,7 +131,7 @@ function Orcamento() {
             </div>
           </Panel>
 
-          <CalcGesso onAdd={(novos) => setItens([...itens, ...novos])} />
+          <CalculadoraServico categoria={categoria} onCategoria={setCategoria} onAdd={(novos) => setItens([...itens, ...novos])} />
 
 
           {(salvar.error || converter.error) && <p role="alert" className="text-xs text-destructive">{(salvar.error ?? converter.error)?.message}</p>}

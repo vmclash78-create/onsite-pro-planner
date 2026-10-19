@@ -10,7 +10,7 @@ const n = (s: string) => Number(s.replace(",", ".")) || 0;
 const fmt = (v: number) => v.toFixed(2).replace(".", ",");
 
 /** Area / linear-meter calculator that turns room measurements into quote lines. */
-export function CalcGesso({ onAdd }: { onAdd: (itens: NovoItem[]) => void }) {
+export function CalcGesso({ onAdd, acao = "Adicionar ao orçamento" }: { onAdd: (itens: NovoItem[]) => void; acao?: string }) {
   const [tipo, setTipo] = useState<TipoGesso>("Forro");
   const [larg, setLarg] = useState("");
   const [comp, setComp] = useState("");
@@ -43,7 +43,7 @@ export function CalcGesso({ onAdd }: { onAdd: (itens: NovoItem[]) => void }) {
       <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3 text-sm">
         <span className="tabular-nums"><b>{fmt(r.quantidade)} {r.unidade}</b> · {brl(r.quantidade * n(preco))}</span>
         {r.materiais.length > 0 && <span className="text-xs text-muted-foreground">Materiais: {r.materiais.map((m) => `${m.qtd} ${m.nome.toLowerCase()}`).join(", ")}</span>}
-        <Button type="button" size="sm" className="ml-auto" disabled={r.quantidade <= 0} onClick={adicionar}>Adicionar ao orçamento</Button>
+        <Button type="button" size="sm" className="ml-auto" disabled={r.quantidade <= 0} onClick={adicionar}>{acao}</Button>
       </div>
     </Panel>
   );
