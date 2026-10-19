@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { canOpenPanel, canSeeNav } from "@/lib/access";
 import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
+import { DefinirNome } from "@/components/DefinirNome";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
@@ -164,7 +165,10 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
             {me.data?.isAdmin && allowed && actions}
           </div>
         </header>
-        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">{body}</main>
+        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">
+          {me.data?.precisaNome && <DefinirNome userId={me.data.id} />}
+          {body}
+        </main>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">

@@ -78,7 +78,7 @@ function AuthPage() {
           <h1 className="text-lg font-semibold">{modo === "entrar" ? "Entrar" : "Criar conta"}</h1>
           <form onSubmit={enviar} className="mt-4 space-y-3">
             {modo === "cadastrar" && (
-              <input className={input} placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} required autoComplete="name" />
+              <input className={input} placeholder="Nome de usuário (ex.: Livia Souza)" value={nome} onChange={(e) => setNome(e.target.value)} required minLength={2} maxLength={80} autoComplete="name" />
             )}
             <input className={input} type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             <input className={input} type="password" placeholder="Senha (mínimo 6 caracteres)" minLength={6} value={senha} onChange={(e) => setSenha(e.target.value)} required autoComplete={modo === "entrar" ? "current-password" : "new-password"} />
