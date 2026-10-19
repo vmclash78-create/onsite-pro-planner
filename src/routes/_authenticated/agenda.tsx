@@ -1,13 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { Field, FormPanel, Panel, StateRow, StatusSelect, inputCls } from "@/components/kit";
 import { supabase } from "@/integrations/supabase/client";
 import { addDias, dataBR, isoLocal } from "@/lib/format";
 import { pageHead } from "@/lib/seo";
-import { CATEGORIAS, STATUS_AG, TIPOS } from "@/lib/staff";
+import { CATEGORIAS, STATUS_AG, TIPOS, useMe } from "@/lib/staff";
+import { excluirAgendamento, rotuloLembrete, textoLembrete, tipoLembrete } from "@/lib/agendamento";
 import { useClientes, useTecnicos } from "./-shared";
 import { WhatsButton } from "@/components/WhatsButton";
 
@@ -27,6 +29,7 @@ function Agenda() {
   const qc = useQueryClient();
   const clientes = useClientes();
   const tecnicos = useTecnicos();
+  const me = useMe();
   const [inicio, setInicio] = useState(() => segunda(isoLocal()));
   const [aberto, setAberto] = useState(false);
   const vazio = { client_id: "", categoria: "Refrigeração", tipo: "Instalação", data: isoLocal(), hora: "08:00", tecnico_id: "", descricao: "" };
@@ -70,6 +73,15 @@ function Agenda() {
     },
     onSuccess: inval,
   });
+  const excluir = useMutation({
+    mutationFn: async (aid: string) => {
+      const { data } = await supabase.from("appointments").select("fotos").eq("id", aid).maybeSingle();
+      await excluirAgendamento(aid, data?.fotos ?? []);
+    },
+    onSuccess: () => { inval(); toast.success("Agendamento excluído."); },
+    onError: (e) => toast.error(e.message),
+  });
+  const hoje = isoLocal();
 
   const dias = Array.from({ length: 7 }, (_, i) => addDias(inicio, i));
   const nomeDia = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long" });
@@ -130,18 +142,27 @@ function Agenda() {
                           <div className="truncate text-xs text-muted-foreground">{a.categoria} · {a.tipo}{a.profiles?.nome ? ` · ${a.profiles.nome}` : ""}</div>
                           <div className="truncate text-xs text-muted-foreground">{a.endereco}</div>
                           {a.status !== "Cancelada" && a.status !== "Concluída" && (() => {
-                            const vars = { nome: a.nome_contato, servico: `${a.tipo} (${a.categoria})`, data: dataBR(a.data ?? d), hora: a.hora ?? "", tecnico: a.profiles?.nome ?? "a definir" };
+                            const dia = a.data ?? d;
+                            const servico = `${a.tipo} (${a.categoria})`;
+                            const vars = { nome: a.nome_contato, servico, data: dataBR(dia), hora: a.hora ?? "", tecnico: a.profiles?.nome ?? "a definir" };
                             const p = { telefone: a.whatsapp, clienteId: a.client_id, referenciaId: a.id, vars };
+                            const t = tipoLembrete(dia, hoje);
                             return (
                               <div className="mt-2 flex flex-wrap gap-2">
                                 <WhatsButton label="Confirmar" chave="confirmacao" {...p} />
-                                <WhatsButton label="Lembrar amanhã" chave="vespera" {...p} />
+                                {t !== "passado" && <WhatsButton label={rotuloLembrete(dia, hoje)} chave="vespera" {...p}
+                                  texto={t === "amanha" ? undefined : textoLembrete({ nome: a.nome_contato, servico, data: dia, hora: a.hora ?? "" }, hoje, "VM Climatização & Acabamentos")} />}
                                 <WhatsButton label="A caminho" chave="a_caminho" {...p} />
                               </div>
                             );
                           })()}
                         </div>
-                        <div className="col-start-2 sm:col-start-auto"><StatusSelect value={a.status} options={STATUS_AG} onChange={(s) => status.mutate({ id: a.id, s })} /></div>
+                        <div className="col-start-2 flex items-center gap-1 sm:col-start-auto">
+                          <StatusSelect value={a.status} options={STATUS_AG} onChange={(s) => status.mutate({ id: a.id, s })} />
+                          {me.data?.isAdmin && <button type="button" aria-label="Excluir agendamento" title="Excluir"
+                            onClick={() => confirm(`Excluir de vez o agendamento de ${a.nome_contato}? Isso não pode ser desfeito. (Para guardar o histórico, use "Cancelada".)`) && excluir.mutate(a.id)}
+                            className="flex h-8 w-8 items-center justify-center rounded-[6px] text-muted-foreground hover:bg-muted hover:text-destructive"><Trash2 className="h-4 w-4" /></button>}
+                        </div>
                       </li>
                     ))}
                   </ul>
