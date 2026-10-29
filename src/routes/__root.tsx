@@ -109,17 +109,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" style={{ colorScheme: "light", background: "#ffffff" }}>
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <meta name="color-scheme" content="light" />
+        <meta name="color-scheme" content="light dark" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="VM Climatização" />
+        <script dangerouslySetInnerHTML={{ __html: TEMA_JS }} />
         <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
         <script dangerouslySetInnerHTML={{ __html: RECARREGAR_JS }} />
       </head>
-      <body style={{ background: "#ffffff" }}>
+      <body>
         <div id="vm-splash" aria-hidden="true">
           <img src="/icon-192.png" alt="" width={84} height={84} />
           <strong>VM Climatização &amp; Acabamentos</strong>
@@ -139,7 +140,13 @@ window.addEventListener("vite:preloadError",function(e){e.preventDefault();r("pr
 window.addEventListener("error",function(e){r(e.message)});
 window.addEventListener("unhandledrejection",function(e){r(e.reason&&(e.reason.message||e.reason))});})();`;
 
+const TEMA_JS = `(function(){try{var t=localStorage.getItem("vm-tema")||"claro";var p=location.pathname;var pub=/^\\/(agendar|catalogo|imprimir)/.test(p);var d=!pub&&(t==="escuro"||(t==="sistema"&&matchMedia("(prefers-color-scheme: dark)").matches));if(d){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark";}}catch(e){}})();`;
+
 const SPLASH_CSS = `
+html.dark,html.dark body{background:#0b0f17}
+html.dark #vm-splash{background:#0b0f17}
+html.dark #vm-splash strong{color:#e2e8f0}
+html.dark #vm-splash i{background:#1e293b}
 #vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
 #vm-splash img{border-radius:22px;box-shadow:0 10px 30px rgba(37,99,235,.18);animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
 #vm-splash strong{font-size:16px;font-weight:700;color:#1e293b}

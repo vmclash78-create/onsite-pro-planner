@@ -157,6 +157,65 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
+.dark {
+  --background: oklch(0.16 0.012 260);
+  --foreground: oklch(0.94 0.006 260);
+  --card: oklch(0.21 0.014 260);
+  --popover: oklch(0.22 0.014 260);
+  --primary: oklch(0.64 0.2 262);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.25 0.014 260);
+  --muted-foreground: oklch(0.7 0.015 260);
+  --accent: oklch(0.28 0.03 262);
+  --destructive: oklch(0.62 0.2 25);
+  --success: oklch(0.7 0.15 155);
+  --warning: oklch(0.78 0.14 80);
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.16);
+  --sidebar: oklch(0.18 0.013 260);
+  --sidebar-foreground: oklch(0.78 0.012 260);
+  --chart-1: oklch(0.7 0.12 262);
+  --chart-2: oklch(0.6 0.1 262);
+  --chart-3: oklch(0.5 0.08 262);
+  --chart-4: oklch(0.8 0.08 262);
+  --chart-5: oklch(0.42 0.06 262);
+}
+.dark body {
+  color-scheme: dark;
+  background:
+    radial-gradient(900px 500px at 10% -10%, oklch(0.4 0.15 262 / 0.22), transparent 60%),
+    radial-gradient(700px 400px at 100% 0%, oklch(0.45 0.12 220 / 0.14), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
+}
+
+/* Liquid Glass ampliado: topo, menus, modais e campos */
+.vm-topo {
+  background: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(170%);
+}
+[role="dialog"], [role="menu"], [role="listbox"], [data-radix-popper-content-wrapper] > * {
+  background: color-mix(in oklab, var(--popover) 82%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(170%);
+  border-color: color-mix(in oklab, var(--foreground) 12%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 8%, transparent), 0 24px 60px -20px oklch(0 0 0 / 0.45);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select {
+  background-color: color-mix(in oklab, var(--card) 70%, transparent);
+  transition: box-shadow 200ms, border-color 200ms;
+}
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+.dark .liquid-glass, .dark .rounded-xl.bg-card, .dark .rounded-2xl.bg-card {
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.07), 0 12px 32px -16px oklch(0 0 0 / 0.6);
+}
+.dark .liquid-pill {
+  background: color-mix(in oklab, var(--primary) 30%, transparent);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.12), 0 0 18px -4px color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.dark .print-area, .dark .print-area * { color-scheme: light; }
+
 :root {
   --gradient-top: none;
   --gradient-cta: linear-gradient(var(--primary), var(--primary));
