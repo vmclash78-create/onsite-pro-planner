@@ -167,7 +167,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
             {me.data?.isAdmin && allowed && actions}
           </div>
         </header>
-        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">
+        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-28 lg:px-8 lg:py-6">
           {me.data && (me.data.precisaNome || me.data.precisaTelefone) && <DefinirNome userId={me.data.id} pedirNome={me.data.precisaNome} pedirTelefone={me.data.precisaTelefone} />}
           {me.data?.isStaff && <AvisoNotificacao />}
           {body}
