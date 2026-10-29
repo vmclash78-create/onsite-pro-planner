@@ -14,6 +14,7 @@ import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
 import { DefinirNome } from "@/components/DefinirNome";
 import { AvisoNotificacao } from "@/components/AvisoNotificacao";
+import { BarraVidro } from "@/components/BarraVidro";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
