@@ -158,35 +158,53 @@
   &::-webkit-scrollbar { display: none; }
 }
 .dark {
-  --background: oklch(0.16 0.012 260);
-  --foreground: oklch(0.94 0.006 260);
-  --card: oklch(0.21 0.014 260);
-  --popover: oklch(0.22 0.014 260);
-  --primary: oklch(0.64 0.2 262);
+  --background: oklch(0.13 0.008 265);
+  --foreground: oklch(0.96 0.004 265);
+  --card: oklch(0.18 0.01 265);
+  --card-foreground: oklch(0.96 0.004 265);
+  --popover: oklch(0.19 0.01 265);
+  --popover-foreground: oklch(0.96 0.004 265);
+  --primary: oklch(0.66 0.18 258);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.25 0.014 260);
-  --muted-foreground: oklch(0.7 0.015 260);
-  --accent: oklch(0.28 0.03 262);
-  --destructive: oklch(0.62 0.2 25);
-  --success: oklch(0.7 0.15 155);
-  --warning: oklch(0.78 0.14 80);
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.16);
-  --sidebar: oklch(0.18 0.013 260);
-  --sidebar-foreground: oklch(0.78 0.012 260);
-  --chart-1: oklch(0.7 0.12 262);
-  --chart-2: oklch(0.6 0.1 262);
-  --chart-3: oklch(0.5 0.08 262);
-  --chart-4: oklch(0.8 0.08 262);
-  --chart-5: oklch(0.42 0.06 262);
+  --secondary: oklch(0.22 0.01 265);
+  --secondary-foreground: oklch(0.94 0.004 265);
+  --muted: oklch(0.22 0.01 265);
+  --muted-foreground: oklch(0.68 0.012 265);
+  --accent: oklch(0.24 0.025 258);
+  --accent-foreground: oklch(0.96 0.004 265);
+  --destructive: oklch(0.68 0.15 18);
+  --success: oklch(0.78 0.12 165);
+  --warning: oklch(0.82 0.11 78);
+  --border: oklch(1 0 0 / 0.08);
+  --input: oklch(1 0 0 / 0.12);
+  --ring: oklch(0.66 0.18 258);
+  --sidebar: oklch(0.15 0.009 265);
+  --sidebar-foreground: oklch(0.78 0.01 265);
+  --chart-1: oklch(0.7 0.13 258);
+  --chart-2: oklch(0.75 0.11 200);
+  --chart-3: oklch(0.78 0.12 165);
+  --chart-4: oklch(0.82 0.11 78);
+  --chart-5: oklch(0.68 0.15 18);
 }
 .dark body {
   color-scheme: dark;
   background:
-    radial-gradient(900px 500px at 10% -10%, oklch(0.4 0.15 262 / 0.22), transparent 60%),
-    radial-gradient(700px 400px at 100% 0%, oklch(0.45 0.12 220 / 0.14), transparent 60%),
+    radial-gradient(800px 420px at 0% -10%, oklch(0.45 0.16 258 / 0.16), transparent 65%),
+    radial-gradient(600px 360px at 100% 0%, oklch(0.55 0.1 210 / 0.08), transparent 65%),
     var(--background);
   background-attachment: fixed;
+}
+h1, h2, h3, .tabular-nums.text-2xl, .text-2xl, .text-3xl { letter-spacing: -0.025em; }
+.vm-kpi {
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 85%, transparent);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.06), 0 10px 28px -18px oklch(0 0 0 / 0.5);
+}
+.vm-chip {
+  display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 0.65rem;
+  background: color-mix(in oklab, var(--tone) 16%, transparent);
+  color: var(--tone);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.1);
 }
 
 /* Liquid Glass ampliado: topo, menus, modais e campos */

@@ -159,14 +159,14 @@ function ReceberResumo({ enabled }: { enabled: boolean }) {
     },
   });
   return (
-    <Link to="/receber" className="mt-5 grid grid-cols-2 overflow-hidden rounded-lg border bg-card hover:bg-muted/40">
-      <div className="border-r p-4">
-        <div className="text-xs text-muted-foreground">A receber</div>
-        <div className="mt-1 text-2xl font-semibold tabular-nums">{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.total ?? 0)}</div>
+    <Link to="/receber" className="mt-3 grid grid-cols-2 gap-3">
+      <div className="vm-kpi rounded-2xl p-4">
+        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">A receber</div>
+        <div className="mt-2 text-2xl font-semibold tabular-nums">{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.total ?? 0)}</div>
       </div>
-      <div className="p-4">
-        <div className="text-xs text-muted-foreground">Em atraso</div>
-        <div className="mt-1 text-2xl font-semibold tabular-nums text-destructive">{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.atraso ?? 0)}</div>
+      <div className="vm-kpi rounded-2xl p-4">
+        <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Em atraso</div>
+        <div className={`mt-2 text-2xl font-semibold tabular-nums ${(q.data?.atraso ?? 0) > 0 ? "text-destructive" : ""}`}>{q.isLoading ? "–" : q.error ? "!" : brl(q.data?.atraso ?? 0)}</div>
         <div className="mt-1 text-xs text-muted-foreground">{q.data ? `${q.data.n} cobrança(s)` : ""}</div>
       </div>
     </Link>
@@ -227,17 +227,17 @@ function Dashboard() {
       {me.data && <Saudacao nome={me.data.nome} />}
       {me.data?.isAdmin && <AvisoPedidos enabled />}
       {me.data?.isAdmin && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {([["/clientes", "Novo cliente", UserPlus], ["/ordens", "Nova OS", Wrench], ["/orcamentos", "Novo orçamento", FileText], ["/agenda", "Agendamento", CalendarPlus]] as const).map(([to, l, I]) => (
-          <Link key={to} to={to} className="flex items-center gap-2 rounded-lg border bg-card px-3 py-3 text-sm font-medium hover:bg-muted/50">
-            <I className="h-4 w-4 shrink-0 text-primary" /> <span className="truncate">{l}</span>
+        {([["/clientes", "Novo cliente", UserPlus, "var(--chart-2)"], ["/ordens", "Nova OS", Wrench, "var(--primary)"], ["/orcamentos", "Novo orçamento", FileText, "var(--warning)"], ["/agenda", "Agendamento", CalendarPlus, "var(--success)"]] as const).map(([to, l, I, tone]) => (
+          <Link key={to} to={to} className="vm-kpi flex items-center gap-2.5 rounded-2xl px-3 py-3 text-sm font-medium transition hover:bg-muted/50">
+            <span className="vm-chip shrink-0" style={{ ["--tone" as string]: tone }}><I className="h-4 w-4" /></span> <span className="truncate">{l}</span>
           </Link>
         ))}
       </div>}
-      <div className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card lg:grid-cols-4">
-        {kpis.map((k, i) => (
-          <div key={k.r} className={`p-4 ${i < 2 ? "border-b lg:border-b-0" : ""} ${i % 2 === 0 ? "border-r" : ""} ${i === 1 ? "lg:border-r" : ""} ${i === 3 ? "lg:border-r-0" : ""}`}>
-            <div className="text-xs text-muted-foreground">{k.r}</div>
-            <div className="mt-1 text-2xl font-semibold tabular-nums">{q.isLoading ? "–" : k.v}</div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {kpis.map((k) => (
+          <div key={k.r} className="vm-kpi rounded-2xl p-4">
+            <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{k.r}</div>
+            <div className="mt-2 text-3xl font-semibold tabular-nums">{q.isLoading ? "–" : k.v}</div>
             <div className={`mt-1 text-xs ${k.t}`}>{q.isLoading ? "" : k.s}</div>
           </div>
         ))}
