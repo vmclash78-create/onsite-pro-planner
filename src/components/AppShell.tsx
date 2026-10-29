@@ -14,6 +14,7 @@ import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
 import { DefinirNome } from "@/components/DefinirNome";
 import { AvisoNotificacao } from "@/components/AvisoNotificacao";
+import { BarraVidro } from "@/components/BarraVidro";
 
 type NavItem = { to: string; label: string; icon: typeof Users };
 export const navGroups: { titulo: string; itens: NavItem[] }[] = [
@@ -166,25 +167,15 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
             {me.data?.isAdmin && allowed && actions}
           </div>
         </header>
-        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-24 lg:px-8 lg:py-6">
+        <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-28 lg:px-8 lg:py-6">
           {me.data && (me.data.precisaNome || me.data.precisaTelefone) && <DefinirNome userId={me.data.id} pedirNome={me.data.precisaNome} pedirTelefone={me.data.precisaTelefone} />}
           {me.data?.isStaff && <AvisoNotificacao />}
           {body}
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {[
-          { to: "/inicio", label: "Início", icon: LayoutDashboard },
-          { to: "/agenda", label: "Agenda", icon: CalendarDays },
-          me.data?.isAdmin ? { to: "/pedidos", label: "Pedidos", icon: Inbox } : { to: "/ordens", label: "Ordens", icon: Wrench },
-          { to: "/mais", label: "Mais", icon: MoreHorizontal },
-        ].map(({ to, label, icon: Icon }) => (
-          <Link key={to} to={to} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground" activeProps={{ className: "!text-primary font-medium" }}>
-            <Icon className="h-5 w-5" strokeWidth={1.75} />{label}
-          </Link>
-        ))}
-      </nav>
+      <BarraVidro isAdmin={!!me.data?.isAdmin} />
+
     </div>
   );
 }
