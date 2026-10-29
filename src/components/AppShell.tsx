@@ -173,18 +173,8 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card pb-[env(safe-area-inset-bottom)] lg:hidden">
-        {[
-          { to: "/inicio", label: "Início", icon: LayoutDashboard },
-          { to: "/agenda", label: "Agenda", icon: CalendarDays },
-          me.data?.isAdmin ? { to: "/pedidos", label: "Pedidos", icon: Inbox } : { to: "/ordens", label: "Ordens", icon: Wrench },
-          { to: "/mais", label: "Mais", icon: MoreHorizontal },
-        ].map(({ to, label, icon: Icon }) => (
-          <Link key={to} to={to} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground" activeProps={{ className: "!text-primary font-medium" }}>
-            <Icon className="h-5 w-5" strokeWidth={1.75} />{label}
-          </Link>
-        ))}
-      </nav>
+      <BarraVidro isAdmin={!!me.data?.isAdmin} />
+
     </div>
   );
 }
