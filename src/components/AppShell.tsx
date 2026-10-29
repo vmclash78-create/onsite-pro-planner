@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { canOpenPanel, canSeeNav } from "@/lib/access";
 import { definirContador, avisoSistema } from "@/lib/notificacoes";
 import { toast } from "sonner";
+import { SeletorTema } from "@/components/SeletorTema";
 import { DefinirNome } from "@/components/DefinirNome";
 import { AvisoNotificacao } from "@/components/AvisoNotificacao";
 import { BarraVidro } from "@/components/BarraVidro";
@@ -151,7 +152,7 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
       </aside>
 
       <div className="min-w-0 lg:pl-60">
-        <header className="border-b px-4 pb-4 pt-5 lg:px-8 lg:pt-6">
+        <header className="vm-topo sticky top-0 z-20 border-b px-4 pb-4 pt-5 lg:px-8 lg:pt-6">
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             <div className="min-w-0">
               <div className="flex min-w-0 flex-wrap items-center gap-1 text-xs text-muted-foreground">
@@ -164,7 +165,10 @@ export function AppShell({ title, breadcrumb, actions, children }: { title: stri
               </div>
               <h1 className="mt-1 text-xl font-semibold">{title}</h1>
             </div>
-            {me.data?.isAdmin && allowed && actions}
+            <div className="flex items-center gap-2">
+              {me.data?.isAdmin && allowed && actions}
+              <SeletorTema />
+            </div>
           </div>
         </header>
         <main className="panel-content mx-auto min-w-0 max-w-7xl px-4 py-5 pb-28 lg:px-8 lg:py-6">
