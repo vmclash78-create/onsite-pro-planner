@@ -227,7 +227,7 @@ function Dashboard() {
       {me.data && <Saudacao nome={me.data.nome} />}
       {me.data?.isAdmin && <AvisoPedidos enabled />}
       {me.data?.isAdmin && <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {([["/clientes", "Novo cliente", UserPlus, "var(--chart-2)"], ["/ordens", "Nova OS", Wrench, "var(--primary)"], ["/orcamentos", "Novo orçamento", FileText, "var(--warning)"], ["/agenda", "Agendamento", CalendarPlus, "var(--success)"]] as const).map(([to, l, I, tone]) => (
+        {([["/clientes", "Novo cliente", UserPlus, "var(--primary)"], ["/ordens", "Nova OS", Wrench, "var(--primary)"], ["/orcamentos", "Novo orçamento", FileText, "var(--primary)"], ["/agenda", "Agendamento", CalendarPlus, "var(--primary)"]] as const).map(([to, l, I, tone]) => (
           <Link key={to} to={to} className="vm-kpi flex items-center gap-2.5 rounded-2xl px-3 py-3 text-sm font-medium transition hover:bg-muted/50">
             <span className="vm-chip shrink-0" style={{ ["--tone" as string]: tone }}><I className="h-4 w-4" /></span> <span className="truncate">{l}</span>
           </Link>
