@@ -192,8 +192,8 @@ function Agendar() {
         <footer className="ft">
           <a className="b go" href={`${company.whatsappUrl}?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">Confirmar solicitação via WhatsApp</a>
           <div className="bt" style={{ marginTop: 10 }}>
-            <Button variant="ghost" className="b bk" onClick={() => recomecar("agendar")}>Novo agendamento</Button>
-            <Button variant="ghost" className="b bk" onClick={() => recomecar("vitrine")}>Ver serviços</Button>
+            <Button variant="ghost" className="b bk fim" onClick={() => recomecar("agendar")}>Novo agendamento</Button>
+            <Button variant="ghost" className="b bk fim" onClick={() => recomecar("vitrine")}>Ver serviços</Button>
           </div>
         </footer>
       </div></div>

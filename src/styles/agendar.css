@@ -174,3 +174,7 @@
 .vm-ag .go,.vm-ag a.go{box-shadow:0 10px 24px -12px var(--ac)}
 .vm-ag .go:disabled{opacity:.4;box-shadow:none}
 .vm-ag .card{border-radius:14px}
+
+/* Botões finais da confirmação dividem a largura sem cortar o texto */
+.vm-ag .bt .bk.fim{flex:1;width:auto;min-width:0;padding:0 10px;white-space:nowrap;font-size:15px}
+.vm-ag .ft{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
