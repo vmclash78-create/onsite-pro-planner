@@ -141,7 +141,7 @@ window.addEventListener("vite:preloadError",function(e){e.preventDefault();r("pr
 window.addEventListener("error",function(e){r(e.message)});
 window.addEventListener("unhandledrejection",function(e){r(e.reason&&(e.reason.message||e.reason))});})();`;
 
-const TEMA_JS = `(function(){try{var t=localStorage.getItem("vm-tema")||"sistema";var p=location.pathname;var pub=/^\\/(agendar|catalogo|imprimir)/.test(p);var d=!pub&&(t==="escuro"||(t==="sistema"&&matchMedia("(prefers-color-scheme: dark)").matches));if(d){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark";}}catch(e){}})();`;
+const TEMA_JS = `(function(){try{var L=localStorage;if(!L.getItem("vm-tema-v2")){L.setItem("vm-tema","sistema");L.setItem("vm-tema-v2","1");}var mq=matchMedia("(prefers-color-scheme: dark)");function ap(){var t=L.getItem("vm-tema")||"sistema";var pub=/^\\/(agendar|catalogo|imprimir)/.test(location.pathname);var d=!pub&&(t==="escuro"||(t==="sistema"&&mq.matches));var h=document.documentElement;h.classList.toggle("dark",d);h.style.colorScheme=d?"dark":"light";}ap();var f=function(){if((L.getItem("vm-tema")||"sistema")==="sistema")ap();};mq.addEventListener?mq.addEventListener("change",f):mq.addListener(f);document.addEventListener("visibilitychange",function(){if(!document.hidden)f();});window.addEventListener("pageshow",f);window.addEventListener("focus",f);}catch(e){}})();`;
 
 const SPLASH_CSS = `
 html.dark,html.dark body{background:#000}
