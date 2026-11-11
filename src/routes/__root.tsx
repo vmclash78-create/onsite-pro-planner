@@ -82,7 +82,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "VM Climatização & Acabamentos — Gestão de Serviços" },
       { name: "description", content: "Gestão de refrigeração, gesso e elétrica" },
       { name: "author", content: "VM Climatização & Acabamentos" },
-      { name: "theme-color", content: "#000000" },
+      { name: "theme-color", content: "#ffffff", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#000000", media: "(prefers-color-scheme: dark)" },
       { property: "og:site_name", content: "VM Climatização & Acabamentos" },
       { property: "og:title", content: "VM Climatização & Acabamentos — Gestão de Serviços" },
       { property: "og:description", content: "Gestão de refrigeração, gesso e elétrica" },
@@ -140,15 +141,18 @@ window.addEventListener("vite:preloadError",function(e){e.preventDefault();r("pr
 window.addEventListener("error",function(e){r(e.message)});
 window.addEventListener("unhandledrejection",function(e){r(e.reason&&(e.reason.message||e.reason))});})();`;
 
-const TEMA_JS = `(function(){try{var t=localStorage.getItem("vm-tema")||"claro";var p=location.pathname;var pub=/^\\/(agendar|catalogo|imprimir)/.test(p);var d=!pub&&(t==="escuro"||(t==="sistema"&&matchMedia("(prefers-color-scheme: dark)").matches));if(d){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark";}}catch(e){}})();`;
+const TEMA_JS = `(function(){try{var t=localStorage.getItem("vm-tema")||"sistema";var p=location.pathname;var pub=/^\\/(agendar|catalogo|imprimir)/.test(p);var d=!pub&&(t==="escuro"||(t==="sistema"&&matchMedia("(prefers-color-scheme: dark)").matches));if(d){document.documentElement.classList.add("dark");document.documentElement.style.colorScheme="dark";}}catch(e){}})();`;
 
 const SPLASH_CSS = `
 html.dark,html.dark body{background:#000}
-#vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#000;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
+#vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
+html.dark #vm-splash{background:#000}
 #vm-splash img{border-radius:22px;box-shadow:0 10px 40px rgba(37,99,235,.25);animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
-#vm-splash strong{font-size:16px;font-weight:700;color:#f5f5f5}
+#vm-splash strong{font-size:16px;font-weight:700;color:#111}
+html.dark #vm-splash strong{color:#f5f5f5}
 #vm-splash span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a8a8e}
-#vm-splash i{display:block;width:140px;height:3px;border-radius:3px;background:#1c1c1e;overflow:hidden;margin-top:22px}
+#vm-splash i{display:block;width:140px;height:3px;border-radius:3px;background:#e5e7eb;overflow:hidden;margin-top:22px}
+html.dark #vm-splash i{background:#1c1c1e}
 #vm-splash b{display:block;width:40%;height:100%;border-radius:3px;background:#2563eb;animation:vmBar 1.1s ease-in-out infinite}
 html.vm-pronto #vm-splash{opacity:0;visibility:hidden;pointer-events:none}
 @keyframes vmPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.85}}
