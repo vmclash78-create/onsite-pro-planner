@@ -81,6 +81,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "VM Climatização & Acabamentos — Gestão de Serviços" },
       { name: "description", content: "Gestão de refrigeração, gesso e elétrica" },
+      { name: "application-name", content: "VM Climatização" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { name: "author", content: "VM Climatização & Acabamentos" },
       { name: "theme-color", content: "#ffffff", media: "(prefers-color-scheme: light)" },
       { name: "theme-color", content: "#000000", media: "(prefers-color-scheme: dark)" },
@@ -99,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Archivo:wght@600;800&family=Figtree:wght@400;600&display=swap" },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "manifest", href: "/manifest.json" },
     ],
   }),
   shellComponent: RootShell,
@@ -165,6 +167,14 @@ function RootComponent() {
   useEffect(() => {
     const t = setTimeout(() => document.documentElement.classList.add("vm-pronto"), 350);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    // Messaging/install worker only (no caching); skipped in previews and iframes.
+    const h = location.hostname.toLowerCase();
+    const preview = window.self !== window.top || /^(id-preview|preview)(-[a-z0-9]+)?--/.test(h) || h.endsWith("lovableproject.com") || h === "localhost";
+    if (preview || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("/push-sw.js", { scope: "/" }).catch(() => {});
   }, []);
 
   return (
