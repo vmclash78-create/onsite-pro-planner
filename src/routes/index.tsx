@@ -1,17 +1,23 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
+const OG = "https://vmclimatizacao.lovable.app/og-agendar.jpg";
+const T = "Agendamento · VM Climatização & Acabamentos";
+const D = "Solicite serviços e orçamentos de climatização, gesso e elétrica em Hidrolândia e região e em Fortaleza/CE.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Painel — VM Climatização & Acabamentos" },
-      { name: "description", content: "Painel de gestão da VM Climatização & Acabamentos." },
-      { property: "og:title", content: "Painel — VM Climatização & Acabamentos" },
-      { property: "og:description", content: "Painel de gestão da VM Climatização & Acabamentos." },
+      { title: T },
+      { name: "description", content: D },
+      { property: "og:title", content: T },
+      { property: "og:description", content: D },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: OG },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: OG },
     ],
   }),
   beforeLoad: () => {
-    throw redirect({ to: "/inicio" });
+    throw redirect({ to: "/agendar" });
   },
 });
