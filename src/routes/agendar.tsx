@@ -359,7 +359,7 @@ function Brand() {
   return (
     <header className="brand">
       <div className="logo"><img src={logoSimbolo.url} alt="VM Climatização" width={22} height={22} /></div>
-      <div><b>{company.name}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
+      <div><b>{company.name.replace(" & ", " &\u00a0")}</b><span>Climatização · Gesso · Instalações elétricas · {company.city}/{company.state}</span></div>
     </header>
   );
 }

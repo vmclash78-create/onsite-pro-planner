@@ -119,6 +119,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="VM Climatização" />
+        <script dangerouslySetInnerHTML={{ __html: "addEventListener(\"beforeinstallprompt\",function(e){e.preventDefault();window.__bip=e;dispatchEvent(new Event(\"vm-bip\"))})" }} />
         <script dangerouslySetInnerHTML={{ __html: TEMA_JS }} />
         <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
         <script dangerouslySetInnerHTML={{ __html: RECARREGAR_JS }} />
