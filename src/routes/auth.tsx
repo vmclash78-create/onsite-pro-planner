@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { InstalarApp } from "@/components/InstalarApp";
 import logoV from "@/assets/logo-vertical-escuro.png.asset.json";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -100,6 +101,7 @@ function AuthPage() {
         <button onClick={() => setModo(modo === "entrar" ? "cadastrar" : "entrar")} className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground">
           {modo === "entrar" ? "Não tem conta? Criar conta" : "Já tem conta? Entrar"}
         </button>
+        <div className="mt-6"><InstalarApp /></div>
       </div>
     </main>
   );

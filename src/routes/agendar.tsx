@@ -349,6 +349,7 @@ function Agendar() {
         </div>
         {erroEnvio && <p className="alt envio-erro" role="alert">{erroEnvio}</p>}
         {step === 1 && <p className="alt">Atendimento direto: <a href={company.whatsappUrl}>WhatsApp {company.phoneDisplay}</a></p>}
+        {step === 1 && <p className="alt"><Link to="/auth">Área da equipe</Link></p>}
       </footer>
       </>)}
     </div></div>
