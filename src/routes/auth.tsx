@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { InstalarApp } from "@/components/InstalarApp";
-import logoV from "@/assets/logo-vertical-escuro.png.asset.json";
+import logoClaro from "@/assets/logo-vertical-escuro.png.asset.json";
+import logoEscuro from "@/assets/logo-vertical.png.asset.json";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -71,7 +72,8 @@ function AuthPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <img src={logoV.url} alt="VM Climatização & Acabamentos" className="mx-auto mb-4 h-32 w-auto object-contain" />
+        <img src={logoClaro.url} alt="VM Climatização & Acabamentos" className="mx-auto mb-4 h-32 w-auto object-contain dark:hidden" />
+        <img src={logoEscuro.url} alt="VM Climatização & Acabamentos" className="mx-auto mb-4 hidden h-32 w-auto object-contain dark:block" />
         <div className="flex items-center justify-center gap-2.5 text-center">
           <div className="leading-tight">
             <div className="text-sm font-semibold">VM Climatização & Acabamentos</div>

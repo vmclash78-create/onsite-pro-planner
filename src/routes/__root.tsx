@@ -126,7 +126,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         <div id="vm-splash" aria-hidden="true">
-          <img src="/icon-192.png" alt="" width={84} height={84} />
+          <img src="/favicon.png" alt="" width={84} height={84} />
           <strong>VM Climatização &amp; Acabamentos</strong>
           <span>Climatização · Gesso · Elétrica</span>
           <i><b /></i>
@@ -150,7 +150,7 @@ const SPLASH_CSS = `
 html.dark,html.dark body{background:#000}
 #vm-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;font-family:Inter,system-ui,sans-serif;transition:opacity .45s ease,visibility .45s;}
 html.dark #vm-splash{background:#000}
-#vm-splash img{border-radius:22px;box-shadow:0 10px 40px rgba(37,99,235,.25);animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
+#vm-splash img{object-fit:contain;animation:vmPulse 1.6s ease-in-out infinite;margin-bottom:14px}
 #vm-splash strong{font-size:16px;font-weight:700;color:#111}
 html.dark #vm-splash strong{color:#f5f5f5}
 #vm-splash span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8a8a8e}
